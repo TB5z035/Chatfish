@@ -1,6 +1,6 @@
-# Meeting Board
+# FishChat
 
-Manage meetings.
+A web chat application for the course of Software Engineering.
 
 The backend was bootstrapped with [`django-admin startproject app`](https://docs.djangoproject.com/en/2.2/ref/django-admin/).
 The frontend was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
