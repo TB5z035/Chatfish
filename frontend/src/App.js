@@ -1,16 +1,18 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
+import Button from '@material-ui/core/Button'
+import SignInSide from './login'
 
 function App () {
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello World!
-        </p>
-      </header>
+      </header> */}
+      <body>
+        <SignInSide></SignInSide>
+      </body>
     </div>
   )
 }
