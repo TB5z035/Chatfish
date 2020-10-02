@@ -9,9 +9,12 @@
   "keywords": [
     "websocket"
   ],
-  "author": "wzf2000 && zwd",
+  "author": "wzf2000 & zwd",
   "license": "ISC",
   "dependencies": {
+    "connect": "^3.7.0",
+    "http": "0.0.1-security",
+    "http-proxy-middleware": "^1.0.5",
     "nodejs-websocket": "^1.7.2"
   }
 }
