@@ -2,4 +2,4 @@
 python manage.py makemigrations
 python manage.py migrate
 gunicorn 'app.wsgi' -b 0.0.0.0:8000 --access-logfile - --log-level info &
-node websocket_server/websocket_server.js
+node server/server.js
