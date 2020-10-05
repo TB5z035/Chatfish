@@ -1,20 +1,23 @@
 {
-  "name": "websocket_server",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Websocket server used node.js.",
-  "main": "websocket_server.js",
+  "description": "Web server used node.js.",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "websocket"
   ],
-  "author": "wzf2000 & zwd",
+  "author": "wzf2000",
   "license": "ISC",
   "dependencies": {
     "connect": "^3.7.0",
+    "cookie": "^0.4.1",
+    "crypto": "^1.0.1",
     "http": "0.0.1-security",
     "http-proxy-middleware": "^1.0.5",
-    "nodejs-websocket": "^1.7.2"
+    "nodejs-websocket": "^1.7.2",
+    "socket.io": "^2.3.0"
   }
 }

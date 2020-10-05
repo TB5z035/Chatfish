@@ -18,8 +18,8 @@ ENV BACKEND=/opt/backend
 
 WORKDIR $BACKEND
 
-COPY websocket_server/package.json $BACKEND
-COPY websocket_server/package-lock.json $BACKEND
+COPY server/package.json $BACKEND
+COPY server/package-lock.json $BACKEND
 RUN npm install
 
 # Second Stage, build the backend
@@ -41,7 +41,7 @@ COPY . $HOME
 COPY --from=0 /opt/frontend/build frontend/build
 
 # Copy backend node_modules directory from the first stage
-COPY --from=0 /opt/backend/node_modules websocket_server/node_modules
+COPY --from=0 /opt/backend/node_modules server/node_modules
 
 ENV EXPOSE_PORT 80
 EXPOSE 80
