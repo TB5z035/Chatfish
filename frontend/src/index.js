@@ -5,9 +5,9 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import thunk from 'redux-thunk'
 import logger from 'redux-logger'
-import { createStore, combineReducers, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
-import * as reducers from './reducers'
+import chat from './reducers/index'
 import { BrowserRouter } from 'react-router-dom'
 import { SnackbarProvider } from 'notistack'
 import Button from '@material-ui/core/Button'
@@ -16,7 +16,7 @@ let middleware = [thunk]
 if (process.env.NODE_ENV !== 'production') {
   middleware = [...middleware, logger]
 }
-const store = createStore(combineReducers(reducers), applyMiddleware(...middleware))
+const store = createStore(chat, applyMiddleware(...middleware))
 
 const notistackRef = React.createRef()
 const onClickDismiss = key => () => {
