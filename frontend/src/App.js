@@ -3,6 +3,7 @@ import logo from './logo.svg'
 import './App.css'
 import Button from '@material-ui/core/Button'
 import SignInSide from './login'
+import DashBoard from './Board/Dashboard'
 
 function App () {
   return (
