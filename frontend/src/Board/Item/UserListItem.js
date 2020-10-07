@@ -6,56 +6,67 @@ import {
   ListItemAvatar,
   Typography,
   Card,
-  Box
+  Box, Avatar
 } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import {
+  deepOrange,
+  deepPurple,
+} from '@material-ui/core/colors';
 
-
-export default function UserListItem() {
+export default function UserListItem(name, time, recent) {
 
   const classes = makeStyles((theme) => ({
     root: {
-      width: '100%',
-      maxWidth: '36ch',
-      backgroundColor: theme.palette.background.paper,
+      display: 'flex',
+      '& > *': {
+        margin: theme.spacing(1),
+      },
     },
     inline: {
-      display: 'inline',
+      display: 'inline-block',
     },
   }));
 
   return (
     <div>
-      <Card rasied>
-        <ListItem button alignItems="flex-start">
-          <ListItemAvatar>
-
-          </ListItemAvatar>
-          <ListItemText
-            primary={"Brunch this weekend?"}
-            secondary={
-              <Box>
-                <React.Fragment>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    Ali Connors
+      <ListItem button alignItems="flex-start">
+        <ListItemAvatar>
+          <Avatar > {name.toString()[0]} </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary={name}
+          secondary={
+            <React.Fragment>
+              <Typography
+                component="div"
+                variant="body2"
+                className={classes.inline}
+                noWrap
+              >
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="textPrimary"
+                  noWrap
+                >
+                  {time ? time : "time" + " - "}
                 </Typography>
-                  {" — I'll be in your neighborhood doing errands this…"}
-                </React.Fragment>
-              </Box>
-            }
-          />
-        </ListItem>
-      </Card>
+                <Typography
+                  component="span"
+                  variant="body2"
+                  color="textSecondary"
+                  noWrap
+                >
+                  {recent ? recent : "recent messages blah blah blah"}
+                </Typography>
+              </Typography>
+            </React.Fragment>
+          }
+        />
+      </ListItem>
     </div>
   )
 }
-
-
-// export default UserListItem;
