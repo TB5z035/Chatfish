@@ -14,21 +14,36 @@ RUN npm install
 COPY frontend/ $FRONTEND
 RUN npm run build
 
-# Second stage for the backend
-FROM python:3.8.5
+ENV BACKEND=/opt/backend
+
+WORKDIR $BACKEND
+
+COPY server/package.json $BACKEND
+COPY server/package-lock.json $BACKEND
+RUN npm install
+
+# Second Stage, build the backend
+
+FROM nikolaik/python-nodejs:latest
 
 ENV HOME=/opt/app
 
 WORKDIR $HOME
 
 COPY requirements.txt $HOME
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+
+RUN npm config set registry https://registry.npm.taobao.org &&\
+    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
 COPY . $HOME
 
 # Copy frontend from the first stage
 COPY --from=0 /opt/frontend/build frontend/build
 
+# Copy backend node_modules directory from the first stage
+COPY --from=0 /opt/backend/node_modules server/node_modules
+
+ENV EXPOSE_PORT 80
 EXPOSE 80
 
 ENV PYTHONUNBUFFERED=true

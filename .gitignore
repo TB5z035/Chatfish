@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # Environments
+.vscode
 .env
 .venv
 env/
@@ -22,3 +23,4 @@ xunit-reports/
 *.sqlite3
 
 frontend/.idea
+.idea
