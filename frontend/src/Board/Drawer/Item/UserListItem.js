@@ -1,32 +1,31 @@
-import React from 'react'
+import React from "react"
 import {
   ListItem,
   ListItemText,
   ListItemAvatar,
   Typography,
-  Avatar,
+  Avatar
 } from "@material-ui/core"
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from "@material-ui/core/styles"
 
 export default function UserListItem(name, time, recent) {
-
   const classes = makeStyles((theme) => ({
     root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
+      display: "flex",
+      "& > *": {
+        margin: theme.spacing(1)
+      }
     },
     inline: {
-      display: 'inline-block',
-    },
+      display: "inline-block"
+    }
   }))
 
   return (
     <div>
       <ListItem button alignItems="flex-start">
         <ListItemAvatar>
-          <Avatar > {name.toString()[0]} </Avatar>
+          <Avatar> {name.toString()[0]} </Avatar>
         </ListItemAvatar>
         <ListItemText
           primary={name}
