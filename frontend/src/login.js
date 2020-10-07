@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
+import sha1 from 'crypto-js/sha1'
 
 function Copyright () {
   return (
@@ -67,11 +68,31 @@ export default function SignInSide () {
   const classes = useStyles()
   const [isSignIn, setIsSignIn] = useState(true)
   const history = useHistory()
+  const [password, setPassword] = useState('')
+  const [userName, setUserName] = useState('')
 
-  const handleLogin = (e) => {
+  const handleLogin = useCallback(async (e) => {
     e.preventDefault()
-    history.push('/chat')
-  }
+    const passwordSHA = sha1(password + 'iwantaplus').toString()
+
+    const params = {
+      username: userName,
+      password: passwordSHA
+    }
+
+    fetch('/login', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+            data['state'] === 200) {
+          history.push('/chat')
+        } else alert('Wrong Password')
+      }))
+  }, [])
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -92,9 +113,11 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
+                value={userName}
                 id="email"
                 label="Email Address"
                 name="email"
+                onChange={(e) => setUserName(e.target.value)}
                 autoComplete="email"
                 autoFocus
               />
@@ -103,6 +126,8 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 name="password"
                 label="Password"
                 type="password"
