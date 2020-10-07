@@ -73,8 +73,8 @@ export default function SignInSide () {
 
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
-    const passwordSHA = sha1(userName + 'iwantaplus').toString()
-    // history.push('/chat')
+    const passwordSHA = sha1(password + 'iwantaplus').toString()
+    console.log(sha1('super' + 'iwantaplus').toString())
     const params = {
       username: userName,
       password: passwordSHA
@@ -87,8 +87,10 @@ export default function SignInSide () {
     }).then(res => res.json()
       .catch(error => console.error('Error:', error))
       .then((data) => {
-        if (data.has('state') && data['state'] === 200) { history.push('/chat') }
-        else alert('wrong data')
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+            data['state'] === 200) {
+          history.push('/chat')
+        } else alert('Wrong Password')
       }))
   }, [])
 
