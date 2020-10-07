@@ -1,6 +1,6 @@
 import React from 'react'
 import AcUnitIcon from '@material-ui/icons/AcUnit'
-import UserListItem from './Item/UserListItem'
+import UserListItem from './UserListItem'
 import {
   Avatar,
   ListItem,
