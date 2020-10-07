@@ -1,25 +1,25 @@
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Drawer from '@material-ui/core/Drawer';
-import Box from '@material-ui/core/Box';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
-import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import { userList, useSecondaryListItems } from './Drawer/Drawerlist';
-import Switch from '@material-ui/core/Switch';
-import Avatar from '@material-ui/core/Avatar';
-import { Menu, MenuItem } from '@material-ui/core';
+import React from 'react'
+import clsx from 'clsx'
+import { makeStyles } from '@material-ui/core/styles'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import Drawer from '@material-ui/core/Drawer'
+import Box from '@material-ui/core/Box'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import List from '@material-ui/core/List'
+import Typography from '@material-ui/core/Typography'
+import Divider from '@material-ui/core/Divider'
+import IconButton from '@material-ui/core/IconButton'
+import Badge from '@material-ui/core/Badge'
+import Container from '@material-ui/core/Container'
+import Link from '@material-ui/core/Link'
+import MenuIcon from '@material-ui/icons/Menu'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import NotificationsIcon from '@material-ui/icons/Notifications'
+import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
+import Switch from '@material-ui/core/Switch'
+import Avatar from '@material-ui/core/Avatar'
+import { Menu, MenuItem } from '@material-ui/core'
 
 function Copyright() {
   return (
@@ -31,10 +31,10 @@ function Copyright() {
       {new Date().getFullYear()}
       {'.'}
     </Typography>
-  );
+  )
 }
 
-const drawerWidth = 240;
+const drawerWidth = 240
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -121,22 +121,22 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: '36ch',
     backgroundColor: theme.palette.background.paper,
   },
-}));
+}))
 
 export default function Dashboard() {
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const [anchorMenu, setAnchorMenu] = React.useState(null);
+  const classes = useStyles()
+  const [open, setOpen] = React.useState(false)
+  const [anchorMenu, setAnchorMenu] = React.useState(null)
   const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
   const handleDrawerClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
-  const handleAvatarClick = (event) => { setAnchorMenu(event.currentTarget); }
-  const handleMenuClose = () => { setAnchorMenu(null); }
-  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const handleAvatarClick = (event) => { setAnchorMenu(event.currentTarget) }
+  const handleMenuClose = () => { setAnchorMenu(null) }
+  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   return (
     <div className={classes.root}>
@@ -223,5 +223,5 @@ export default function Dashboard() {
         </Container>
       </main>
     </div>
-  );
+  )
 }

@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 import {
   ListItem,
   ListItemText,
   ListItemAvatar,
   Typography,
   Avatar,
-} from "@material-ui/core";
-import { makeStyles } from '@material-ui/core/styles';
+} from "@material-ui/core"
+import { makeStyles } from '@material-ui/core/styles'
 
 export default function UserListItem(name, time, recent) {
 
@@ -20,7 +20,7 @@ export default function UserListItem(name, time, recent) {
     inline: {
       display: 'inline-block',
     },
-  }));
+  }))
 
   return (
     <div>
@@ -44,7 +44,7 @@ export default function UserListItem(name, time, recent) {
                   color="textPrimary"
                   noWrap
                 >
-                  {time ? time : "time"}-
+                  {time ? time : "time"} -
                 </Typography>
                 <Typography
                   component="span"

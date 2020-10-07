@@ -7,7 +7,7 @@ export default function Title(props) {
     <Typography component="h2" variant="h6" color="primary" gutterBottom>
       {props.children}
     </Typography>
-  );
+  )
 }
 
 Title.propTypes = {
