@@ -74,7 +74,7 @@ export default function SignInSide () {
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
     const passwordSHA = sha1(password + 'iwantaplus').toString()
-    console.log(sha1('super' + 'iwantaplus').toString())
+
     const params = {
       username: userName,
       password: passwordSHA
