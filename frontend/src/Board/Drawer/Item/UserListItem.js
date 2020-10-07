@@ -1,20 +1,12 @@
 import React from 'react';
 import {
   ListItem,
-  ListItemIcon,
   ListItemText,
   ListItemAvatar,
   Typography,
-  Card,
-  Box, Avatar
+  Avatar,
 } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import AssignmentIcon from '@material-ui/icons/Assignment';
-import {
-  deepOrange,
-  deepPurple,
-} from '@material-ui/core/colors';
 
 export default function UserListItem(name, time, recent) {
 
@@ -52,7 +44,7 @@ export default function UserListItem(name, time, recent) {
                   color="textPrimary"
                   noWrap
                 >
-                  {time ? time : "time" + " - "}
+                  {time ? time : "time"}-
                 </Typography>
                 <Typography
                   component="span"

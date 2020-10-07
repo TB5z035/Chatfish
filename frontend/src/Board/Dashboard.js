@@ -12,23 +12,21 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
-import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
+import { userList, useSecondaryListItems } from './Drawer/Drawerlist';
+import Switch from '@material-ui/core/Switch';
+import Avatar from '@material-ui/core/Avatar';
+import { Menu, MenuItem } from '@material-ui/core';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="https://gitlab.secoder.net/GoJellyfish/ChatFish">
+        FishChat
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -66,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
+  },
+  appBarIcon: {
+    padding: 5,
   },
   menuButton: {
     marginRight: 36,
@@ -124,20 +125,26 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
+  const [anchorMenu, setAnchorMenu] = React.useState(null);
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const handleAvatarClick = (event) => { setAnchorMenu(event.currentTarget); }
+  const handleMenuClose = () => { setAnchorMenu(null); }
+  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
       <CssBaseline />
+
       <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-        <Toolbar className={classes.toolbar}>
+        <Toolbar id="toolbar" className={classes.toolbar}>
+
           <IconButton
             edge="start"
             color="inherit"
@@ -147,16 +154,48 @@ export default function Dashboard() {
           >
             <MenuIcon />
           </IconButton>
+
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Dashboard
+            FishChat
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+
+          <div>
+            <Switch
+              name="checkedA"
+              inputProps={{ 'aria-label': 'secondary checkbox' }}
+            />
+          </div>
+          <div className={classes.appBarIcon}>
+            <IconButton color="inherit" >
+              {/* number of notification*/}
+              <Badge badgeContent={"12"} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </div>
+
+          <div className={classes.appBarIcon}>
+            {/* user icon */}
+            <IconButton>
+              <Avatar onClick={handleAvatarClick}>
+                S
+            </Avatar>
+            </IconButton>
+          </div>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorMenu}
+            keepMounted
+            open={Boolean(anchorMenu)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
+
       <Drawer
         variant="permanent"
         classes={{
@@ -170,15 +209,14 @@ export default function Dashboard() {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.listStyles}>{mainListItems}</List>
+        <List className={classes.listStyles}>{userList}</List>
         <Divider />
-        <List>{secondaryListItems}</List>
+        <List>{useSecondaryListItems()}</List>
       </Drawer>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-
           <Box pt={4}>
             <Copyright />
           </Box>
