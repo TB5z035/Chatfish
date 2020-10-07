@@ -20,6 +20,7 @@ import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
 import { Menu, MenuItem } from '@material-ui/core'
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -130,6 +131,12 @@ export default function Dashboard() {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [anchorMenu, setAnchorMenu] = React.useState(null)
+  const history = useHistory()
+
+  const handleLogout = (e) => {
+    e.preventDefault()
+    history.push('/')
+  }
   const handleDrawerOpen = () => {
     setOpen(true)
   }
@@ -174,7 +181,7 @@ export default function Dashboard() {
             noWrap
             className={classes.title}
           >
-            FishChat
+            Chat Fish
           </Typography>
 
           <div>
@@ -207,7 +214,7 @@ export default function Dashboard() {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
