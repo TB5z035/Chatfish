@@ -1,23 +1,23 @@
-import React from "react"
+import React from 'react'
 import {
   ListItem,
   ListItemText,
   ListItemAvatar,
   Typography,
   Avatar
-} from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
+} from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 
 export default function UserListItem(name, time, recent) {
   const classes = makeStyles((theme) => ({
     root: {
-      display: "flex",
-      "& > *": {
+      display: 'flex',
+      '& > *': {
         margin: theme.spacing(1)
       }
     },
     inline: {
-      display: "inline-block"
+      display: 'inline-block'
     }
   }))
 
@@ -43,7 +43,7 @@ export default function UserListItem(name, time, recent) {
                   color="textPrimary"
                   noWrap
                 >
-                  {time ? time : "time"} -
+                  {time ? time : 'time'} -
                 </Typography>
                 <Typography
                   component="span"
@@ -51,7 +51,7 @@ export default function UserListItem(name, time, recent) {
                   color="textSecondary"
                   noWrap
                 >
-                  {recent ? recent : "recent messages blah blah blah"}
+                  {recent ? recent : 'recent messages blah blah blah'}
                 </Typography>
               </Typography>
             </React.Fragment>

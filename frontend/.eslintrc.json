@@ -25,6 +25,7 @@
         "react"
     ],
     "rules": {
+        "space-before-function-paren":0,
         "max-len": [
           "warn",
           {

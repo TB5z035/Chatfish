@@ -1,20 +1,20 @@
-import React from "react"
-import AcUnitIcon from "@material-ui/icons/AcUnit"
-import UserListItem from "./Item/UserListItem"
+import React from 'react'
+import AcUnitIcon from '@material-ui/icons/AcUnit'
+import UserListItem from './Item/UserListItem'
 import {
   Avatar,
   ListItem,
   ListItemIcon,
   ListItemText,
   ListSubheader
-} from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
-import { green, pink } from "@material-ui/core/colors"
+} from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+import { green, pink } from '@material-ui/core/colors'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: "flex",
-    "& > *": {
+    display: 'flex',
+    '& > *': {
       margin: theme.spacing(1)
     }
   },
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: pink[500]
   },
   green: {
-    color: "#fff",
+    color: '#fff',
     backgroundColor: green[500]
   }
 }))
