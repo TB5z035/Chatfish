@@ -14,9 +14,9 @@ function App() {
       <body>
         <SignInSide></SignInSide>
       </body> */}
-      <body>
+      {/* <body> */}
         <DashBoard />
-      </body>
+      {/* </body> */}
     </div>
 
   )

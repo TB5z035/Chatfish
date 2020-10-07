@@ -20,6 +20,7 @@ import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
 import { Menu, MenuItem } from '@material-ui/core'
+import Chatroom from './Chatroom/Chatroom'
 
 function Copyright() {
   return (
@@ -194,8 +195,8 @@ export default function Dashboard() {
 
           <div className={classes.appBarIcon}>
             {/* user icon */}
-            <IconButton>
-              <Avatar onClick={handleAvatarClick}>S</Avatar>
+            <IconButton onClick={handleAvatarClick}>
+              <Avatar>S</Avatar>
             </IconButton>
           </div>
           <Menu
@@ -232,6 +233,9 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
+        <Container maxWidth="lg" className={classes.container}>
+          {Chatroom()}
+        </Container>
         <Container maxWidth="lg" className={classes.container}>
           <Box pt={4}>
             <Copyright />
