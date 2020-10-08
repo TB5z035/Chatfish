@@ -92,7 +92,7 @@ export default function SignInSide () {
           history.push('/chat')
         } else alert('Wrong Password')
       }))
-  }, [])
+  }, [userName, password])
 
   return (
     <Grid container component="main" className={classes.root}>
