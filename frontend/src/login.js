@@ -70,7 +70,12 @@ export default function SignInSide () {
   const history = useHistory()
   const [password, setPassword] = useState('')
   const [userName, setUserName] = useState('')
-
+  const [newUserName, setNewUserName] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatNewPassword, setRepeatNewPassword] = useState('')
+  const [newPasswordValid, setNewPasswordValid] = useState(false)
+  const [newUserNameValid, setNewUserNameValid] = useState(false)
+  const [repeatNewPasswordValid, setRepeatNewPasswordValid] = useState(false)
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
     const passwordSHA = sha1(password + 'iwantaplus').toString()
@@ -94,6 +99,29 @@ export default function SignInSide () {
       }))
   }, [userName, password])
 
+  const handleSignUp = useCallback(async (e) => {
+    e.preventDefault()
+    const newPasswordSHA = sha1(newPassword + 'iwantaplus').toString()
+
+    const params = {
+      username: newUserName,
+      password: newPasswordSHA
+    }
+
+    fetch('/register', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          history.push('/chat')
+        } else alert('Fail to register!')
+      }))
+  }, [newUserName, newPassword])
+
   return (
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
@@ -114,11 +142,11 @@ export default function SignInSide () {
                 required
                 fullWidth
                 value={userName}
-                id="email"
-                label="Email Address"
-                name="email"
+                id="UserName"
+                label="UserName"
+                name="UserName"
                 onChange={(e) => setUserName(e.target.value)}
-                autoComplete="email"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -183,10 +211,21 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="newUserName"
+                label="UserName"
+                error={!newUserNameValid}
+                helperText="4-12 characters including numbers and letters"
+                value={newUserName}
+                onChange={(e) => {
+                  setNewUserName(e.target.value)
+                  if (/^[A-Za-z0-9]{4,12}$/.test(e.target.value)) {
+                    setNewUserNameValid(true)
+                  } else {
+                    setNewUserNameValid(false)
+                  }
+                }}
+                name="newUserName"
+                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -196,7 +235,22 @@ export default function SignInSide () {
                 fullWidth
                 name="password"
                 label="Password"
+                error={!newPasswordValid}
+                helperText="8-16 characters including numbers and letters"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value)
+                  if (/^[A-Za-z0-9]{8,16}$/.test(e.target.value)) {
+                    setNewPasswordValid(true)
+                  } else {
+                    setNewPasswordValid(false)
+                  }
+                  if (e.target.value !== repeatNewPassword) {
+                    setRepeatNewPasswordValid(false)
+                  } else setRepeatNewPasswordValid(true)
+                }}
                 type="password"
+                autoComplete="password"
                 id="password"
               />
               <TextField
@@ -204,18 +258,29 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
+                error={!repeatNewPasswordValid}
+                helperText="RepeatPassword must be the same as the Password"
                 name="repeat_password"
                 label="RepeatPassword"
                 type="password"
+                value={repeatNewPassword}
+                onChange={(e) => {
+                  setRepeatNewPassword(e.target.value)
+                  if (e.target.value !== newPassword) {
+                    setRepeatNewPasswordValid(false)
+                  } else setRepeatNewPasswordValid(true)
+                }}
                 id="repeat_password"
+                autoComplete="repeat password"
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={!(newPasswordValid && newUserNameValid && repeatNewPasswordValid)}
                 className={classes.submit}
-                onClick={() => alert('Sign up!')}
+                onClick={handleSignUp}
               >
                   Sign Up
               </Button>
