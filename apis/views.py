@@ -17,6 +17,26 @@ def get_data(request):
     print('Receive get request from nodejs.')
     return JsonResponse(data, safe = False)
 
+def login_varify(data):
+    user = User.objects.filter(name = data['username'])
+    if user.count() == 1:
+        if user[0].pwd == data['password']:
+            ret = {
+                'state': 200,
+                'meesage': 'Successfully varified!'
+            }
+        else:
+            ret = {
+                'state': 401,
+                'message': 'Invalid password!'
+            }
+    else:
+        ret = {
+            'state': 400,
+            'message': 'Invalid username!'
+        }
+    return ret
+
 @require_http_methods(["POST"])
 @csrf_exempt
 def post_data(request):
@@ -28,6 +48,17 @@ def post_data(request):
             'status': 'success',
             'message': 'Successfuly post!'
         }
+        try:
+            data = json.loads(body)
+            if 'type' not in data:
+                raise Exception("No type info!")
+            if data['type'] == 'LOGIN_VARIFY':
+                ret = login_varify(data.get('user_info'))
+        except Exception as e:
+            ret = {
+                'status': 'error',
+                'message': str(e)
+            }
     else:
         ret = {
             'status': 'error',

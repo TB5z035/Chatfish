@@ -12,7 +12,11 @@ exports.get = function get(path, on_data_callback, on_err_callback) {
     var url = default_protocol + default_host + ':' + default_port + path
     http.get(url, function(res) {
         res.setEncoding('utf-8')
+        var body = ""
         res.on('data', function(data) {
+            body += data
+        })
+        res.on("end", function() {
             try {
                 on_data_callback(JSON.parse(data))
             }
@@ -48,14 +52,19 @@ exports.post = function post(path, data, on_data_callback, on_err_callback) {
     }
     var post_req = http.request(options, function(res) {
         res.setEncoding('utf-8')
+        var body = ""
         res.on('data', function(data) {
+            body += data
+        })
+        res.on("end", function() {
             try {
-                on_data_callback(JSON.parse(data))
+                on_data_callback(JSON.parse(body))
             }
             catch (e) {
                 console.log('error message: ' + e)
             }
         })
+        res.resume()
     }).on('error', function(e) {
         console.log(e)
         if (on_err_callback)
