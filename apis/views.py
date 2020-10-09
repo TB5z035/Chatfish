@@ -37,6 +37,25 @@ def login_varify(data):
         }
     return ret
 
+def register_in(data):
+    '''
+    {id: user_id, password: user_password}
+    '''
+    new_user = User(name = data['username'], pwd = data['password'])
+    try:
+        new_user.full_clean()
+        new_user.save()
+        ret = {
+            'state': 200,
+            'message': 'Successfully registered!'
+        }
+    except:
+        ret = {
+            'state': 403,
+            'message': 'Register failed!'
+        }
+    return ret
+
 @require_http_methods(["POST"])
 @csrf_exempt
 def post_data(request):
@@ -54,6 +73,8 @@ def post_data(request):
                 raise Exception("No type info!")
             if data['type'] == 'LOGIN_VARIFY':
                 ret = login_varify(data.get('user_info'))
+            elif data['type'] == 'REGISTER_IN':
+                ret = register_in(data.get('user_info'))
         except Exception as e:
             ret = {
                 'status': 'error',
