@@ -65,8 +65,23 @@ var login_request = function(request, response, body) {
 }
 
 var register_request = function(request, response, body) {
-    response.writeHead(403)
-    response.end()
+    // response.writeHead(403)
+    // response.end()
+    var data = {
+        type: 'REGISTER_IN',
+        user_info: JSON.parse(body)
+    }
+    console.log(body)
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+        console.log(res)
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    } )
 }
 
 var django_request = function(request, response, body) {

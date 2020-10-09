@@ -24,3 +24,5 @@ xunit-reports/
 
 frontend/.idea
 .idea
+
+config/mysql-config-local.json
