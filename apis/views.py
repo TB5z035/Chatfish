@@ -39,7 +39,7 @@ def login_varify(data):
 
 def register_in(data):
     '''
-    {id: user_id, password: user_password}
+    {username: user_name, password: user_password}
     '''
     new_user = User(name = data['username'], pwd = data['password'])
     try:
