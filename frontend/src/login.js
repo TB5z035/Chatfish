@@ -76,6 +76,9 @@ export default function SignInSide () {
   const [newPasswordValid, setNewPasswordValid] = useState(false)
   const [newUserNameValid, setNewUserNameValid] = useState(false)
   const [repeatNewPasswordValid, setRepeatNewPasswordValid] = useState(false)
+  const [newUserNameInit, setNewUserNameInit] = useState(false)
+  const [newPasswordInit, setNewPasswordInit] = useState(false)
+  const [repeatNewUserNameInit, setRepeatNewPasswordInit] = useState(false)
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
     const passwordSHA = sha1(password + 'iwantaplus').toString()
@@ -146,7 +149,6 @@ export default function SignInSide () {
                 label="UserName"
                 name="UserName"
                 onChange={(e) => setUserName(e.target.value)}
-                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -160,7 +162,6 @@ export default function SignInSide () {
                 label="Password"
                 type="password"
                 id="password"
-                autoComplete="current-password"
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -213,11 +214,12 @@ export default function SignInSide () {
                 fullWidth
                 id="newUserName"
                 label="UserName"
-                error={!newUserNameValid}
+                error={!newUserNameValid && newUserNameInit}
                 helperText="4-12 characters including numbers and letters"
                 value={newUserName}
                 onChange={(e) => {
                   setNewUserName(e.target.value)
+                  setNewUserNameInit(true)
                   if (/^[A-Za-z0-9]{4,12}$/.test(e.target.value)) {
                     setNewUserNameValid(true)
                   } else {
@@ -225,7 +227,6 @@ export default function SignInSide () {
                   }
                 }}
                 name="newUserName"
-                autoComplete="username"
                 autoFocus
               />
               <TextField
@@ -235,11 +236,12 @@ export default function SignInSide () {
                 fullWidth
                 name="password"
                 label="Password"
-                error={!newPasswordValid}
+                error={!newPasswordValid && newPasswordInit}
                 helperText="8-16 characters including numbers and letters"
                 value={newPassword}
                 onChange={(e) => {
                   setNewPassword(e.target.value)
+                  setNewPasswordInit(true)
                   if (/^[A-Za-z0-9]{8,16}$/.test(e.target.value)) {
                     setNewPasswordValid(true)
                   } else {
@@ -250,7 +252,6 @@ export default function SignInSide () {
                   } else setRepeatNewPasswordValid(true)
                 }}
                 type="password"
-                autoComplete="password"
                 id="password"
               />
               <TextField
@@ -258,7 +259,7 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
-                error={!repeatNewPasswordValid}
+                error={!repeatNewPasswordValid && repeatNewUserNameInit}
                 helperText="RepeatPassword must be the same as the Password"
                 name="repeat_password"
                 label="RepeatPassword"
@@ -266,12 +267,12 @@ export default function SignInSide () {
                 value={repeatNewPassword}
                 onChange={(e) => {
                   setRepeatNewPassword(e.target.value)
+                  setRepeatNewPasswordInit(true)
                   if (e.target.value !== newPassword) {
                     setRepeatNewPasswordValid(false)
                   } else setRepeatNewPasswordValid(true)
                 }}
                 id="repeat_password"
-                autoComplete="repeat password"
               />
               <Button
                 type="submit"
