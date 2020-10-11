@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
+import sha1 from 'crypto-js/sha1'
 
 function Copyright () {
   return (
@@ -67,11 +68,62 @@ export default function SignInSide () {
   const classes = useStyles()
   const [isSignIn, setIsSignIn] = useState(true)
   const history = useHistory()
-
-  const handleLogin = (e) => {
+  const [password, setPassword] = useState('')
+  const [userName, setUserName] = useState('')
+  const [newUserName, setNewUserName] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatNewPassword, setRepeatNewPassword] = useState('')
+  const [newPasswordValid, setNewPasswordValid] = useState(false)
+  const [newUserNameValid, setNewUserNameValid] = useState(false)
+  const [repeatNewPasswordValid, setRepeatNewPasswordValid] = useState(false)
+  const [newUserNameInit, setNewUserNameInit] = useState(false)
+  const [newPasswordInit, setNewPasswordInit] = useState(false)
+  const [repeatNewUserNameInit, setRepeatNewPasswordInit] = useState(false)
+  const handleLogin = useCallback(async (e) => {
     e.preventDefault()
-    history.push('/chat')
-  }
+    const passwordSHA = sha1(password + 'iwantaplus').toString()
+
+    const params = {
+      username: userName,
+      password: passwordSHA
+    }
+
+    fetch('/login', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+            data['state'] === 200) {
+          history.push('/chat')
+        } else alert('Wrong Password')
+      }))
+  }, [userName, password])
+
+  const handleSignUp = useCallback(async (e) => {
+    e.preventDefault()
+    const newPasswordSHA = sha1(newPassword + 'iwantaplus').toString()
+
+    const params = {
+      username: newUserName,
+      password: newPasswordSHA
+    }
+
+    fetch('/register', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          history.push('/chat')
+        } else alert('Fail to register!')
+      }))
+  }, [newUserName, newPassword])
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -92,10 +144,11 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                value={userName}
+                id="UserName"
+                label="UserName"
+                name="UserName"
+                onChange={(e) => setUserName(e.target.value)}
                 autoFocus
               />
               <TextField
@@ -103,11 +156,12 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 name="password"
                 label="Password"
                 type="password"
                 id="password"
-                autoComplete="current-password"
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -158,10 +212,21 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="newUserName"
+                label="UserName"
+                error={!newUserNameValid && newUserNameInit}
+                helperText="4-12 characters including numbers and letters"
+                value={newUserName}
+                onChange={(e) => {
+                  setNewUserName(e.target.value)
+                  setNewUserNameInit(true)
+                  if (/^[A-Za-z0-9]{4,12}$/.test(e.target.value)) {
+                    setNewUserNameValid(true)
+                  } else {
+                    setNewUserNameValid(false)
+                  }
+                }}
+                name="newUserName"
                 autoFocus
               />
               <TextField
@@ -171,6 +236,21 @@ export default function SignInSide () {
                 fullWidth
                 name="password"
                 label="Password"
+                error={!newPasswordValid && newPasswordInit}
+                helperText="8-16 characters including numbers and letters"
+                value={newPassword}
+                onChange={(e) => {
+                  setNewPassword(e.target.value)
+                  setNewPasswordInit(true)
+                  if (/^[A-Za-z0-9]{8,16}$/.test(e.target.value)) {
+                    setNewPasswordValid(true)
+                  } else {
+                    setNewPasswordValid(false)
+                  }
+                  if (e.target.value !== repeatNewPassword) {
+                    setRepeatNewPasswordValid(false)
+                  } else setRepeatNewPasswordValid(true)
+                }}
                 type="password"
                 id="password"
               />
@@ -179,9 +259,19 @@ export default function SignInSide () {
                 margin="normal"
                 required
                 fullWidth
+                error={!repeatNewPasswordValid && repeatNewUserNameInit}
+                helperText="RepeatPassword must be the same as the Password"
                 name="repeat_password"
                 label="RepeatPassword"
                 type="password"
+                value={repeatNewPassword}
+                onChange={(e) => {
+                  setRepeatNewPassword(e.target.value)
+                  setRepeatNewPasswordInit(true)
+                  if (e.target.value !== newPassword) {
+                    setRepeatNewPasswordValid(false)
+                  } else setRepeatNewPasswordValid(true)
+                }}
                 id="repeat_password"
               />
               <Button
@@ -189,8 +279,9 @@ export default function SignInSide () {
                 fullWidth
                 variant="contained"
                 color="primary"
+                disabled={!(newPasswordValid && newUserNameValid && repeatNewPasswordValid)}
                 className={classes.submit}
-                onClick={() => alert('Sign up!')}
+                onClick={handleSignUp}
               >
                   Sign Up
               </Button>

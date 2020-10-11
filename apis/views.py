@@ -17,6 +17,46 @@ def get_data(request):
     print('Receive get request from nodejs.')
     return JsonResponse(data, safe = False)
 
+def login_varify(data):
+    user = User.objects.filter(name = data['username'])
+    if user.count() == 1:
+        if user[0].pwd == data['password']:
+            ret = {
+                'id': user[0].uid,
+                'state': 200,
+                'meesage': 'Successfully verified!'
+            }
+        else:
+            ret = {
+                'state': 401,
+                'message': 'Invalid password!'
+            }
+    else:
+        ret = {
+            'state': 400,
+            'message': 'Invalid username!'
+        }
+    return ret
+
+def register_in(data):
+    '''
+    {username: user_name, password: user_password}
+    '''
+    new_user = User(name = data['username'], pwd = data['password'])
+    try:
+        new_user.full_clean()
+        new_user.save()
+        ret = {
+            'state': 200,
+            'message': 'Successfully registered!'
+        }
+    except:
+        ret = {
+            'state': 403,
+            'message': 'Register failed!'
+        }
+    return ret
+
 @require_http_methods(["POST"])
 @csrf_exempt
 def post_data(request):
@@ -28,6 +68,19 @@ def post_data(request):
             'status': 'success',
             'message': 'Successfuly post!'
         }
+        try:
+            data = json.loads(body)
+            if 'type' not in data:
+                raise Exception("No type info!")
+            if data['type'] == 'LOGIN_VERIFY':
+                ret = login_varify(data.get('user_info'))
+            elif data['type'] == 'REGISTER_IN':
+                ret = register_in(data.get('user_info'))
+        except Exception as e:
+            ret = {
+                'status': 'error',
+                'message': str(e)
+            }
     else:
         ret = {
             'status': 'error',
