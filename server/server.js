@@ -3,6 +3,9 @@ const connect = require('connect')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const crypto = require('crypto')
 const encoder = new TextEncoder('utf8')
+const random = require('string-random')
+
+var manager = require('./connection-manager.js').instance()
 
 const ws_options = {
     target: 'http://localhost:8801',
@@ -48,7 +51,7 @@ const request_to_django = require('./django_request')
 
 var login_request = function(request, response, body) {
     var data = {
-        type: 'LOGIN_VARIFY',
+        type: 'LOGIN_VERIFY',
         user_info: JSON.parse(body)
     }
     console.log(body)
@@ -57,6 +60,13 @@ var login_request = function(request, response, body) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         })
+        if (res.state === 200) {
+            res.token = random(32)
+            console.log(res)
+            manager.add_user(res.id, res.token)
+            manager.close_ws(res.id)
+            delete res.id
+        }
         console.log(res)
         response.end(JSON.stringify(res))
     }, function(e) {
@@ -65,8 +75,6 @@ var login_request = function(request, response, body) {
 }
 
 var register_request = function(request, response, body) {
-    // response.writeHead(403)
-    // response.end()
     var data = {
         type: 'REGISTER_IN',
         user_info: JSON.parse(body)
