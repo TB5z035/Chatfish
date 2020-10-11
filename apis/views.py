@@ -22,8 +22,9 @@ def login_varify(data):
     if user.count() == 1:
         if user[0].pwd == data['password']:
             ret = {
+                'id': user[0].uid,
                 'state': 200,
-                'meesage': 'Successfully varified!'
+                'meesage': 'Successfully verified!'
             }
         else:
             ret = {
@@ -71,7 +72,7 @@ def post_data(request):
             data = json.loads(body)
             if 'type' not in data:
                 raise Exception("No type info!")
-            if data['type'] == 'LOGIN_VARIFY':
+            if data['type'] == 'LOGIN_VERIFY':
                 ret = login_varify(data.get('user_info'))
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))

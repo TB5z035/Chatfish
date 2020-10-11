@@ -1,6 +1,4 @@
-const querystring = require('querystring')
 const http = require('http')
-const cookie = require('cookie')
 const crypto = require('crypto')
 const encoder = new TextEncoder('utf8')
 
