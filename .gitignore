@@ -24,3 +24,5 @@ xunit-reports/
 
 frontend/.idea
 .idea
+
+*.log
