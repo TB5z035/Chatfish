@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -22,6 +22,7 @@ import Avatar from '@material-ui/core/Avatar'
 import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
+import Cookies from 'js-cookie'
 
 function Copyright() {
   return (
@@ -136,7 +137,7 @@ export default function Dashboard() {
 
   const handleLogout = (e) => {
     e.preventDefault()
-    history.push('/')
+    history.push('/sign')
   }
   const handleDrawerOpen = () => {
     setOpen(true)
@@ -152,6 +153,32 @@ export default function Dashboard() {
     setAnchorMenu(null)
   }
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
+
+  useEffect(() => {
+    var localCookie = Cookies.get('token')
+
+    if (localCookie != null) {
+      var socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+
+      // Connection opened
+      socket.addEventListener('open', function (event) {
+        socket.send('Hello Server!')
+        console.log('open')
+      })
+
+      // Listen for messages
+      socket.addEventListener('message', function (event) {
+        console.log('Message from server ', event.data)
+      })
+
+      socket.onerror = function(event) {
+        console.error('WebSocket error observed:', event)
+        history.push('/sign')
+      }
+    } else {
+      history.push('/sign')
+    }
+  }, [history])
 
   return (
     <div className={classes.root}>
