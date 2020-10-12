@@ -137,6 +137,7 @@ export default function Dashboard() {
 
   const handleLogout = (e) => {
     e.preventDefault()
+    Cookies.remove('token')
     history.push('/sign')
   }
   const handleDrawerOpen = () => {

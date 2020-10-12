@@ -21,6 +21,7 @@ from . import view
 
 urlpatterns = [
     path('', view.serve_static),
+    path('sign', view.serve_static),
     path('admin/', admin.site.urls),
     path('api/', include('apis.urls')),
     re_path(r'(?P<path>.+)', view.serve_static),
