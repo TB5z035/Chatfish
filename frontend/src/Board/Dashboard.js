@@ -19,7 +19,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem } from '@material-ui/core'
+import { Grid, Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 
@@ -106,11 +106,15 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     height: '100vh',
-    overflow: 'auto'
+    overflow: 'hidden'
   },
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4)
+  },
+  box: {
+    padding: theme.spacing(4),
+    minWidth: 300 // fixme: not working!
   },
   paper: {
     padding: theme.spacing(2),
@@ -240,14 +244,24 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        {/* <Grid container direction="row" justify="center"> */}
+        {/* <Grid item xl={1}>
+            <Container maxWidth="lg" className={classes.container}>
+              <Box pt={4}>
+                <Copyright />
+              </Box>
+            </Container>
+          </Grid> */}
+        {/* <Grid item > */}
+        {/* <Container maxWidth="xl" className={classes.container}>
           {Chatroom()}
-        </Container>
-        <Container maxWidth="lg" className={classes.container}>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
-        </Container>
+        </Container> */}
+        <Box display="flex" flexDirection="row" justifyContent="center">
+          {/* <Box className={classes.box}>{Chatroom()}</Box> */}
+          <Box className={classes.box}>{Chatroom()}</Box>
+        </Box>
+        {/* </Grid> */}
+        {/* </Grid> */}
       </main>
     </div>
   )
