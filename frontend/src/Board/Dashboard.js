@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -22,6 +22,7 @@ import Avatar from '@material-ui/core/Avatar'
 import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
+import Cookies from 'js-cookie'
 
 function Copyright() {
   return (
@@ -136,7 +137,7 @@ export default function Dashboard() {
 
   const handleLogout = (e) => {
     e.preventDefault()
-    history.push('/')
+    history.push('/sign')
   }
   const handleDrawerOpen = () => {
     setOpen(true)
@@ -152,6 +153,30 @@ export default function Dashboard() {
     setAnchorMenu(null)
   }
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
+
+  useEffect(() => {
+    var localCookie = Cookies.get('token')
+
+    if (localCookie != null) {
+      var aWebSocket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+
+      ws.on('open', function open() {
+        ws.send('{"type":"message","body":"zsqtql"}')
+        console.log('open')
+      })
+
+      ws.on('unexpected-response', function open() {
+        console.log('unexpected-response')
+        history.push('/sign')
+      })
+      ws.on('error', function open() {
+        console.log('error')
+        history.push('/signBB')
+      })
+    } else {
+      history.push('/sign')
+    }
+  }, [history])
 
   return (
     <div className={classes.root}>
