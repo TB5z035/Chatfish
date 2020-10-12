@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -14,7 +14,7 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import { useHistory } from 'react-router-dom'
 import sha1 from 'crypto-js/sha1'
-
+import Cookies from 'js-cookie'
 function Copyright () {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -79,8 +79,10 @@ export default function SignInSide () {
   const [newUserNameInit, setNewUserNameInit] = useState(false)
   const [newPasswordInit, setNewPasswordInit] = useState(false)
   const [repeatNewUserNameInit, setRepeatNewPasswordInit] = useState(false)
+
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
+
     const passwordSHA = sha1(password + 'iwantaplus').toString()
 
     const params = {
@@ -97,10 +99,11 @@ export default function SignInSide () {
       .then((data) => {
         if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
             data['state'] === 200) {
+          Cookies.set('token', data['token'], { expires: 2 })
           history.push('/chat')
         } else alert('Wrong Password')
       }))
-  }, [userName, password])
+  }, [userName, password, history])
 
   const handleSignUp = useCallback(async (e) => {
     e.preventDefault()
@@ -120,10 +123,32 @@ export default function SignInSide () {
       .then((data) => {
         if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200) {
-          history.push('/chat')
+          alert('Successfully register!')
         } else alert('Fail to register!')
       }))
   }, [newUserName, newPassword])
+
+  useEffect(() => {
+    var localCookie = Cookies.get('token')
+    const params = {
+      type: 'LOGIN_WITH_TOKEN'
+    }
+    if (localCookie != null) {
+      fetch('/login', {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then(res => res.json()
+        .catch(error => console.error('Error:', error))
+        .then((data) => {
+          if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200) {
+            history.push('/chat')
+          }
+        }))
+    }
+  }, [history])
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -189,7 +214,9 @@ export default function SignInSide () {
                   <Button
                     color="primary"
                     size="small"
-                    onClick={() => setIsSignIn(false)}>
+                    onClick={() => {
+                      setIsSignIn(false)
+                    }}>
                     {"Don't have an account? Sign Up"}
                   </Button>
                 </Grid>
