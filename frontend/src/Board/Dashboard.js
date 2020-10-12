@@ -154,6 +154,32 @@ export default function Dashboard() {
   }
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
+  useEffect(() => {
+    var localCookie = Cookies.get('token')
+
+    if (localCookie != null) {
+      var socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+
+      // Connection opened
+      socket.addEventListener('open', function (event) {
+        socket.send('Hello Server!')
+        console.log('open')
+      })
+
+      // Listen for messages
+      socket.addEventListener('message', function (event) {
+        console.log('Message from server ', event.data)
+      })
+
+      socket.onerror = function(event) {
+        console.error('WebSocket error observed:', event)
+        history.push('/sign')
+      }
+    } else {
+      history.push('/sign')
+    }
+  }, [history])
+
   return (
     <div className={classes.root}>
       <CssBaseline />
