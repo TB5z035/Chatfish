@@ -22,15 +22,18 @@
         "ecmaVersion": 2018
     },
     "plugins": [
-        "react"
+        "react",
+        "react-hooks"
     ],
     "rules": {
-        "space-before-function-paren":0,
+        "react-hooks/rules-of-hooks": "error", // 检查 Hook 的规则
+        "react-hooks/exhaustive-deps": "warn", // 检查 effect 的依赖
+        "space-before-function-paren": 0,
         "max-len": [
-          "warn",
-          {
-            "code": 100
-          }
+            "warn",
+            {
+                "code": 100
+            }
         ],
         "no-console": "off"
     },
