@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -131,9 +131,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Dashboard() {
   const classes = useStyles()
-  const [open, setOpen] = React.useState(false)
-  const [anchorMenu, setAnchorMenu] = React.useState(null)
   const history = useHistory()
+  const [open, setOpen] = useState(false)
+  const [anchorMenu, setAnchorMenu] = useState(null)
+  const [friendList, setFriendList] = useState([])
+  var socket
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -159,17 +161,37 @@ export default function Dashboard() {
     var localCookie = Cookies.get('token')
 
     if (localCookie != null) {
-      var socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+      socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
 
       // Connection opened
       socket.addEventListener('open', function (event) {
-        socket.send('Hello Server!')
-        console.log('open')
+        socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
       })
 
       // Listen for messages
       socket.addEventListener('message', function (event) {
-        console.log('Message from server ', event.data)
+        const receivedData = JSON.parse(event.data)
+        if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
+            receivedData['state'] === 200) {
+          switch (receivedData['type']) {
+            case 'FRIEND_LIST':
+              setFriendList(receivedData['friend_list'])
+              break
+            case 'ADD_NEW_FRIEND':
+              setFriendList([...friendList, receivedData['user_2']])
+              break
+            case 'DELETE_FRIEND': {
+              const newFriendList = friendList
+              const index = newFriendList.indexOf(receivedData['user_2'])
+              if (index > 0) {
+                newFriendList.slice(index, 1)
+                setFriendList(newFriendList)
+              }
+              break }
+            default:
+              break
+          }
+        }
       })
 
       socket.onerror = function(event) {
