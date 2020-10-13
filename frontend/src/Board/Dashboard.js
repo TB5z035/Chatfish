@@ -129,15 +129,19 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     maxWidth: '36ch',
     maxHeight: '60ch',
-    overflow: 'auto',
+    overflow: 'hidden',
     overflowX: 'hidden',
+    '&:hover': {
+      overflow: 'auto',
+      overflowX: 'hidden'
+    },
     backgroundColor: theme.palette.background.paper,
     '&::-webkit-scrollbar-track': {
       padding: '2px',
       backgroundColor: '#e8e8e8'
     },
     '&::-webkit-scrollbar': {
-      width: '6px'
+      width: '3px'
     },
     '&::-webkit-scrollbar-thumb': {
       borderRadius: '10px',

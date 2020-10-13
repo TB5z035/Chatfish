@@ -40,7 +40,7 @@ export const userList = (
 export function useSecondaryListItems() {
   const classes = useStyles()
   return (
-    <div>
+    <>
       <ListSubheader inset component="li">
         Tools
       </ListSubheader>
@@ -52,6 +52,6 @@ export function useSecondaryListItems() {
         </ListItemAvatar>
         <ListItemText primary="Settings" />
       </ListItem>
-    </div>
+    </>
   )
 }
