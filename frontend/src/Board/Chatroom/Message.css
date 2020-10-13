@@ -1,0 +1,35 @@
+.root {
+}
+
+.listBox {
+  display: flex;
+  flex-grow: 1;
+  /* margin-left: 1em; */
+  /* margin-right: 1em; */
+}
+
+.avatarBox {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.paperBox {
+  display: flex;
+  max-width: 300px;
+  align-items: center;
+}
+
+.textBox {
+  margin: 1em;
+}
+
+.text {
+  font-size: 130%;
+  text-align: left;
+  word-break: break-all;
+}
+
+.textTime {
+  font-size: 60%;
+  text-align: right;
+}

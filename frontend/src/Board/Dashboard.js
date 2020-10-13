@@ -11,8 +11,7 @@ import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import Badge from '@material-ui/core/Badge'
-import Container from '@material-ui/core/Container'
-import Link from '@material-ui/core/Link'
+// import Link from '@material-ui/core/Link'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import NotificationsIcon from '@material-ui/icons/Notifications'
@@ -24,21 +23,21 @@ import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link
-        color="inherit"
-        href="https://gitlab.secoder.net/GoJellyfish/ChatFish"
-      >
-        FishChat
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
+// function Copyright() {
+//   return (
+//     <Typography variant="body2" color="textSecondary" align="center">
+//       {'Copyright © '}
+//       <Link
+//         color="inherit"
+//         href="https://gitlab.secoder.net/GoJellyfish/ChatFish"
+//       >
+//         FishChat
+//       </Link>{' '}
+//       {new Date().getFullYear()}
+//       {'.'}
+//     </Typography>
+//   )
+// }
 
 const drawerWidth = 240
 
@@ -47,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   toolbar: {
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
     paddingRight: 24 // keep right padding when drawer closed
   },
   toolbarIcon: {
@@ -107,11 +107,15 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     height: '100vh',
-    overflow: 'auto'
+    overflow: 'hidden'
   },
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4)
+  },
+  box: {
+    padding: theme.spacing(4),
+    minWidth: 300 // fixme: not working!
   },
   paper: {
     padding: theme.spacing(2),
@@ -290,14 +294,24 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        {/* <Grid container direction="row" justify="center"> */}
+        {/* <Grid item xl={1}>
+            <Container maxWidth="lg" className={classes.container}>
+              <Box pt={4}>
+                <Copyright />
+              </Box>
+            </Container>
+          </Grid> */}
+        {/* <Grid item > */}
+        {/* <Container maxWidth="xl" className={classes.container}>
           {Chatroom()}
-        </Container>
-        <Container maxWidth="lg" className={classes.container}>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
-        </Container>
+        </Container> */}
+        <Box display="flex" flexDirection="row" justifyContent="center">
+          {/* <Box className={classes.box}>{Chatroom()}</Box> */}
+          <Box className={classes.box}>{Chatroom()}</Box>
+        </Box>
+        {/* </Grid> */}
+        {/* </Grid> */}
       </main>
     </div>
   )
