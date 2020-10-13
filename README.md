@@ -1,4 +1,4 @@
-# FishChat
+# ChatFish
 
 A web chat application for the course of Software Engineering.
 
