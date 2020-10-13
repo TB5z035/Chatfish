@@ -30,7 +30,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const userList = (
-  <div>{[1, 2, 4, 5].map((name) => UserListItem(name))}</div>
+  <div>
+    {[1, 2, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6].map((name) =>
+      UserListItem(name)
+    )}
+  </div>
 )
 
 export function useSecondaryListItems() {

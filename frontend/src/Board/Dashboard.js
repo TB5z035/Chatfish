@@ -128,7 +128,22 @@ const useStyles = makeStyles((theme) => ({
   listStyles: {
     width: '100%',
     maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper
+    maxHeight: '60ch',
+    overflow: 'auto',
+    overflowX: 'hidden',
+    backgroundColor: theme.palette.background.paper,
+    '&::-webkit-scrollbar-track': {
+      padding: '2px',
+      backgroundColor: '#e8e8e8'
+    },
+    '&::-webkit-scrollbar': {
+      width: '6px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '10px',
+      // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      backgroundColor: '#203152'
+    }
   }
 }))
 
