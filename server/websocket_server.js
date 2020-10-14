@@ -32,11 +32,11 @@ exports.init_server = function() {
         var token = get_token(req.headers.cookie, req.url)
         manager.set_ws(token, ws)
         var id = manager.find_by_token(token).id
-        console.log(id, token)
         ws.on('message', function(message) {
             try {
                 var data = JSON.parse(message)
                 console.log('message received:', JSON.stringify(data))
+                data['uid'] = id
                 django_request.post('/api/post_data/', data, function(res) {
                     console.log('post_data response: %j', res)
                 }, function(e) {
@@ -64,5 +64,5 @@ exports.init_server = function() {
     wss.on('close', function() {
         clearInterval(interval)
     })
-    return wss;
+    return wss
 }
