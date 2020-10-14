@@ -101,12 +101,26 @@ var django_request = function(request, response, body) {
     })
     if (key == request.headers['data-key']) {
         ret = {
-            'status': 'success'
+            'status': 'success',
+            'message': 'Successfully post!'
+        }
+        var data = JSON.parse(body)
+        var ws = manager.get_ws(data.uid)
+        delete data.uid
+        if (ws) {
+            ws.send(JSON.stringify(data))
+        }
+        else {
+            ret = {
+                'status': 'failed',
+                'message': 'No connection available!'
+            }
         }
     }
     else {
         ret = {
-            'status': 'error'
+            'status': 'error',
+            'message': 'Data key is wrong!'
         }
     }
     response.end(JSON.stringify(ret))
