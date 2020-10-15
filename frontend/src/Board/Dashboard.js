@@ -138,8 +138,9 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const [friendList, setFriendList] = useState([])
+  // const [friendList, setFriendList] = useState([])
   var socket
+  var username
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -163,10 +164,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     var localCookie = Cookies.get('token')
-
-    if (localCookie != null) {
+    var nameCookie = Cookies.get('username')
+    if (localCookie != null && nameCookie != null) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
-
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      username = nameCookie
+      console.log(username)
       // Connection opened
       socket.addEventListener('open', function (event) {
         // socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
