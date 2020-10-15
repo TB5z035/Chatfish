@@ -138,8 +138,9 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const [friendList, setFriendList] = useState([])
+  // const [friendList, setFriendList] = useState([])
   var socket
+  var username
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -163,13 +164,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     var localCookie = Cookies.get('token')
-
-    if (localCookie != null) {
+    var nameCookie = Cookies.get('username')
+    if (localCookie != null && nameCookie != null) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
-
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      username = nameCookie
+      console.log(username)
       // Connection opened
       socket.addEventListener('open', function (event) {
-        socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
+        // socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
       })
 
       // Listen for messages
@@ -177,24 +181,24 @@ export default function Dashboard() {
         const receivedData = JSON.parse(event.data)
         if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200) {
-          switch (receivedData['type']) {
-            case 'FRIEND_LIST':
-              setFriendList(receivedData['friend_list'])
-              break
-            case 'ADD_NEW_FRIEND':
-              setFriendList([...friendList, receivedData['user_2']])
-              break
-            case 'DELETE_FRIEND': {
-              const newFriendList = friendList
-              const index = newFriendList.indexOf(receivedData['user_2'])
-              if (index > 0) {
-                newFriendList.slice(index, 1)
-                setFriendList(newFriendList)
-              }
-              break }
-            default:
-              break
-          }
+          // switch (receivedData['type']) {
+          //   case 'FRIEND_LIST':
+          //     setFriendList(receivedData['friend_list'])
+          //     break
+          //   case 'ADD_NEW_FRIEND':
+          //     setFriendList([...friendList, receivedData['user_2']])
+          //     break
+          //   case 'DELETE_FRIEND': {
+          //     const newFriendList = friendList
+          //     const index = newFriendList.indexOf(receivedData['user_2'])
+          //     if (index > 0) {
+          //       newFriendList.slice(index, 1)
+          //       setFriendList(newFriendList)
+          //     }
+          //     break }
+          //   default:
+          //     break
+          // }
         }
       })
 

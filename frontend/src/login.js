@@ -91,6 +91,7 @@ export default function SignInSide () {
       password: passwordSHA
     }
 
+    Cookies.set('username', userName)
     fetch('/login', {
       method: 'POST',
       body: JSON.stringify(params),
