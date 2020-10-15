@@ -207,6 +207,10 @@ def post_data(request):
                 }
             elif data['type'] == 'TEST': # 本地测试接口正确性
                 print('successful testing.')
+                ret = {
+                    'state': 200,
+                    'message': 'successful testing.'
+                }
             else:
                 '''
                 other apis.
@@ -237,9 +241,3 @@ def post_to_nodejs(data):
     r = requests.post('http://localhost:3000', json = data, headers = headers)
     ret = r.text
     return JsonResponse(json.loads(ret))
-
-'''
-接的时候一定会有uid字段
-发给server信息
-回头post要带个uid
-'''
