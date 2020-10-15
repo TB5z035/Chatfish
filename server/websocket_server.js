@@ -6,6 +6,11 @@ const cookie_parse = require('cookie').parse
 var manager = require('./connection-manager.js').instance()
 
 function get_token(cookie, url) {
+    if (cookie == undefined || cookie == null) {
+        var params = URL.parse(url, true).query
+        token = params.token
+        return token
+    }
     var cookies = cookie_parse(cookie)
     if ('token' in cookies)
         token = cookies.token
