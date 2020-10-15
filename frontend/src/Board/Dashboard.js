@@ -169,7 +169,7 @@ export default function Dashboard() {
 
       // Connection opened
       socket.addEventListener('open', function (event) {
-        socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
+        // socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
       })
 
       // Listen for messages
@@ -177,24 +177,24 @@ export default function Dashboard() {
         const receivedData = JSON.parse(event.data)
         if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200) {
-          switch (receivedData['type']) {
-            case 'FRIEND_LIST':
-              setFriendList(receivedData['friend_list'])
-              break
-            case 'ADD_NEW_FRIEND':
-              setFriendList([...friendList, receivedData['user_2']])
-              break
-            case 'DELETE_FRIEND': {
-              const newFriendList = friendList
-              const index = newFriendList.indexOf(receivedData['user_2'])
-              if (index > 0) {
-                newFriendList.slice(index, 1)
-                setFriendList(newFriendList)
-              }
-              break }
-            default:
-              break
-          }
+          // switch (receivedData['type']) {
+          //   case 'FRIEND_LIST':
+          //     setFriendList(receivedData['friend_list'])
+          //     break
+          //   case 'ADD_NEW_FRIEND':
+          //     setFriendList([...friendList, receivedData['user_2']])
+          //     break
+          //   case 'DELETE_FRIEND': {
+          //     const newFriendList = friendList
+          //     const index = newFriendList.indexOf(receivedData['user_2'])
+          //     if (index > 0) {
+          //       newFriendList.slice(index, 1)
+          //       setFriendList(newFriendList)
+          //     }
+          //     break }
+          //   default:
+          //     break
+          // }
         }
       })
 
