@@ -139,62 +139,62 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [friendList, setFriendList] = useState([])
-  const [friendToAdd, setFriendToAdd] = useState('')
-  const [friendRequst, setFriendRequest] = useState('')
+  // const [friendToAdd, setFriendToAdd] = useState('')
+  // const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
 
-  const handleAddFriend = useCallback(async () => {
-    const params = {
-      username: username,
-      friend_name: friendToAdd
-    }
-
-    fetch('/add_friend', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    })
-  }, [friendToAdd])
-
-  const handleRequireFriendList = useCallback(async () => {
-    const params = {
-      username: username
-    }
-
-    fetch('/require_friend_list', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then(res => res.json()
-      .catch(error => console.error('Error:', error))
-      .then((data) => {
-        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200) {
-          setFriendList(data['message_list'])
-        }
-      }))
-  }, [])
-
-  const handleAddFriendRequest = useCallback(async () => {
-    const params = {
-      username: username,
-      friend_name: friendRequst
-    }
-
-    fetch('/agree_add_friend', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then(res => res.json()
-      .catch(error => console.error('Error:', error))
-      .then((data) => {
-        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200) {
-          setFriendList([...friendList, { user: username, message_list: [] }])
-        }
-      }))
-  }, [])
+  // const handleAddFriend = useCallback(async () => {
+  //   const params = {
+  //     username: username,
+  //     friend_name: friendToAdd
+  //   }
+  //
+  //   fetch('/add_friend', {
+  //     method: 'POST',
+  //     body: JSON.stringify(params),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   })
+  // }, [friendToAdd, username])
+  //
+  // const handleRequireFriendList = useCallback(async () => {
+  //   const params = {
+  //     username: username
+  //   }
+  //
+  //   fetch('/require_friend_list', {
+  //     method: 'POST',
+  //     body: JSON.stringify(params),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   }).then(res => res.json()
+  //     .catch(error => console.error('Error:', error))
+  //     .then((data) => {
+  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+  //             data['state'] === 200) {
+  //         setFriendList(data['message_list'])
+  //       }
+  //     }))
+  // }, [username])
+  //
+  // const handleAddFriendRequest = useCallback(async () => {
+  //   const params = {
+  //     username: username,
+  //     friend_name: friendRequst
+  //   }
+  //
+  //   fetch('/agree_add_friend', {
+  //     method: 'POST',
+  //     body: JSON.stringify(params),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   }).then(res => res.json()
+  //     .catch(error => console.error('Error:', error))
+  //     .then((data) => {
+  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+  //             data['state'] === 200) {
+  //         setFriendList([...friendList, { user: username, message_list: [] }])
+  //       }
+  //     }))
+  // }, [username, friendRequst, friendList])
 
   const handleReply = async (message) => {
     const params = {
