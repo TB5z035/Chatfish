@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -22,6 +22,8 @@ import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
+import sha1 from 'crypto-js/sha1'
+import { FRIEND_LIST } from '../actions/ActionTypes'
 
 // function Copyright() {
 //   return (
@@ -138,9 +140,75 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  // const [friendList, setFriendList] = useState([])
+  const [friendList, setFriendList] = useState([])
+  const [friendToAdd, setFriendToAdd] = useState('')
+  const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
+
+  const handleAddFriend = useCallback(async () => {
+    const params = {
+      username: username,
+      friend_name: friendToAdd
+    }
+
+    fetch('/add_friend', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }, [friendToAdd])
+
+  const handleRequireFriendList = useCallback(async () => {
+    const params = {
+      username: username
+    }
+
+    fetch('/require_friend_list', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList(data['message_list'])
+        }
+      }))
+  }, [])
+
+  const handleAddFriendRequest = useCallback(async () => {
+    const params = {
+      username: username,
+      friend_name: friendRequst
+    }
+
+    fetch('/agree_add_friend', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList([...friendList, { user: username, message_list: [] }])
+        }
+      }))
+  }, [])
+
+  const handleReply = async (message) => {
+    const params = {
+      response: message
+    }
+
+    fetch('/response', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -163,8 +231,8 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
-    var localCookie = Cookies.get('token')
-    var nameCookie = Cookies.get('username')
+    const localCookie = Cookies.get('token')
+    const nameCookie = Cookies.get('username')
     if (localCookie != null && nameCookie != null) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
