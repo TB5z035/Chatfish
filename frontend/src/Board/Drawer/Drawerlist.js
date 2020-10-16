@@ -1,5 +1,6 @@
 import React from 'react'
-import AcUnitIcon from '@material-ui/icons/AcUnit'
+import SettingsIcon from '@material-ui/icons/Settings';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import UserListItem from './UserListItem'
 import {
   Avatar,
@@ -46,8 +47,16 @@ export function useSecondaryListItems() {
       </ListSubheader>
       <ListItem button>
         <ListItemAvatar>
+          <Avatar className={classes.green}>
+            <PersonAddIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText primary="Add Friends" />
+      </ListItem>
+      <ListItem button>
+        <ListItemAvatar>
           <Avatar className={classes.pink}>
-            <AcUnitIcon />
+            <SettingsIcon />
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary="Settings" />
