@@ -22,8 +22,6 @@ import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
-import sha1 from 'crypto-js/sha1'
-import { FRIEND_LIST } from '../actions/ActionTypes'
 
 // function Copyright() {
 //   return (
@@ -238,10 +236,10 @@ export default function Dashboard() {
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
       // eslint-disable-next-line react-hooks/exhaustive-deps
       username = nameCookie
-      console.log(username)
+
       // Connection opened
       socket.addEventListener('open', function (event) {
-        // socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
+
       })
 
       // Listen for messages
@@ -249,24 +247,19 @@ export default function Dashboard() {
         const receivedData = JSON.parse(event.data)
         if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200) {
-          // switch (receivedData['type']) {
-          //   case 'FRIEND_LIST':
-          //     setFriendList(receivedData['friend_list'])
-          //     break
-          //   case 'ADD_NEW_FRIEND':
-          //     setFriendList([...friendList, receivedData['user_2']])
-          //     break
-          //   case 'DELETE_FRIEND': {
-          //     const newFriendList = friendList
-          //     const index = newFriendList.indexOf(receivedData['user_2'])
-          //     if (index > 0) {
-          //       newFriendList.slice(index, 1)
-          //       setFriendList(newFriendList)
-          //     }
-          //     break }
-          //   default:
-          //     break
-          // }
+          switch (receivedData['type']) {
+            case 'MESSAGE_NOTIFY':
+              handleReply('NOTIFY_MESSAGE_NOTIFY')
+              break
+            case 'NEW_ADD_FRIEND':
+              handleReply('NOTIFY_NEW_ADD_FRIEND')
+              break
+            case 'AGREE_ADD_FRIEND':
+              handleReply('NOTIFY_AGREE_ADD_FRIEND')
+              break
+            default:
+              break
+          }
         }
       })
 
