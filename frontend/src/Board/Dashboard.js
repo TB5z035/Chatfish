@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -158,7 +158,7 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const [friendList, setFriendList] = useState([])
+  // const [friendList, setFriendList] = useState([])
   // const [friendToAdd, setFriendToAdd] = useState('')
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
@@ -256,6 +256,7 @@ export default function Dashboard() {
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
       // eslint-disable-next-line react-hooks/exhaustive-deps
       username = nameCookie
+      console.log(username)
 
       // Connection opened
       socket.addEventListener('open', function (event) {
