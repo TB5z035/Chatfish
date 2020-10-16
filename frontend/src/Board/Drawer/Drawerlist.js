@@ -1,5 +1,6 @@
 import React from 'react'
-import AcUnitIcon from '@material-ui/icons/AcUnit'
+import SettingsIcon from '@material-ui/icons/Settings';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import UserListItem from './UserListItem'
 import {
   Avatar,
@@ -30,24 +31,36 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const userList = (
-  <div>{[1, 2, 4, 5].map((name) => UserListItem(name))}</div>
+  <div>
+    {[1, 2, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6].map((name) =>
+      UserListItem(name)
+    )}
+  </div>
 )
 
 export function useSecondaryListItems() {
   const classes = useStyles()
   return (
-    <div>
+    <>
       <ListSubheader inset component="li">
         Tools
       </ListSubheader>
       <ListItem button>
         <ListItemAvatar>
+          <Avatar className={classes.green}>
+            <PersonAddIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText primary="Add Friends" />
+      </ListItem>
+      <ListItem button>
+        <ListItemAvatar>
           <Avatar className={classes.pink}>
-            <AcUnitIcon />
+            <SettingsIcon />
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary="Settings" />
       </ListItem>
-    </div>
+    </>
   )
 }

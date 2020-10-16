@@ -14,6 +14,7 @@ import Badge from '@material-ui/core/Badge'
 // import Link from '@material-ui/core/Link'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import AddIcon from '@material-ui/icons/Add'
 import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
@@ -129,7 +130,26 @@ const useStyles = makeStyles((theme) => ({
   listStyles: {
     width: '100%',
     maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper
+    maxHeight: '60vh',
+    overflow: 'hidden',
+    overflowX: 'hidden',
+    '&:hover': {
+      overflow: 'auto',
+      overflowX: 'hidden'
+    },
+    backgroundColor: theme.palette.background.paper,
+    '&::-webkit-scrollbar-track': {
+      padding: '2px',
+      backgroundColor: '#e8e8e8'
+    },
+    '&::-webkit-scrollbar': {
+      width: '3px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '10px',
+      // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      backgroundColor: '#203152'
+    }
   }
 }))
 
@@ -347,6 +367,7 @@ export default function Dashboard() {
         open={open}
       >
         <div className={classes.toolbarIcon}>
+          <Typography>Friends</Typography>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
