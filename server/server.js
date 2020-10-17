@@ -52,17 +52,17 @@ server.on('upgrade', ws_proxy.upgrade)
 const request_to_django = require('./django_request')
 
 var login_request = function(request, response, body) {
-    var data = {}
+    var json_data = {}
     try {
-        data = JSON.parse(body)
+        json_data = JSON.parse(body)
     }
     catch (e) {
-        data = {}
+        json_data = {}
         console.log('error post: ' + e)
     }
     var data = {
         type: 'LOGIN_VERIFY',
-        user_info: data
+        user_info: json_data
     }
     console.log(body)
     request_to_django.post('/api/post_data/', data, function(res) {
@@ -78,7 +78,7 @@ var login_request = function(request, response, body) {
             console.log(res)
             if (manager.find(res.id) !== undefined)
                 manager.close(res.id)
-            manager.add_user(res.id, res.token, data.username)
+            manager.add_user(res.id, res.token, json_data.username)
             manager.close_ws(res.id)
             delete res.id
         }
