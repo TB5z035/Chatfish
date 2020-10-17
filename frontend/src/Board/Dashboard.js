@@ -206,7 +206,13 @@ export default function Dashboard() {
   //       }
   //     }))
   // }, [username, friendRequst, friendList])
-
+  const refuseAddRequest = (refusedUsername) => {
+    const index = friendToAddList.indexOf(refusedUsername)
+    const newArray = [...friendToAddList]
+    newArray.splice(index, 1)
+    console.log(newArray)
+    setFriendToAddList(newArray)
+  }
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -277,10 +283,10 @@ export default function Dashboard() {
 
       socket.onerror = function(event) {
         console.error('WebSocket error observed:', event)
-        history.push('/sign')
+        // history.push('/sign')
       }
     } else {
-      history.push('/sign')
+      // history.push('/sign')
     }
   }, [history])
 
@@ -405,7 +411,7 @@ export default function Dashboard() {
           <Box className={classes.chatBox}>
             <List className={classes.textList}>
               {friendToAddList.map((notification) => (
-                <NotificationListItem notification={notification} />
+                <NotificationListItem notification={notification} refuse={refuseAddRequest} key={notification}/>
               ))}
             </List>
           </Box>

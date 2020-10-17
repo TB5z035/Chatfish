@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { ListItem, Box, Paper, Avatar, ButtonBase, IconButton } from '@material-ui/core'
+import React from 'react'
+import { ListItem, Box, IconButton } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
 import CheckIcon from '@material-ui/icons/Check'
 import CloseIcon from '@material-ui/icons/Close'
+import PropTypes from 'prop-types'
 export default class NotificationListItem extends React.Component {
   constructor(props) {
     super(props)
@@ -24,7 +24,7 @@ export default class NotificationListItem extends React.Component {
             <IconButton>
               <CheckIcon></CheckIcon>
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => { this.props.refuse(this.props.notification) }}>
               <CloseIcon></CloseIcon>
             </IconButton>
           </Box>
@@ -32,4 +32,9 @@ export default class NotificationListItem extends React.Component {
       </ListItem>
     )
   }
+}
+
+NotificationListItem.propTypes = {
+  notification: PropTypes.string,
+  refuse: PropTypes.func
 }
