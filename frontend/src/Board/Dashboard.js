@@ -269,6 +269,16 @@ export default function Dashboard() {
     chatBoxRef.current.setChat(usr)
   }
 
+  const updateUser = (usr) => {
+    const friendListCopy = friendList
+    var index = 1
+    friendListCopy.forEach((item) => {
+      if (item.user == usr.user) index = friendListCopy.indexOf(item)
+    })
+    friendListCopy.splice(index, 1, usr)
+    setFriendList(friendListCopy)
+  }
+
   const handleLogout = (e) => {
     e.preventDefault()
     Cookies.remove('token')
@@ -448,7 +458,7 @@ export default function Dashboard() {
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
             {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            {Chatroom(chatBoxRef)}
+            {Chatroom(chatBoxRef, updateUser)}
           </Box>
         </Box>
       </main>
