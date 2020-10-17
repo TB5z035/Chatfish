@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
-export default function UserListItem(user) {
+export default function UserListItem(user, setChat) {
   const classes = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -23,7 +23,13 @@ export default function UserListItem(user) {
 
   return (
     <div>
-      <ListItem button alignItems="flex-start">
+      <ListItem
+        button
+        alignItems="flex-start"
+        onClick={() => {
+          setChat(user)
+        }}
+      >
         <ListItemAvatar>
           <Avatar> {user.user.toString()[0]} </Avatar>
         </ListItemAvatar>
