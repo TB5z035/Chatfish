@@ -157,7 +157,13 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  // const [friendList, setFriendList] = useState([])
+  const [friendList, setFriendList] = useState([
+    { user: 'TB5', message_list: [] },
+    { user: 'TB6', message_list: [] },
+    { user: 'TB7', message_list: [] },
+    { user: 'TB8', message_list: [] },
+    { user: 'TB9', message_list: [] }
+  ])
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
@@ -244,15 +250,16 @@ export default function Dashboard() {
       console.log(username)
 
       // Connection opened
-      socket.addEventListener('open', function (event) {
-
-      })
+      socket.addEventListener('open', function (event) {})
 
       // Listen for messages
       socket.addEventListener('message', function (event) {
         const receivedData = JSON.parse(event.data)
-        if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
-            receivedData['state'] === 200) {
+        if (
+          receivedData != null &&
+          Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
+          receivedData['state'] === 200
+        ) {
           switch (receivedData['type']) {
             case 'MESSAGE_NOTIFY':
               handleReply('NOTIFY_MESSAGE_NOTIFY')
@@ -269,12 +276,12 @@ export default function Dashboard() {
         }
       })
 
-      socket.onerror = function(event) {
+      socket.onerror = function (event) {
         console.error('WebSocket error observed:', event)
-        history.push('/sign')
+        // history.push('/sign')
       }
     } else {
-      history.push('/sign')
+      // history.push('/sign')
     }
   }, [history])
 
@@ -359,7 +366,7 @@ export default function Dashboard() {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.listStyles}>{userList}</List>
+        <List className={classes.listStyles}>{userList(friendList)}</List>
         <Divider />
         <List>{useSecondaryListItems()}</List>
       </Drawer>
