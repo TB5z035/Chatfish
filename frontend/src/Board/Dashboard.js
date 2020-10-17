@@ -22,7 +22,11 @@ import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
-
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import Dialog from '@material-ui/core/Dialog'
+import NotificationListItem from './NotificationListItem'
 // function Copyright() {
 //   return (
 //     <Typography variant="body2" color="textSecondary" align="center">
@@ -157,6 +161,8 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
+  const [friendToAddList, setFriendToAddList] = useState(['asddb', 'badsgf', 'sdgaga', 'gddasgasgasdgsagda'])
   // const [friendList, setFriendList] = useState([])
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
@@ -316,12 +322,12 @@ export default function Dashboard() {
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
           </div>
-          <div className={classes.appBarIcon}>
+          <div className={classes.appBarIcon} onClick={() => { setNotificationDialogOpen(true) }}>
             <IconButton color="inherit">
-              {/* number of notification */}
-              <Badge badgeContent={'12'} color="secondary">
-                <NotificationsIcon />
-              </Badge>
+              {friendToAddList.length !== 0
+                ? <Badge badgeContent={friendToAddList.length.toString()} color="secondary">
+                  <NotificationsIcon />
+                </Badge> : <NotificationsIcon />}
             </IconButton>
           </div>
 
@@ -385,6 +391,26 @@ export default function Dashboard() {
         {/* </Grid> */}
         {/* </Grid> */}
       </main>
+      <Dialog
+        open={notificationDialogOpen}
+        onClose={() => {
+          setNotificationDialogOpen(false)
+        }}
+      >
+        <DialogTitle> Notifications </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            New friend requests
+          </DialogContentText>
+          <Box className={classes.chatBox}>
+            <List className={classes.textList}>
+              {friendToAddList.map((notification) => (
+                <NotificationListItem notification={notification} />
+              ))}
+            </List>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
