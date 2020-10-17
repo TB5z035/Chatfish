@@ -19,7 +19,7 @@ function get_token(cookie, url) {
 function ClientVerify(info) {
     var token = get_token(info.req.headers.cookie, info.req.url)
 
-    return manager.find_by_token(token)
+    return manager.find_by_token(token) !== undefined
 }
 
 exports.init_server = function() {
