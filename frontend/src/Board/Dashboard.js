@@ -158,24 +158,10 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   // const [friendList, setFriendList] = useState([])
-  // const [friendToAdd, setFriendToAdd] = useState('')
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
 
-  // const handleAddFriend = useCallback(async () => {
-  //   const params = {
-  //     username: username,
-  //     friend_name: friendToAdd
-  //   }
-  //
-  //   fetch('/add_friend', {
-  //     method: 'POST',
-  //     body: JSON.stringify(params),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   })
-  // }, [friendToAdd, username])
-  //
   // const handleRequireFriendList = useCallback(async () => {
   //   const params = {
   //     username: username
