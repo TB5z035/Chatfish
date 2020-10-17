@@ -1,4 +1,5 @@
 const http = require('http')
+const URL = require('url')
 const connect = require('connect')
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const crypto = require('crypto')
@@ -32,7 +33,8 @@ const django_filter = function(pathname, req) {
 }
 
 const login_register_filter = function(pathname, req) {
-    return (pathname.match('^/login$') || pathname.match('^/register$')) && req.method === 'POST'
+    var params = URL.parse(req.url, true).query
+    return 'action' in params && req.method === 'POST'
 }
 
 const django_proxy = createProxyMiddleware(django_filter, django_options)
@@ -50,9 +52,17 @@ server.on('upgrade', ws_proxy.upgrade)
 const request_to_django = require('./django_request')
 
 var login_request = function(request, response, body) {
+    var data = {}
+    try {
+        data = JSON.parse(body)
+    }
+    catch (e) {
+        data = {}
+        console.log('error post: ' + e)
+    }
     var data = {
         type: 'LOGIN_VERIFY',
-        user_info: JSON.parse(body)
+        user_info: data
     }
     console.log(body)
     request_to_django.post('/api/post_data/', data, function(res) {
@@ -61,7 +71,9 @@ var login_request = function(request, response, body) {
             'Access-Control-Allow-Origin': '*'
         })
         if (res.state === 200) {
-            res.token = random(32)
+            do {
+                res.token = random(32)
+            } while(manager.find_by_token(res.token) !== undefined)
             console.log(res)
             manager.add_user(res.id, res.token)
             manager.close_ws(res.id)
@@ -75,9 +87,17 @@ var login_request = function(request, response, body) {
 }
 
 var register_request = function(request, response, body) {
+    var data = {}
+    try {
+        data = JSON.parse(body)
+    }
+    catch (e) {
+        data = {}
+        console.log('error post: ' + e)
+    }
     var data = {
         type: 'REGISTER_IN',
-        user_info: JSON.parse(body)
+        user_info: data
     }
     console.log(body)
     request_to_django.post('/api/post_data/', data, function(res) {
@@ -101,12 +121,26 @@ var django_request = function(request, response, body) {
     })
     if (key == request.headers['data-key']) {
         ret = {
-            'status': 'success'
+            'status': 'success',
+            'message': 'Successfully post!'
+        }
+        var data = JSON.parse(body)
+        var ws = manager.get_ws(data.uid)
+        delete data.uid
+        if (ws) {
+            ws.send(JSON.stringify(data))
+        }
+        else {
+            ret = {
+                'status': 'failed',
+                'message': 'No connection available!'
+            }
         }
     }
     else {
         ret = {
-            'status': 'error'
+            'status': 'error',
+            'message': 'Data key is wrong!'
         }
     }
     response.end(JSON.stringify(ret))
@@ -125,11 +159,15 @@ request_server.on('request', function(request, response) {
 
         request.on('end', function() {
             var pathname = request.url
-        
-            if (pathname.match('^/login$'))
-                login_request(request, response, body)
-            else if (pathname.match('^/register$'))
-                register_request(request, response, body)
+
+            var params = URL.parse(pathname, true).query
+
+            if ('action' in params) {
+                if (params.action === 'login')
+                    login_request(request, response, body)
+                else if (params.action === 'register')
+                    register_request(request, response, body)
+            }
             else
                 django_request(request, response, body)
         })

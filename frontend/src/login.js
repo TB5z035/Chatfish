@@ -92,7 +92,7 @@ export default function SignInSide () {
     }
 
     Cookies.set('username', userName, { expires: 1 })
-    fetch('/login', {
+    fetch('/?action=login', {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
@@ -116,7 +116,7 @@ export default function SignInSide () {
       password: newPasswordSHA
     }
 
-    fetch('/register', {
+    fetch('/?action=register', {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
