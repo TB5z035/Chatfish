@@ -61,7 +61,9 @@ var login_request = function(request, response, body) {
             'Access-Control-Allow-Origin': '*'
         })
         if (res.state === 200) {
-            res.token = random(32)
+            do {
+                res.token = random(32)
+            } while(manager.find_by_token(res.token) !== undefined)
             console.log(res)
             manager.add_user(res.id, res.token)
             manager.close_ws(res.id)
