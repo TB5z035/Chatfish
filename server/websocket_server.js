@@ -6,6 +6,11 @@ const cookie_parse = require('cookie').parse
 var manager = require('./connection-manager.js').instance()
 
 function get_token(cookie, url) {
+    if (cookie == undefined || cookie == null) {
+        var params = URL.parse(url, true).query
+        token = params.token
+        return token
+    }
     var cookies = cookie_parse(cookie)
     if ('token' in cookies)
         token = cookies.token
@@ -16,10 +21,28 @@ function get_token(cookie, url) {
     return token
 }
 
+function get_username(cookie) {
+    if (cookie == undefined || cookie == null) {
+        var params = URL.parse(url, true).query
+        username = params.usernbame
+        return username
+    }
+    var cookies = cookie_parse(cookie)
+    if ('username' in cookies)
+        username = cookies.username
+    else {
+        var params = URL.parse(url, true).query
+        username = params.username
+    }
+    return username
+}
+
 function ClientVerify(info) {
     var token = get_token(info.req.headers.cookie, info.req.url)
 
-    return manager.find_by_token(token)
+    var user = manager.find_by_token(token)
+
+    return user !== undefined && user.username === get_username(info.req.headers.cookie)
 }
 
 exports.init_server = function() {
@@ -32,11 +55,11 @@ exports.init_server = function() {
         var token = get_token(req.headers.cookie, req.url)
         manager.set_ws(token, ws)
         var id = manager.find_by_token(token).id
-        console.log(id, token)
         ws.on('message', function(message) {
             try {
                 var data = JSON.parse(message)
                 console.log('message received:', JSON.stringify(data))
+                data['uid'] = id
                 django_request.post('/api/post_data/', data, function(res) {
                     console.log('post_data response: %j', res)
                 }, function(e) {
@@ -64,5 +87,5 @@ exports.init_server = function() {
     wss.on('close', function() {
         clearInterval(interval)
     })
-    return wss;
+    return wss
 }
