@@ -6,6 +6,10 @@ class ConnectionManager {
         this.users = []
     }
 
+    clear() {
+        this.users = []
+    }
+
     add_user(id, token, username) {
         this.users.push({
             id: id,
@@ -46,6 +50,10 @@ class ConnectionManager {
 
     set_ws(token, ws) {
         var index = this.find_index_by_token(token)
+        if (this.users[index].ws) {
+            ws.close()
+            delete this.users[index].ws
+        }
         this.users[index].ws = ws
         if (this.users[index].timer) {
             console.log('clear timeout!')
@@ -67,6 +75,7 @@ class ConnectionManager {
 
     close_ws(id) {
         var index = this.find_index(id)
+        if (index !== -1) delete this.users[index].ws
         if (index !== -1) this.users[index].timer = setTimeout(function(ts, index) {
             ts.users.splice(index, 1)
             console.log('token expirated!')
