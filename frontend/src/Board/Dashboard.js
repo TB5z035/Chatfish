@@ -168,25 +168,25 @@ export default function Dashboard() {
   var socket
   var username
 
-  // const handleRequireFriendList = useCallback(async () => {
-  //   const params = {
-  //     username: username
-  //   }
-  //
-  //   fetch('/require_friend_list', {
-  //     method: 'POST',
-  //     body: JSON.stringify(params),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   }).then(res => res.json()
-  //     .catch(error => console.error('Error:', error))
-  //     .then((data) => {
-  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-  //             data['state'] === 200) {
-  //         setFriendList(data['message_list'])
-  //       }
-  //     }))
-  // }, [username])
-  //
+  const handleRequireFriendList = useCallback(async () => {
+    const params = {
+      username: username
+    }
+
+    fetch('/require_friend_list', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList(data['message_list'])
+        }
+      }))
+  }, [username])
+
   const handleAddFriendRequest = useCallback(async (fiendName) => {
     const params = {
       username: username,
@@ -210,7 +210,6 @@ export default function Dashboard() {
     const index = friendToAddList.indexOf(refusedUsername)
     const newArray = [...friendToAddList]
     newArray.splice(index, 1)
-    console.log(newArray)
     setFriendToAddList(newArray)
   }
   const handleReply = async (message) => {
@@ -253,11 +252,10 @@ export default function Dashboard() {
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
       // eslint-disable-next-line react-hooks/exhaustive-deps
       username = nameCookie
-      console.log(username)
 
       // Connection opened
       socket.addEventListener('open', function (event) {
-
+        handleRequireFriendList().then()
       })
 
       // Listen for messages
@@ -267,13 +265,15 @@ export default function Dashboard() {
             receivedData['state'] === 200) {
           switch (receivedData['type']) {
             case 'MESSAGE_NOTIFY':
-              handleReply('NOTIFY_MESSAGE_NOTIFY')
+              handleReply('NOTIFY_MESSAGE_NOTIFY').then()
               break
             case 'NEW_ADD_FRIEND':
-              handleReply('NOTIFY_NEW_ADD_FRIEND')
+              handleReply('NOTIFY_NEW_ADD_FRIEND').then()
+              setFriendToAddList([...friendToAddList, receivedData['friend_name']])
               break
             case 'AGREE_ADD_FRIEND':
-              handleReply('NOTIFY_AGREE_ADD_FRIEND')
+              handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
+              setFriendList([friendList, { user: username, message_list: [] }])
               break
             default:
               break
@@ -283,10 +283,10 @@ export default function Dashboard() {
 
       socket.onerror = function(event) {
         console.error('WebSocket error observed:', event)
-        history.push('/sign')
+        // history.push('/sign')
       }
     } else {
-      history.push('/sign')
+      // history.push('/sign')
     }
   }, [history])
 
