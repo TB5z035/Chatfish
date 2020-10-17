@@ -173,7 +173,7 @@ export default function Dashboard() {
       username: username
     }
 
-    fetch('/require_friend_list', {
+    fetch('/?action=require_friend_list', {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
@@ -283,10 +283,10 @@ export default function Dashboard() {
 
       socket.onerror = function(event) {
         console.error('WebSocket error observed:', event)
-        // history.push('/sign')
+        history.push('/sign')
       }
     } else {
-      // history.push('/sign')
+      history.push('/sign')
     }
   }, [history])
 
