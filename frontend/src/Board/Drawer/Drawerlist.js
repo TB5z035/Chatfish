@@ -62,7 +62,7 @@ export function useSecondaryListItems() {
       friend_name: friendToAdd
     }
 
-    fetch('/add_friend', {
+    fetch('/?action=add_friend', {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
