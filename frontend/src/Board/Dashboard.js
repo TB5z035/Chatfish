@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -22,7 +22,11 @@ import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
-
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import Dialog from '@material-ui/core/Dialog'
+import NotificationListItem from './NotificationListItem'
 // function Copyright() {
 //   return (
 //     <Typography variant="body2" color="textSecondary" align="center">
@@ -157,50 +161,57 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  // const [friendList, setFriendList] = useState([])
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
+  const [friendToAddList, setFriendToAddList] = useState(['asddb', 'badsgf', 'sdgaga', 'gddasgasgasdgsagda'])
+  const [friendList, setFriendList] = useState([])
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
 
-  // const handleRequireFriendList = useCallback(async () => {
-  //   const params = {
-  //     username: username
-  //   }
-  //
-  //   fetch('/require_friend_list', {
-  //     method: 'POST',
-  //     body: JSON.stringify(params),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   }).then(res => res.json()
-  //     .catch(error => console.error('Error:', error))
-  //     .then((data) => {
-  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-  //             data['state'] === 200) {
-  //         setFriendList(data['message_list'])
-  //       }
-  //     }))
-  // }, [username])
-  //
-  // const handleAddFriendRequest = useCallback(async () => {
-  //   const params = {
-  //     username: username,
-  //     friend_name: friendRequst
-  //   }
-  //
-  //   fetch('/agree_add_friend', {
-  //     method: 'POST',
-  //     body: JSON.stringify(params),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   }).then(res => res.json()
-  //     .catch(error => console.error('Error:', error))
-  //     .then((data) => {
-  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-  //             data['state'] === 200) {
-  //         setFriendList([...friendList, { user: username, message_list: [] }])
-  //       }
-  //     }))
-  // }, [username, friendRequst, friendList])
+  const handleRequireFriendList = useCallback(async () => {
+    const params = {
+      username: username
+    }
 
+    fetch('/?action=require_friend_list', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList(data['message_list'])
+        }
+      }))
+  }, [username])
+
+  const handleAddFriendRequest = useCallback(async (fiendName) => {
+    const params = {
+      username: username,
+      friend_name: fiendName
+    }
+
+    fetch('/?action=agree_add_friend', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList([...friendList, { user: username, message_list: [] }])
+        }
+      }))
+  }, [username, friendList])
+  const refuseAddRequest = (refusedUsername) => {
+    const index = friendToAddList.indexOf(refusedUsername)
+    const newArray = [...friendToAddList]
+    newArray.splice(index, 1)
+    setFriendToAddList(newArray)
+  }
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -241,11 +252,10 @@ export default function Dashboard() {
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
       // eslint-disable-next-line react-hooks/exhaustive-deps
       username = nameCookie
-      console.log(username)
 
       // Connection opened
       socket.addEventListener('open', function (event) {
-
+        handleRequireFriendList().then()
       })
 
       // Listen for messages
@@ -255,13 +265,15 @@ export default function Dashboard() {
             receivedData['state'] === 200) {
           switch (receivedData['type']) {
             case 'MESSAGE_NOTIFY':
-              handleReply('NOTIFY_MESSAGE_NOTIFY')
+              handleReply('NOTIFY_MESSAGE_NOTIFY').then()
               break
             case 'NEW_ADD_FRIEND':
-              handleReply('NOTIFY_NEW_ADD_FRIEND')
+              handleReply('NOTIFY_NEW_ADD_FRIEND').then()
+              setFriendToAddList([...friendToAddList, receivedData['friend_name']])
               break
             case 'AGREE_ADD_FRIEND':
-              handleReply('NOTIFY_AGREE_ADD_FRIEND')
+              handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
+              setFriendList([friendList, { user: username, message_list: [] }])
               break
             default:
               break
@@ -316,12 +328,12 @@ export default function Dashboard() {
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
           </div>
-          <div className={classes.appBarIcon}>
+          <div className={classes.appBarIcon} onClick={() => { setNotificationDialogOpen(true) }}>
             <IconButton color="inherit">
-              {/* number of notification */}
-              <Badge badgeContent={'12'} color="secondary">
-                <NotificationsIcon />
-              </Badge>
+              {friendToAddList.length !== 0
+                ? <Badge badgeContent={friendToAddList.length.toString()} color="secondary">
+                  <NotificationsIcon />
+                </Badge> : <NotificationsIcon />}
             </IconButton>
           </div>
 
@@ -385,6 +397,30 @@ export default function Dashboard() {
         {/* </Grid> */}
         {/* </Grid> */}
       </main>
+      <Dialog
+        open={notificationDialogOpen}
+        onClose={() => {
+          setNotificationDialogOpen(false)
+        }}
+      >
+        <DialogTitle> Notifications </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            New friend requests
+          </DialogContentText>
+          <Box className={classes.chatBox}>
+            <List className={classes.textList}>
+              {friendToAddList.map((notification) => (
+                <NotificationListItem
+                  notification={notification}
+                  refuse={refuseAddRequest}
+                  accept={handleAddFriendRequest}
+                  key={notification}/>
+              ))}
+            </List>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
