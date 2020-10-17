@@ -6,10 +6,11 @@ class ConnectionManager {
         this.users = []
     }
 
-    add_user(id, token) {
+    add_user(id, token, username) {
         this.users.push({
             id: id,
-            token: token
+            token: token,
+            username: username
         })
     }
 

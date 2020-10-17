@@ -73,9 +73,12 @@ var login_request = function(request, response, body) {
         if (res.state === 200) {
             do {
                 res.token = random(32)
-            } while(manager.find_by_token(res.token) !== undefined)
+            }
+            while (manager.find_by_token(res.token) !== undefined)
             console.log(res)
-            manager.add_user(res.id, res.token)
+            if (manager.find(res.id) !== undefined)
+                manager.close(res.id)
+            manager.add_user(res.id, res.token, data.username)
             manager.close_ws(res.id)
             delete res.id
         }
