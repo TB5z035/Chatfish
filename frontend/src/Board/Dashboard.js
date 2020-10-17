@@ -273,7 +273,7 @@ export default function Dashboard() {
               break
             case 'AGREE_ADD_FRIEND':
               handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-              setFriendList([friendList, { user: username, message_list: [] }])
+              setFriendList([friendList, { user: receivedData['friend_name'], message_list: [] }])
               break
             default:
               break
