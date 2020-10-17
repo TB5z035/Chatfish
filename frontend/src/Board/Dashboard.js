@@ -129,7 +129,26 @@ const useStyles = makeStyles((theme) => ({
   listStyles: {
     width: '100%',
     maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper
+    maxHeight: '60vh',
+    overflow: 'hidden',
+    overflowX: 'hidden',
+    '&:hover': {
+      overflow: 'auto',
+      overflowX: 'hidden'
+    },
+    backgroundColor: theme.palette.background.paper,
+    '&::-webkit-scrollbar-track': {
+      padding: '2px',
+      backgroundColor: '#e8e8e8'
+    },
+    '&::-webkit-scrollbar': {
+      width: '3px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '10px',
+      // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      backgroundColor: '#203152'
+    }
   }
 }))
 
@@ -138,8 +157,61 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const [friendList, setFriendList] = useState([])
+  // const [friendList, setFriendList] = useState([])
+  // const [friendRequst, setFriendRequest] = useState('')
   var socket
+  var username
+
+  // const handleRequireFriendList = useCallback(async () => {
+  //   const params = {
+  //     username: username
+  //   }
+  //
+  //   fetch('/require_friend_list', {
+  //     method: 'POST',
+  //     body: JSON.stringify(params),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   }).then(res => res.json()
+  //     .catch(error => console.error('Error:', error))
+  //     .then((data) => {
+  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+  //             data['state'] === 200) {
+  //         setFriendList(data['message_list'])
+  //       }
+  //     }))
+  // }, [username])
+  //
+  // const handleAddFriendRequest = useCallback(async () => {
+  //   const params = {
+  //     username: username,
+  //     friend_name: friendRequst
+  //   }
+  //
+  //   fetch('/agree_add_friend', {
+  //     method: 'POST',
+  //     body: JSON.stringify(params),
+  //     headers: { 'Content-Type': 'application/json' }
+  //   }).then(res => res.json()
+  //     .catch(error => console.error('Error:', error))
+  //     .then((data) => {
+  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+  //             data['state'] === 200) {
+  //         setFriendList([...friendList, { user: username, message_list: [] }])
+  //       }
+  //     }))
+  // }, [username, friendRequst, friendList])
+
+  const handleReply = async (message) => {
+    const params = {
+      response: message
+    }
+
+    fetch('/response', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
 
   const handleLogout = (e) => {
     e.preventDefault()
@@ -162,14 +234,18 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
-    var localCookie = Cookies.get('token')
-
-    if (localCookie != null) {
+    const localCookie = Cookies.get('token')
+    const nameCookie = Cookies.get('username')
+    if (localCookie != null && nameCookie != null) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      username = nameCookie
+      console.log(username)
 
       // Connection opened
       socket.addEventListener('open', function (event) {
-        socket.send(JSON.stringify({ type: 'REQUIRE_FRIEND_LIST' }))
+
       })
 
       // Listen for messages
@@ -178,20 +254,15 @@ export default function Dashboard() {
         if (receivedData != null && Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200) {
           switch (receivedData['type']) {
-            case 'FRIEND_LIST':
-              setFriendList(receivedData['friend_list'])
+            case 'MESSAGE_NOTIFY':
+              handleReply('NOTIFY_MESSAGE_NOTIFY')
               break
-            case 'ADD_NEW_FRIEND':
-              setFriendList([...friendList, receivedData['user_2']])
+            case 'NEW_ADD_FRIEND':
+              handleReply('NOTIFY_NEW_ADD_FRIEND')
               break
-            case 'DELETE_FRIEND': {
-              const newFriendList = friendList
-              const index = newFriendList.indexOf(receivedData['user_2'])
-              if (index > 0) {
-                newFriendList.slice(index, 1)
-                setFriendList(newFriendList)
-              }
-              break }
+            case 'AGREE_ADD_FRIEND':
+              handleReply('NOTIFY_AGREE_ADD_FRIEND')
+              break
             default:
               break
           }
@@ -282,6 +353,7 @@ export default function Dashboard() {
         open={open}
       >
         <div className={classes.toolbarIcon}>
+          <Typography>Friends</Typography>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>

@@ -91,6 +91,7 @@ export default function SignInSide () {
       password: passwordSHA
     }
 
+    Cookies.set('username', userName, { expires: 1 })
     fetch('/login', {
       method: 'POST',
       body: JSON.stringify(params),
@@ -100,7 +101,7 @@ export default function SignInSide () {
       .then((data) => {
         if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
             data['state'] === 200) {
-          Cookies.set('token', data['token'], { expires: 2 })
+          Cookies.set('token', data['token'], { expires: 1 })
           history.push('/')
         } else alert('Wrong Password')
       }))
