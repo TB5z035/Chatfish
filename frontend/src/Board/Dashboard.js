@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -163,7 +163,7 @@ export default function Dashboard() {
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState(['asddb', 'badsgf', 'sdgaga', 'gddasgasgasdgsagda'])
-  // const [friendList, setFriendList] = useState([])
+  const [friendList, setFriendList] = useState([])
   // const [friendRequst, setFriendRequest] = useState('')
   var socket
   var username
@@ -187,25 +187,25 @@ export default function Dashboard() {
   //     }))
   // }, [username])
   //
-  // const handleAddFriendRequest = useCallback(async () => {
-  //   const params = {
-  //     username: username,
-  //     friend_name: friendRequst
-  //   }
-  //
-  //   fetch('/agree_add_friend', {
-  //     method: 'POST',
-  //     body: JSON.stringify(params),
-  //     headers: { 'Content-Type': 'application/json' }
-  //   }).then(res => res.json()
-  //     .catch(error => console.error('Error:', error))
-  //     .then((data) => {
-  //       if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
-  //             data['state'] === 200) {
-  //         setFriendList([...friendList, { user: username, message_list: [] }])
-  //       }
-  //     }))
-  // }, [username, friendRequst, friendList])
+  const handleAddFriendRequest = useCallback(async (fiendName) => {
+    const params = {
+      username: username,
+      friend_name: fiendName
+    }
+
+    fetch('/?action=agree_add_friend', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()
+      .catch(error => console.error('Error:', error))
+      .then((data) => {
+        if (data != null && Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200) {
+          setFriendList([...friendList, { user: username, message_list: [] }])
+        }
+      }))
+  }, [username, friendList])
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
     const newArray = [...friendToAddList]
@@ -283,10 +283,10 @@ export default function Dashboard() {
 
       socket.onerror = function(event) {
         console.error('WebSocket error observed:', event)
-        // history.push('/sign')
+        history.push('/sign')
       }
     } else {
-      // history.push('/sign')
+      history.push('/sign')
     }
   }, [history])
 
@@ -411,7 +411,11 @@ export default function Dashboard() {
           <Box className={classes.chatBox}>
             <List className={classes.textList}>
               {friendToAddList.map((notification) => (
-                <NotificationListItem notification={notification} refuse={refuseAddRequest} key={notification}/>
+                <NotificationListItem
+                  notification={notification}
+                  refuse={refuseAddRequest}
+                  accept={handleAddFriendRequest}
+                  key={notification}/>
               ))}
             </List>
           </Box>

@@ -21,7 +21,7 @@ export default class NotificationListItem extends React.Component {
             <Typography variant="h6" gutterBottom>
               {this.state.notification}
             </Typography>
-            <IconButton>
+            <IconButton onClick={() => { this.props.accept(this.props.notification) }}>
               <CheckIcon></CheckIcon>
             </IconButton>
             <IconButton onClick={() => { this.props.refuse(this.props.notification) }}>
@@ -36,5 +36,6 @@ export default class NotificationListItem extends React.Component {
 
 NotificationListItem.propTypes = {
   notification: PropTypes.string,
-  refuse: PropTypes.func
+  refuse: PropTypes.func,
+  accept: PropTypes.func
 }
