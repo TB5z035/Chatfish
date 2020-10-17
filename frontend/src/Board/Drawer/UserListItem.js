@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
-export default function UserListItem(name, time, recent) {
+export default function UserListItem(user) {
   const classes = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -25,10 +25,10 @@ export default function UserListItem(name, time, recent) {
     <div>
       <ListItem button alignItems="flex-start">
         <ListItemAvatar>
-          <Avatar> {name.toString()[0]} </Avatar>
+          <Avatar> {user.user.toString()[0]} </Avatar>
         </ListItemAvatar>
         <ListItemText
-          primary={name}
+          primary={user.user}
           secondary={
             <React.Fragment>
               <Typography
@@ -43,7 +43,7 @@ export default function UserListItem(name, time, recent) {
                   color="textPrimary"
                   noWrap
                 >
-                  {time ? time : 'time'} -
+                  {user.time ? user.time : 'time'} -
                 </Typography>
                 <Typography
                   component="span"
@@ -51,7 +51,7 @@ export default function UserListItem(name, time, recent) {
                   color="textSecondary"
                   noWrap
                 >
-                  {recent ? recent : 'recent messages blah blah blah'}
+                  {user.recent ? user.recent : 'recent messages blah blah blah'}
                 </Typography>
               </Typography>
             </React.Fragment>

@@ -37,13 +37,17 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export const userList = (
-  <div>
-    {[1, 2, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6].map((name) =>
-      UserListItem(name)
-    )}
-  </div>
-)
+// export const userList = (
+//   <div>
+//     {[1, 2, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6].map((name) =>
+//       UserListItem(name)
+//     )}
+//   </div>
+// )
+
+export function userList(users) {
+  return <>{users.map((user) => UserListItem(user))}</>
+}
 
 export function useSecondaryListItems() {
   const classes = useStyles()
@@ -79,9 +83,12 @@ export function useSecondaryListItems() {
       <ListSubheader inset component="li">
         Tools
       </ListSubheader>
-      <ListItem button onClick={() => {
-        setAddFriendDialogOpen(true)
-      }}>
+      <ListItem
+        button
+        onClick={() => {
+          setAddFriendDialogOpen(true)
+        }}
+      >
         <ListItemAvatar>
           <Avatar className={classes.green}>
             <PersonAddIcon />
@@ -105,9 +112,7 @@ export function useSecondaryListItems() {
       >
         <DialogTitle> Add new friend</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Enter username of new friend
-          </DialogContentText>
+          <DialogContentText>Enter username of new friend</DialogContentText>
           <TextField
             label="username"
             autoFocus
