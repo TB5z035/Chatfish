@@ -5,7 +5,7 @@ const cookie_parse = require('cookie').parse
 
 var manager = require('./connection-manager.js').instance()
 
-function get_token(cookie, url) {
+var get_token = function(cookie, url) {
     if (cookie == undefined || cookie == null) {
         var params = URL.parse(url, true).query
         token = params.token
@@ -21,7 +21,7 @@ function get_token(cookie, url) {
     return token
 }
 
-function get_username(cookie) {
+var get_username = function(cookie) {
     if (cookie == undefined || cookie == null) {
         var params = URL.parse(url, true).query
         username = params.usernbame
@@ -37,13 +37,15 @@ function get_username(cookie) {
     return username
 }
 
-function ClientVerify(info) {
+var ClientVerify =function(info) {
     var token = get_token(info.req.headers.cookie, info.req.url)
 
     var user = manager.find_by_token(token)
 
     return user !== undefined && user.username === get_username(info.req.headers.cookie)
 }
+
+exports.get_token = get_token
 
 exports.init_server = function() {
     var wss = new Server({
@@ -52,6 +54,7 @@ exports.init_server = function() {
     }, function() {
         console.log('listening')
     }).on('connection', function(ws, req) {
+        console.log('connection build!')
         var token = get_token(req.headers.cookie, req.url)
         manager.set_ws(token, ws)
         var id = manager.find_by_token(token).id
