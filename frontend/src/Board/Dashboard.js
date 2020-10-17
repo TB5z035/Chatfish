@@ -158,7 +158,16 @@ export default function Dashboard() {
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [friendList, setFriendList] = useState([
-    { user: 'TB5', message_list: [] },
+    {
+      user: 'TB5',
+      message_list: [
+        { type: 'normal', content: 'Hi!', time: new Date(), from: 'TB5' },
+        { type: 'normal', content: 'H2!', time: new Date(), from: '_self' }, //fixme
+        { type: 'normal', content: 'H3!', time: new Date(), from: 'TB5' },
+        { type: 'normal', content: 'H4!', time: new Date(), from: 'TB5' },
+        { type: 'normal', content: 'H5!', time: new Date(), from: '_self' }
+      ]
+    },
     { user: 'TB6', message_list: [] },
     { user: 'TB7', message_list: [] },
     { user: 'TB8', message_list: [] },
@@ -387,7 +396,7 @@ export default function Dashboard() {
         </Container> */}
         <Box display="flex" flexDirection="row" justifyContent="center">
           {/* <Box className={classes.box}>{Chatroom()}</Box> */}
-          <Box className={classes.box}>{Chatroom()}</Box>
+          <Box className={classes.box}>{Chatroom(friendList[0])}</Box>
         </Box>
         {/* </Grid> */}
         {/* </Grid> */}
