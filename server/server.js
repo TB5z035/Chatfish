@@ -6,7 +6,10 @@ const crypto = require('crypto')
 const encoder = new TextEncoder('utf8')
 const random = require('string-random')
 
+const ws_server = require('./websocket_server')
 var manager = require('./connection-manager.js').instance()
+
+manager.clear()
 
 const ws_options = {
     target: 'http://localhost:8801',
@@ -51,20 +54,23 @@ server.on('upgrade', ws_proxy.upgrade)
 
 const request_to_django = require('./django_request')
 
-var login_request = function(request, response, body) {
-    var json_data = {}
+var try_json = function(data) {
     try {
-        json_data = JSON.parse(body)
+        var ret = JSON.parse(data)
+        return ret
     }
     catch (e) {
-        json_data = {}
-        console.log('error post: ' + e)
+        console.log('error json: ' + e)
+        return {}
     }
+}
+
+var login_request = function(request, response, body) {
+    var json_data = try_json(body)
     var data = {
         type: 'LOGIN_VERIFY',
         user_info: json_data
     }
-    console.log(body)
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
             'Content-Type': 'application/json',
@@ -90,19 +96,11 @@ var login_request = function(request, response, body) {
 }
 
 var register_request = function(request, response, body) {
-    var data = {}
-    try {
-        data = JSON.parse(body)
-    }
-    catch (e) {
-        data = {}
-        console.log('error post: ' + e)
-    }
+    var json_data = try_json(body)
     var data = {
         type: 'REGISTER_IN',
-        user_info: data
+        user_info: json_data
     }
-    console.log(body)
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
             'Content-Type': 'application/json',
@@ -112,7 +110,99 @@ var register_request = function(request, response, body) {
         response.end(JSON.stringify(res))
     }, function(e) {
         console.log('error post_data: ' + e)
-    } )
+    })
+}
+
+var require_friend_list_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+    var data = {
+        type: 'REQUIRE_FRIEND_LIST',
+        uid: user.id
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var add_friend_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+    var data = {
+        type: 'ADD_NEW_FRIEND',
+        uid: user.id,
+        friend_name: json_data.friend_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var agree_add_friend_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+    var data = {
+        type: 'AGREE_ADD_NEW_FRIEND',
+        uid: user.id,
+        friend_name: json_data.friend_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var response_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+    var data = {
+        type: 'RESPONSE',
+        response_type: json_data.type,
+        uid: user.id,
+        friend_name: json_data.friend_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
 }
 
 var django_request = function(request, response, body) {
@@ -123,15 +213,15 @@ var django_request = function(request, response, body) {
         'Content-Type': 'application/json'
     })
     if (key == request.headers['data-key']) {
-        ret = {
-            'status': 'success',
-            'message': 'Successfully post!'
-        }
         var data = JSON.parse(body)
         var ws = manager.get_ws(data.uid)
         delete data.uid
         if (ws) {
             ws.send(JSON.stringify(data))
+            ret = {
+                'status': 'success',
+                'message': 'Successfully post!'
+            }
         }
         else {
             ret = {
@@ -170,6 +260,14 @@ request_server.on('request', function(request, response) {
                     login_request(request, response, body)
                 else if (params.action === 'register')
                     register_request(request, response, body)
+                else if (params.action === 'require_friend_list')
+                    require_friend_list_request(request, response, body)
+                else if (params.action === 'add_friend')
+                    add_friend_request(request, response, body)
+                else if (params.action === 'agree_add_friend')
+                    agree_add_friend_request(request, response, body)
+                else if (params.action === 'response')
+                    response_request(request, response, body)
             }
             else
                 django_request(request, response, body)
@@ -182,4 +280,4 @@ request_server.on('request', function(request, response) {
 
 request_server.listen(3000)
 
-require('./websocket_server').init_server()
+ws_server.init_server()
