@@ -16,7 +16,7 @@ const messages = (state = initialState, action) => {
           })
         }
       }
-      break
+      return newList
     case 'NEW_MESSAGE_RECEIVE':
       for (; j < len; j++) {
         if (newList[j].user === action.author) {
@@ -28,7 +28,7 @@ const messages = (state = initialState, action) => {
           })
         }
       }
-      break
+      return newList
     default:
       return state
   }
