@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import {messageReceived, setMessageList, setSocket} from '../actions'
+import { messageReceived, setMessageList, setSocket } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -174,8 +174,8 @@ export default function Dashboard() {
     'friendD'
   ])
   // const [friendRequst, setFriendRequest] = useState('')
-  var socket
-  var username
+  let socket
+  let username
 
   const handleRequireFriendList = useCallback(async () => {
     const params = {
