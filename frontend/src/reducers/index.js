@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux'
 import messages from './messages'
-import users from './users'
 import socket from './socket'
+import focusUser from './focusUser'
 
 const chat = combineReducers({
   socket,
-  messages,
-  users
+  focusUser,
+  messages
 })
 
 export default chat
