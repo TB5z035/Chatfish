@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -161,7 +161,6 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
-  const chatBoxRef = useRef()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector(state => state.messages)
@@ -251,20 +250,6 @@ export default function Dashboard() {
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
     })
-  }
-
-  const handleSetChat = (usr) => {
-    chatBoxRef.current.setChat(usr)
-  }
-
-  const updateUser = (usr) => {
-    const friendListCopy = friendList
-    var index = 1
-    friendListCopy.forEach((item) => {
-      if (item.user === usr.user) index = friendListCopy.indexOf(item)
-    })
-    friendListCopy.splice(index, 1, usr)
-    dispatch(setMessageList(friendListCopy))
   }
 
   const handleLogout = (e) => {
@@ -436,7 +421,7 @@ export default function Dashboard() {
         </div>
         <Divider />
         <List className={classes.listStyles}>
-          {userList(friendList, handleSetChat)}
+          {userList(friendList)}
         </List>
         <Divider />
         <List>{useSecondaryListItems()}</List>
@@ -447,7 +432,7 @@ export default function Dashboard() {
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
             {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            {Chatroom(chatBoxRef, updateUser)}
+            {Chatroom}
           </Box>
         </Box>
       </main>
