@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -159,6 +159,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
+  const chatBoxRef = useRef()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [friendList, setFriendList] = useState([
@@ -177,6 +178,7 @@ export default function Dashboard() {
     { user: 'TB8', message_list: [] },
     { user: 'TB9', message_list: [] }
   ])
+  // const [currentChat, setCurrentChat] = useState(friendList[0])
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([
@@ -261,6 +263,20 @@ export default function Dashboard() {
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
     })
+  }
+
+  const handleSetChat = (usr) => {
+    chatBoxRef.current.setChat(usr)
+  }
+
+  const updateUser = (usr) => {
+    const friendListCopy = friendList
+    var index = 1
+    friendListCopy.forEach((item) => {
+      if (item.user === usr.user) index = friendListCopy.indexOf(item)
+    })
+    friendListCopy.splice(index, 1, usr)
+    setFriendList(friendListCopy)
   }
 
   const handleLogout = (e) => {
@@ -430,31 +446,21 @@ export default function Dashboard() {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.listStyles}>{userList(friendList)}</List>
+        <List className={classes.listStyles}>
+          {userList(friendList, handleSetChat)}
+        </List>
         <Divider />
         <List>{useSecondaryListItems()}</List>
       </Drawer>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        {/* <Grid container direction="row" justify="center"> */}
-        {/* <Grid item xl={1}>
-            <Container maxWidth="lg" className={classes.container}>
-              <Box pt={4}>
-                <Copyright />
-              </Box>
-            </Container>
-          </Grid> */}
-        {/* <Grid item > */}
-        {/* <Container maxWidth="xl" className={classes.container}>
-          {Chatroom()}
-        </Container> */}
         <Box display="flex" flexDirection="row" justifyContent="center">
-          {/* <Box className={classes.box}>{Chatroom()}</Box> */}
-          <Box className={classes.box}>{Chatroom(friendList[0])}</Box>
+          <Box className={classes.box}>
+            {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
+            {Chatroom(chatBoxRef, updateUser)}
+          </Box>
         </Box>
-        {/* </Grid> */}
-        {/* </Grid> */}
       </main>
       <Dialog
         open={notificationDialogOpen}
