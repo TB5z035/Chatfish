@@ -1,15 +1,21 @@
 import * as types from './ActionTypes'
 
-export const addMessage = (message, author) => ({
+export const addMessage = (message, author, receiver) => ({
   type: types.NEW_MESSAGE_SEND,
   message,
-  author
+  author,
+  receiver
 })
 
 export const messageReceived = (message, author) => ({
   type: types.NEW_MESSAGE_RECEIVE,
   message,
   author
+})
+
+export const setMessageList = (messageList) => ({
+  type: types.SET_WEBSOCKET,
+  messageList
 })
 
 export const setSocket = (socket) => ({
