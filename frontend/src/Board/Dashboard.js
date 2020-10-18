@@ -321,10 +321,10 @@ export default function Dashboard() {
 
       socket.onerror = function (event) {
         console.error('WebSocket error observed:', event)
-        // history.push('/sign')
+        history.push('/sign')
       }
     } else {
-      // history.push('/sign')
+      history.push('/sign')
     }
   }, [history])
 
@@ -432,7 +432,7 @@ export default function Dashboard() {
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
             {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            {Chatroom}
+            <Chatroom/>
           </Box>
         </Box>
       </main>
