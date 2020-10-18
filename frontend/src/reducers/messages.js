@@ -1,7 +1,7 @@
 const messages = (state = [], action) => {
   switch (action.type) {
-    case 'NEW_MESSAGE_UPDATE':
-    case 'NEW_MESSAGE_BROADCAST':
+    case 'NEW_MESSAGE_SEND':
+    case 'NEW_MESSAGE_RECEIVE':
       return state.concat([
         {
           message: action.message,
