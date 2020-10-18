@@ -201,7 +201,7 @@ export default function Dashboard() {
           }
         })
     )
-  }, [username])
+  }, [username, dispatch])
 
   const handleAddFriendRequest = useCallback(
     async (fiendName) => {
@@ -232,7 +232,7 @@ export default function Dashboard() {
           })
       )
     },
-    [username, friendList]
+    [username, friendList, dispatch]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)

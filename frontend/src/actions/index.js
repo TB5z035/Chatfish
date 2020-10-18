@@ -27,4 +27,3 @@ export const setSocket = (socket) => ({
   type: types.SET_WEBSOCKET,
   socket
 })
-
