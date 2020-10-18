@@ -13,6 +13,11 @@ export const messageReceived = (message, author) => ({
   author
 })
 
+export const setFocusUser = (username) => ({
+  type: types.SET_FOCUS_USER,
+  username
+})
+
 export const setMessageList = (messageList) => ({
   type: types.SET_WEBSOCKET,
   messageList
