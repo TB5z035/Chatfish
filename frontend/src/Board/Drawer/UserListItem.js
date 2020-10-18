@@ -7,8 +7,11 @@ import {
   Avatar
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import { useDispatch } from 'react-redux'
+import { setFocusUser } from '../../actions'
 
 export default function UserListItem(user, setChat) {
+  const dispatch = useDispatch()
   const classes = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -27,7 +30,8 @@ export default function UserListItem(user, setChat) {
         button
         alignItems="flex-start"
         onClick={() => {
-          setChat(user)
+          dispatch(setFocusUser(user.user))
+          console.log(user.user)
         }}
       >
         <ListItemAvatar>

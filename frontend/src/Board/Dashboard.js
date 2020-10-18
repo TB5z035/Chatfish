@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
+import { useSelector, useDispatch } from 'react-redux'
+import { setMessageList, setSocket } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -159,25 +161,10 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
-  const chatBoxRef = useRef()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const [friendList, setFriendList] = useState([
-    {
-      user: 'TB5',
-      message_list: [
-        { type: 'normal', content: 'Hi!', time: new Date(), from: 'TB5' },
-        { type: 'normal', content: 'H2!', time: new Date(), from: '_self' }, // fixme
-        { type: 'normal', content: 'H3!', time: new Date(), from: 'TB5' },
-        { type: 'normal', content: 'H4!', time: new Date(), from: 'TB5' },
-        { type: 'normal', content: 'H5!', time: new Date(), from: '_self' }
-      ]
-    },
-    { user: 'TB6', message_list: [] },
-    { user: 'TB7', message_list: [] },
-    { user: 'TB8', message_list: [] },
-    { user: 'TB9', message_list: [] }
-  ])
+  const friendList = useSelector(state => state.messages)
+  const dispatch = useDispatch()
   // const [currentChat, setCurrentChat] = useState(friendList[0])
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
@@ -210,11 +197,11 @@ export default function Dashboard() {
             Object.prototype.hasOwnProperty.call(data, 'state') &&
             data['state'] === 200
           ) {
-            setFriendList(data['message_list'])
+            dispatch(setMessageList(data['message_list']))
           }
         })
     )
-  }, [username])
+  }, [username, dispatch])
 
   const handleAddFriendRequest = useCallback(
     async (fiendName) => {
@@ -237,15 +224,15 @@ export default function Dashboard() {
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
             ) {
-              setFriendList([
+              dispatch(setMessageList([
                 ...friendList,
                 { user: username, message_list: [] }
-              ])
+              ]))
             }
           })
       )
     },
-    [username, friendList]
+    [username, friendList, dispatch]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
@@ -263,20 +250,6 @@ export default function Dashboard() {
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
     })
-  }
-
-  const handleSetChat = (usr) => {
-    chatBoxRef.current.setChat(usr)
-  }
-
-  const updateUser = (usr) => {
-    const friendListCopy = friendList
-    var index = 1
-    friendListCopy.forEach((item) => {
-      if (item.user === usr.user) index = friendListCopy.indexOf(item)
-    })
-    friendListCopy.splice(index, 1, usr)
-    setFriendList(friendListCopy)
   }
 
   const handleLogout = (e) => {
@@ -311,6 +284,7 @@ export default function Dashboard() {
       // Connection opened
       socket.addEventListener('open', function (event) {
         handleRequireFriendList().then()
+        dispatch(setSocket(socket))
       })
 
       // Listen for messages
@@ -334,10 +308,10 @@ export default function Dashboard() {
               break
             case 'AGREE_ADD_FRIEND':
               handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-              setFriendList([
+              dispatch(setMessageList([
                 friendList,
                 { user: receivedData['friend_name'], message_list: [] }
-              ])
+              ]))
               break
             default:
               break
@@ -347,10 +321,10 @@ export default function Dashboard() {
 
       socket.onerror = function (event) {
         console.error('WebSocket error observed:', event)
-        // history.push('/sign')
+        history.push('/sign')
       }
     } else {
-      // history.push('/sign')
+      history.push('/sign')
     }
   }, [history])
 
@@ -447,7 +421,7 @@ export default function Dashboard() {
         </div>
         <Divider />
         <List className={classes.listStyles}>
-          {userList(friendList, handleSetChat)}
+          {userList(friendList)}
         </List>
         <Divider />
         <List>{useSecondaryListItems()}</List>
@@ -458,7 +432,7 @@ export default function Dashboard() {
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
             {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            {Chatroom(chatBoxRef, updateUser)}
+            <Chatroom/>
           </Box>
         </Box>
       </main>
