@@ -273,7 +273,7 @@ export default function Dashboard() {
     const friendListCopy = friendList
     var index = 1
     friendListCopy.forEach((item) => {
-      if (item.user == usr.user) index = friendListCopy.indexOf(item)
+      if (item.user === usr.user) index = friendListCopy.indexOf(item)
     })
     friendListCopy.splice(index, 1, usr)
     setFriendList(friendListCopy)
