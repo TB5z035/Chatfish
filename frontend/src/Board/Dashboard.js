@@ -162,7 +162,7 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
-  const friendList = useSelector(state => state.messages)
+  const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
   // const [currentChat, setCurrentChat] = useState(friendList[0])
 
@@ -223,10 +223,12 @@ export default function Dashboard() {
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
             ) {
-              dispatch(setMessageList([
-                ...friendList,
-                { user: username, message_list: [] }
-              ]))
+              dispatch(
+                setMessageList([
+                  ...friendList,
+                  { user: username, message_list: [] }
+                ])
+              )
             }
           })
       )
@@ -297,7 +299,12 @@ export default function Dashboard() {
           switch (receivedData['type']) {
             case 'MESSAGE_NOTIFY':
               handleReply('NOTIFY_MESSAGE_NOTIFY').then()
-              dispatch(messageReceived(receivedData['content'], receivedData['friend_name']))
+              dispatch(
+                messageReceived(
+                  receivedData['content'],
+                  receivedData['friend_name']
+                )
+              )
               break
             case 'NEW_ADD_FRIEND':
               handleReply('NOTIFY_NEW_ADD_FRIEND').then()
@@ -308,10 +315,12 @@ export default function Dashboard() {
               break
             case 'AGREE_ADD_FRIEND':
               handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-              dispatch(setMessageList([
-                friendList,
-                { user: receivedData['friend_name'], message_list: [] }
-              ]))
+              dispatch(
+                setMessageList([
+                  friendList,
+                  { user: receivedData['friend_name'], message_list: [] }
+                ])
+              )
               break
             default:
               break
@@ -321,10 +330,10 @@ export default function Dashboard() {
 
       socket.onerror = function (event) {
         console.error('WebSocket error observed:', event)
-        history.push('/sign')
+        // history.push('/sign')
       }
     } else {
-      history.push('/sign')
+      // history.push('/sign')
     }
   }, [history])
 
@@ -420,9 +429,7 @@ export default function Dashboard() {
           </IconButton>
         </div>
         <Divider />
-        <List className={classes.listStyles}>
-          {userList(friendList)}
-        </List>
+        <List className={classes.listStyles}>{userList(friendList)}</List>
         <Divider />
         <List>{useSecondaryListItems()}</List>
       </Drawer>
@@ -432,7 +439,7 @@ export default function Dashboard() {
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
             {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            <Chatroom/>
+            <Chatroom />
           </Box>
         </Box>
       </main>
