@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { setMessageList, setSocket } from '../actions'
+import { messageReceived, setMessageList, setSocket } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -13,7 +13,6 @@ import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import Badge from '@material-ui/core/Badge'
-// import Link from '@material-ui/core/Link'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import NotificationsIcon from '@material-ui/icons/Notifications'
@@ -169,14 +168,14 @@ export default function Dashboard() {
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([
-    'asddb',
-    'badsgf',
-    'sdgaga',
-    'gddasgasgasdgsagda'
+    'friendA',
+    'friendB',
+    'friendC',
+    'friendD'
   ])
   // const [friendRequst, setFriendRequest] = useState('')
-  var socket
-  var username
+  let socket
+  let username
 
   const handleRequireFriendList = useCallback(async () => {
     const params = {
@@ -298,6 +297,7 @@ export default function Dashboard() {
           switch (receivedData['type']) {
             case 'MESSAGE_NOTIFY':
               handleReply('NOTIFY_MESSAGE_NOTIFY').then()
+              dispatch(messageReceived(receivedData['content'], receivedData['friend_name']))
               break
             case 'NEW_ADD_FRIEND':
               handleReply('NOTIFY_NEW_ADD_FRIEND').then()

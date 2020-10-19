@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch } from 'react-redux'
 import { setFocusUser } from '../../actions'
 
-export default function UserListItem(user, setChat) {
+export default function UserListItem(user) {
   const dispatch = useDispatch()
   const classes = makeStyles((theme) => ({
     root: {
@@ -25,49 +25,47 @@ export default function UserListItem(user, setChat) {
   }))
 
   return (
-    <div>
-      <ListItem
-        button
-        alignItems="flex-start"
-        onClick={() => {
-          dispatch(setFocusUser(user.user))
-          console.log(user.user)
-        }}
-      >
-        <ListItemAvatar>
-          <Avatar> {user.user.toString()[0]} </Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          primary={user.user}
-          secondary={
-            <React.Fragment>
+    <ListItem
+      button
+      key={user.user}
+      alignItems="flex-start"
+      onClick={() => {
+        dispatch(setFocusUser(user.user))
+      }}
+    >
+      <ListItemAvatar>
+        <Avatar> {user.user.toString()[0]} </Avatar>
+      </ListItemAvatar>
+      <ListItemText
+        primary={user.user}
+        secondary={
+          <React.Fragment>
+            <Typography
+              component="div"
+              variant="body2"
+              className={classes.inline}
+              noWrap
+            >
               <Typography
-                component="div"
+                component="span"
                 variant="body2"
-                className={classes.inline}
+                color="textPrimary"
                 noWrap
               >
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="textPrimary"
-                  noWrap
-                >
-                  {user.time ? user.time : 'time'} -
-                </Typography>
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="textSecondary"
-                  noWrap
-                >
-                  {user.recent ? user.recent : 'recent messages blah blah blah'}
-                </Typography>
+                {user.time ? user.time : 'time'} -
               </Typography>
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </div>
+              <Typography
+                component="span"
+                variant="body2"
+                color="textSecondary"
+                noWrap
+              >
+                {user.recent ? user.recent : 'recent messages blah blah blah'}
+              </Typography>
+            </Typography>
+          </React.Fragment>
+        }
+      />
+    </ListItem>
   )
 }
