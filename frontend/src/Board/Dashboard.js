@@ -157,7 +157,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function Dashboard() {
+export default function Dashboard () {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
@@ -166,12 +166,12 @@ export default function Dashboard() {
   const dispatch = useDispatch()
   // const [currentChat, setCurrentChat] = useState(friendList[0])
 
-  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(true)
   const [friendToAddList, setFriendToAddList] = useState([
-    'friendA',
+    'friesdfndA',
     'friendB',
-    'friendC',
-    'friendD'
+    'frien22f2dC',
+    'friendadsfasdfafD'
   ])
   // const [friendRequst, setFriendRequest] = useState('')
   let socket
@@ -452,14 +452,14 @@ export default function Dashboard() {
         <DialogTitle> Notifications </DialogTitle>
         <DialogContent>
           <DialogContentText>New friend requests</DialogContentText>
-          <Box className={classes.chatBox}>
-            <List className={classes.textList}>
-              {friendToAddList.map((notification) => (
+          <Box className={classes.notificationText}>
+            <List className={classes.notificationList}>
+              {friendToAddList.map((name) => (
                 <NotificationListItem
-                  notification={notification}
+                  name={name}
                   refuse={refuseAddRequest}
                   accept={handleAddFriendRequest}
-                  key={notification}
+                  key={name}
                 />
               ))}
             </List>
