@@ -38,11 +38,11 @@ const initialState = [
   {
     user: 'TB5',
     message_list: [
-      { type: 'normal', content: 'Hi!', time: new Date(), from: 'TB5' },
-      { type: 'normal', content: 'H2!', time: new Date(), from: '_self' },
-      { type: 'normal', content: 'H3!', time: new Date(), from: 'TB5' },
-      { type: 'normal', content: 'H4!', time: new Date(), from: 'TB5' },
-      { type: 'normal', content: 'H5!', time: new Date(), from: '_self' }
+      { type: 'normal', content: 'Hi!', time: new Date("2019-07-04 23:59:59.999"), from: 'TB5' },
+      { type: 'normal', content: 'H2!', time: new Date("2019-07-05 23:59:59.999"), from: '_self' },
+      { type: 'normal', content: 'H3!', time: new Date("2019-07-06 23:59:59.999"), from: 'TB5' },
+      { type: 'normal', content: 'H4!', time: new Date("2019-07-08 23:59:59.999"), from: 'TB5' },
+      { type: 'normal', content: 'H5!', time: new Date("2019-07-09 23:59:59.999"), from: '_self' }
     ]
   },
   { user: 'TB6', message_list: [] },
