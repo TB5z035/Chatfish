@@ -166,7 +166,7 @@ export default function Dashboard () {
   const dispatch = useDispatch()
   // const [currentChat, setCurrentChat] = useState(friendList[0])
 
-  const [notificationDialogOpen, setNotificationDialogOpen] = useState(true)
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([
     'friesdfndA',
     'friendB',

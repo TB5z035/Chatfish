@@ -11,6 +11,8 @@ import chat from './reducers'
 import { BrowserRouter } from 'react-router-dom'
 import { SnackbarProvider } from 'notistack'
 import Button from '@material-ui/core/Button'
+import { ThemeProvider } from '@material-ui/core'
+import { darkTheme } from './themes'
 
 let middleware = [thunk]
 if (process.env.NODE_ENV !== 'production') {
@@ -19,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') {
 const store = createStore(chat, applyMiddleware(...middleware))
 
 const notistackRef = React.createRef()
-const onClickDismiss = key => () => {
+const onClickDismiss = (key) => () => {
   notistackRef.current.closeSnackbar(key)
 }
 
@@ -27,15 +29,17 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <SnackbarProvider
-          maxSnack={3} ref={notistackRef}
-          action={(key) => (
-            <Button onClick={onClickDismiss(key)}>
-                            Dismiss
-            </Button>
-          )}>
-          <App/>
-        </SnackbarProvider>
+        <ThemeProvider theme={darkTheme}>
+          <SnackbarProvider
+            maxSnack={3}
+            ref={notistackRef}
+            action={(key) => (
+              <Button onClick={onClickDismiss(key)}>Dismiss</Button>
+            )}
+          >
+            <App />
+          </SnackbarProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,
