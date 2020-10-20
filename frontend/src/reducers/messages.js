@@ -11,7 +11,7 @@ const messages = (state = initialState, action) => {
           newList[j].message_list.push({
             from: '_self',
             content: action.message,
-            time: new Date(),
+            time: new Date().toLocaleTimeString(),
             type: 'normal'
           })
         }
@@ -38,13 +38,14 @@ const initialState = [
   {
     user: 'TB5',
     message_list: [
-      { type: 'normal', content: 'Hi!', time: new Date(), from: 'TB5' }
+      { type: 'normal', content: 'Hi!', time: new Date().toLocaleTimeString(), from: 'TB5' }
     ]
   },
-  { user: 'TB6', message_list: [] },
-  { user: 'TB7', message_list: [] },
-  { user: 'TB8', message_list: [] },
-  { user: 'TB9', message_list: [] }
+  { user: 'UB6', message_list: [] },
+  { user: 'VB7', message_list: [] },
+  { user: 'WB8', message_list: [] },
+  { user: 'XB9', message_list: [] },
+  { user: 'YB10', message_list: [] }
 ]
 
 export default messages
