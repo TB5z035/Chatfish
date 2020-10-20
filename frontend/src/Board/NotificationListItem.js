@@ -50,7 +50,7 @@ export default class NotificationListItem extends React.Component {
 }
 
 NotificationListItem.propTypes = {
-  notification: PropTypes.string,
+  name: PropTypes.string,
   refuse: PropTypes.func,
   accept: PropTypes.func
 }
