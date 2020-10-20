@@ -185,17 +185,15 @@ export default function Dashboard () {
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
-  // const [currentChat, setCurrentChat] = useState(friendList[0])
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([
-    'friesdfndA',
-    'friendB',
-    'frien22f2dC',
-    'friendadsfasdfafD'
+    'Alice',
+    'Bob',
+    'Carol',
+    'Dave'
   ])
 
-  // const [friendRequst, setFriendRequest] = useState('')
   let socket
   let username
 
