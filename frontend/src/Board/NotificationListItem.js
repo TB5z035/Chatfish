@@ -33,14 +33,14 @@ export default class NotificationListItem extends React.Component {
                 this.props.refuse(this.props.name)
               }}
             >
-              <CheckIcon></CheckIcon>
+              <CheckIcon/>
             </IconButton>
             <IconButton
               onClick={() => {
                 this.props.refuse(this.props.name)
               }}
             >
-              <CloseIcon></CloseIcon>
+              <CloseIcon/>
             </IconButton>
           </Box>
         </ListItem>
