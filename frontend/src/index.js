@@ -11,7 +11,6 @@ import chat from './reducers'
 import { BrowserRouter } from 'react-router-dom'
 import { SnackbarProvider } from 'notistack'
 import Button from '@material-ui/core/Button'
-import { ThemeProvider } from '@material-ui/core'
 
 let middleware = [thunk]
 if (process.env.NODE_ENV !== 'production') {
@@ -24,31 +23,25 @@ const onClickDismiss = (key) => () => {
   notistackRef.current.closeSnackbar(key)
 }
 
-const render = () => {
-  ReactDOM.render(
-    <React.StrictMode>
-      <Provider store={store}>
-        <BrowserRouter basename={process.env.PUBLIC_URL}>
-          <ThemeProvider theme={store.getState().theme}>
-            <SnackbarProvider
-              maxSnack={3}
-              ref={notistackRef}
-              action={(key) => (
-                <Button onClick={onClickDismiss(key)}>Dismiss</Button>
-              )}
-            >
-              <App />
-            </SnackbarProvider>
-          </ThemeProvider>
-        </BrowserRouter>
-      </Provider>
-    </React.StrictMode>,
-    document.getElementById('root')
-  )
-}
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <SnackbarProvider
+          maxSnack={3}
+          ref={notistackRef}
+          action={(key) => (
+            <Button onClick={onClickDismiss(key)}>Dismiss</Button>
+          )}
+        >
+          <App />
+        </SnackbarProvider>
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
+)
 
-store.subscribe(render)
-render()
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA

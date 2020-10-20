@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMessageList, setSocket, setTheme } from '../actions'
+import { messageReceived, setMessageList, setSocket } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -19,7 +19,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem } from '@material-ui/core'
+import { Menu, MenuItem, ThemeProvider, createMuiTheme } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -28,7 +28,13 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
 import NotificationListItem from './NotificationListItem'
-import { darkTheme, lightTheme } from '../themes'
+import {
+  orange,
+  lightBlue,
+  deepPurple,
+  deepOrange
+} from '@material-ui/core/colors'
+
 // function Copyright() {
 //   return (
 //     <Typography variant="body2" color="textSecondary" align="center">
@@ -162,7 +168,21 @@ export default function Dashboard () {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [isDarkTheme, setIsDarkTheme] = useState(false)
+  const [darkState, setDarkState] = useState(false)
+  const palletType = darkState ? 'dark' : 'light'
+  const mainPrimaryColor = darkState ? orange[500] : lightBlue[500]
+  const mainSecondaryColor = darkState ? deepOrange[900] : deepPurple[500]
+  const darkTheme = createMuiTheme({
+    palette: {
+      type: palletType,
+      primary: {
+        main: mainPrimaryColor
+      },
+      secondary: {
+        main: mainSecondaryColor
+      }
+    }
+  })
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
@@ -175,6 +195,7 @@ export default function Dashboard () {
     'frien22f2dC',
     'friendadsfasdfafD'
   ])
+
   // const [friendRequst, setFriendRequest] = useState('')
   let socket
   let username
@@ -340,139 +361,141 @@ export default function Dashboard () {
   }, [history])
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
+    <ThemeProvider theme={darkTheme}>
+      <div className={classes.root}>
+        <CssBaseline />
 
-      <AppBar
-        position="absolute"
-        className={clsx(classes.appBar, open && classes.appBarShift)}
-      >
-        <Toolbar id="toolbar" className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            Chat Fish
-          </Typography>
-
-          <div>
-            <Switch
-              name="checkedDarkTheme"
-              checked={isDarkTheme}
-              onChange={(event) => {
-                setIsDarkTheme(event.target.checked)
-                dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
-              }}
-              inputProps={{ 'aria-label': 'secondary checkbox' }}
-            />
-          </div>
-          <div
-            className={classes.appBarIcon}
-            onClick={() => {
-              setNotificationDialogOpen(true)
-            }}
-          >
-            <IconButton color="inherit">
-              {friendToAddList.length !== 0 ? (
-                <Badge
-                  badgeContent={friendToAddList.length.toString()}
-                  color="secondary"
-                >
-                  <NotificationsIcon />
-                </Badge>
-              ) : (
-                <NotificationsIcon />
+        <AppBar
+          position="absolute"
+          className={clsx(classes.appBar, open && classes.appBarShift)}
+        >
+          <Toolbar id="toolbar" className={classes.toolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              className={clsx(
+                classes.menuButton,
+                open && classes.menuButtonHidden
               )}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
+            Chat Fish
+            </Typography>
+
+            <div>
+              <Switch
+                name="checkedDarkTheme"
+                checked={darkState}
+                onChange={() => {
+                  setDarkState(!darkState)
+                  // dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
+                }}
+                inputProps={{ 'aria-label': 'secondary checkbox' }}
+              />
+            </div>
+            <div
+              className={classes.appBarIcon}
+              onClick={() => {
+                setNotificationDialogOpen(true)
+              }}
+            >
+              <IconButton color="inherit">
+                {friendToAddList.length !== 0 ? (
+                  <Badge
+                    badgeContent={friendToAddList.length.toString()}
+                    color="secondary"
+                  >
+                    <NotificationsIcon />
+                  </Badge>
+                ) : (
+                  <NotificationsIcon />
+                )}
+              </IconButton>
+            </div>
+
+            <div className={classes.appBarIcon}>
+              {/* user icon */}
+              <IconButton onClick={handleAvatarClick}>
+                <Avatar>S</Avatar>
+              </IconButton>
+            </div>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorMenu}
+              keepMounted
+              open={Boolean(anchorMenu)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+              <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
+          }}
+          open={open}
+        >
+          <div className={classes.toolbarIcon}>
+            <Typography>Friends</Typography>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
             </IconButton>
           </div>
+          <Divider />
+          <List className={classes.listStyles}>{userList(friendList)}</List>
+          <Divider />
+          <List>{useSecondaryListItems()}</List>
+        </Drawer>
 
-          <div className={classes.appBarIcon}>
-            {/* user icon */}
-            <IconButton onClick={handleAvatarClick}>
-              <Avatar>S</Avatar>
-            </IconButton>
-          </div>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorMenu}
-            keepMounted
-            open={Boolean(anchorMenu)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <Typography>Friends</Typography>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List className={classes.listStyles}>{userList(friendList)}</List>
-        <Divider />
-        <List>{useSecondaryListItems()}</List>
-      </Drawer>
-
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Box display="flex" flexDirection="row" justifyContent="center">
-          <Box className={classes.box}>
-            {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-            <Chatroom />
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Box display="flex" flexDirection="row" justifyContent="center">
+            <Box className={classes.box}>
+              {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
+              <Chatroom />
+            </Box>
           </Box>
-        </Box>
-      </main>
-      <Dialog
-        open={notificationDialogOpen}
-        onClose={() => {
-          setNotificationDialogOpen(false)
-        }}
-      >
-        <DialogTitle> Notifications </DialogTitle>
-        <DialogContent>
-          <DialogContentText>New friend requests</DialogContentText>
-          <Box className={classes.notificationText}>
-            <List className={classes.notificationList}>
-              {friendToAddList.map((name) => (
-                <NotificationListItem
-                  name={name}
-                  refuse={refuseAddRequest}
-                  accept={handleAddFriendRequest}
-                  key={name}
-                />
-              ))}
-            </List>
-          </Box>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </main>
+        <Dialog
+          open={notificationDialogOpen}
+          onClose={() => {
+            setNotificationDialogOpen(false)
+          }}
+        >
+          <DialogTitle> Notifications </DialogTitle>
+          <DialogContent>
+            <DialogContentText>New friend requests</DialogContentText>
+            <Box className={classes.notificationText}>
+              <List className={classes.notificationList}>
+                {friendToAddList.map((name) => (
+                  <NotificationListItem
+                    name={name}
+                    refuse={refuseAddRequest}
+                    accept={handleAddFriendRequest}
+                    key={name}
+                  />
+                ))}
+              </List>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </ThemeProvider>
   )
 }

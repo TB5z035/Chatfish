@@ -1,7 +1,7 @@
 import * as types from '../actions/ActionTypes'
-import {lightTheme} from '../themes'
+import {darkTheme} from '../themes'
 
-const theme = (state = lightTheme, action) => {
+const theme = (state = darkTheme, action) => {
   switch (action.type) {
     case types.SET_THEME:
       return action.theme
