@@ -180,7 +180,6 @@ def add_friend(data):
             'message': 'Invalid token or username or friend name!'
         }
     else :
-        status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
         if status == 1 :
             ret = {
                 'state': 200,
@@ -193,26 +192,58 @@ def add_friend(data):
             }
     return ret
 
-# def accept_friend_request(data):
-#     name_ret = FindUidByName(data.get('friend_name'))
-#     if name_ret['find'] == 0 :
-#         ret = {
-#             'state': 405,
-#             'message': 'Invalid token or username or friend name!'
-#         }
-#     else :
-#         status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
-#         if status == 1 :
-#             ret = {
-#                 'state': 200,
-#                 'message': 'Successfully requested!'
-#             }
-#         else :
-#             ret ={
-#                 'state': 405,
-#                 'message': 'Invalid token or username or friend name!'
-#             }
-#     return ret
+def accept_friend_request(data):
+    name_ret = FindUidByName(data.get('friend_name'))
+    if name_ret['find'] == 0 :
+        ret = {
+            'state': 405,
+            'message': 'Invalid token or username or friend name!'
+        }
+    else :
+        # set up the chat.
+        init_chat(
+            {
+                'ctype': 0,
+                'name': 'private chat',
+                'users': [ data.get('uid'), name_ret.get('uid' ) ]
+            }
+        )
+        status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
+        status = insert_user_meta(name_ret.get('uid'), 'friend', data.get('uid')).get['status']
+        if status == 1 :
+            ret = {
+                'state': 200,
+                'message': 'Successfully requested!'
+            }
+        else :
+            ret ={
+                'state': 405,
+                'message': 'Invalid token or username or friend name!'
+            }
+    return ret
+
+def message_upload(data):
+    try:
+        ruid = User.objects.filter(name = data.get('friend_name'))[0].uid
+        chats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid')))]
+        rchats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid))]
+        this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.filter(cid = cid).ctype == 0 ][0]
+        init_message({
+            'cid': this_cid,
+            'uid': data.get('uid')
+            'mtype': 'normal',
+            'content': data.get('content')
+        })
+        ret = {
+            'state': 200,
+            'message': 'Successfully uploaded.'
+        }
+    except:
+        ret = {
+            'state': 400,
+            'message': 'Upload failed.'
+        }
+    return ret
 
 def response_handle(data):
     '''
@@ -245,12 +276,16 @@ def post_data(request):
                 ret = login_varify(data.get('user_info'))
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))
+            elif data['type'] == 'ALL_MESSAGE':
+                ret = FetchAllMessage(data)
+            elif data['type'] == 'MESSAGE_UPLOAD':
+                ret = message_upload(data)
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
                 ret = FetchFriends(data.get('uid'))
             elif data['type'] == 'ADD_NEW_FRIEND':
                 ret = add_friend(data) # may need improvement
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
-                ret = add_friend(data) # may need improvement
+                ret = agree_add_friend(data) # may need improvement
             elif data['type'] == 'RESPONSE':
                 ret = response_handle(data)
             elif data['type'] == 'CREATE_NEW_GROUP':
@@ -277,7 +312,10 @@ def post_data(request):
                 '''
                 other apis.
                 '''
-                pass
+                ret = {
+                    'state': 404,
+                    'message': 'undefined API.'
+                }
         except Exception as e:
             ret = {
                 'state': 399,

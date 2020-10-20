@@ -94,8 +94,32 @@ def FetchChatMember(cid):
 
 def FetchChatMessage(cid, number = 20):
     msgs = Message.objects.filter(cid = cid)
-    ret = [ msg.mid for msg in msgs ]
+    ret = [ { 'time':msg.time, 'sender': msg.uid, 'content': msg.content } for msg in msgs ]
     return ret
+
+def FetchAllMessage(data):
+    try:
+        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = data.get('uid'))
+        cid_list = [ chat.cid for chat in chats ]
+        # user can be multiple if delete [0]
+        message_list = [ {
+            'user': [ User.objects.filter(uid = member)[0].name for member in FetchChatMember(cid) if member != data.get('uid') ],
+            'message_list': FetchChatMessage(cid)
+        } for cid in cid_list ]
+
+        ret = {
+            'state': 200,
+            'message': 'All message required successfully.'
+            'message_list': message_list
+        }
+    except:
+        ret = {
+            'state': 400,
+            'message': 'Failed in fetching all message.'
+        }
+    return ret
+
+
 
 def FindUidByName(username):
     user = User.objects.filter(name = name)
