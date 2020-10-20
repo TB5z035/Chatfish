@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMessageList, setSocket } from '../actions'
+import { messageReceived, setMessageList, setSocket, setTheme } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -28,6 +28,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
 import NotificationListItem from './NotificationListItem'
+import { darkTheme, lightTheme } from '../themes'
 // function Copyright() {
 //   return (
 //     <Typography variant="body2" color="textSecondary" align="center">
@@ -161,6 +162,7 @@ export default function Dashboard () {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
@@ -371,7 +373,12 @@ export default function Dashboard () {
 
           <div>
             <Switch
-              name="checkedA"
+              name="checkedDarkTheme"
+              checked={isDarkTheme}
+              onChange={(event) => {
+                setIsDarkTheme(event.target.checked)
+                dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
+              }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
           </div>
