@@ -148,7 +148,6 @@ const useStyles = makeStyles((theme) => ({
       overflow: 'auto',
       overflowX: 'hidden'
     },
-    backgroundColor: theme.palette.background.paper,
     '&::-webkit-scrollbar-track': {
       padding: '2px',
       backgroundColor: '#e8e8e8'
