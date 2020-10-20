@@ -9,7 +9,7 @@ const messages = (state = initialState, action) => {
       for (; j < len; j++) {
         if (newList[j].user === action.receiver) {
           newList[j].message_list.push({
-            from: '_self',
+            from: messages.author,
             content: action.message,
             time: new Date().toLocaleTimeString(),
             type: 'normal'
