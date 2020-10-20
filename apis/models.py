@@ -62,10 +62,24 @@ class OfflineMessage(models.Model):
 def Test():
     pass
 
-def FetchFriend(uid, number = -1):
-    if number == -1:
-        friends = UserMeta.objects.filter(meta_name = 'friend', uid = uid)
-    ret = [ int(friend.meta_value) for friend in friends ] # invert to integer id.
+def FetchFriends(uid, number = -1):
+    try:
+        if number == -1:
+            friends = UserMeta.objects.filter(meta_name = 'friend', uid = uid)
+        uid_list = [ int(friend.meta_value) for friend in friends ] # invert to integer id.
+        ret = {
+            'state': 200,
+            'message': 'Successfully obtain friend list.',
+            'message_list': [{
+                    'uid': uid,
+                    'name': FindNameByUid(uid).get('name'),
+                    'message_list': []} for uid in uid_list]
+        }
+    except:
+        ret = {
+            'state': 406,
+            'message': 'Fail to fetch friend list.'
+        }
     return ret
 
 def FetchOfflineMessage(ruid):
@@ -85,7 +99,7 @@ def FetchChatMessage(cid, number = 20):
 
 def FindUidByName(username):
     user = User.objects.filter(name = name)
-    if user.count() == 0:
+    if user.count() == 0 :
         ret = {
             'find': 0
         }
@@ -93,5 +107,18 @@ def FindUidByName(username):
         ret = {
             'find': 1,
             'uid': user[0].uid
+        }
+    return ret
+
+def FindNameByUid(uid):
+    user = User.objects.filter(uid = uid)
+    if user.count() == 0 :
+        ret = {
+            'find': 0
+        }
+    else :
+        ret = {
+            'find': 1,
+            'name': user[0].name
         }
     return ret

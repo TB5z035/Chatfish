@@ -173,11 +173,6 @@ def insert_chat_meta(cid, meta_name, meta_val):
     return ret
 
 def add_friend(data):
-    '''
-    in data:
-        uid
-        friend_name
-    '''
     name_ret = FindUidByName(data.get('friend_name'))
     if name_ret['find'] == 0 :
         ret = {
@@ -196,6 +191,39 @@ def add_friend(data):
                 'state': 405,
                 'message': 'Invalid token or username or friend name!'
             }
+    return ret
+
+# def accept_friend_request(data):
+#     name_ret = FindUidByName(data.get('friend_name'))
+#     if name_ret['find'] == 0 :
+#         ret = {
+#             'state': 405,
+#             'message': 'Invalid token or username or friend name!'
+#         }
+#     else :
+#         status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
+#         if status == 1 :
+#             ret = {
+#                 'state': 200,
+#                 'message': 'Successfully requested!'
+#             }
+#         else :
+#             ret ={
+#                 'state': 405,
+#                 'message': 'Invalid token or username or friend name!'
+#             }
+#     return ret
+
+def response_handle(data):
+    '''
+    response_type: NOTIFY_ADD_NEW_FRIEND, NOTIFY_DELETE_FRIEND, NOTIFY_CREATE_NEW_GROUP, NOTIFY_ADD_NEW_GROUP, NOTIFY_LEAVE_GROUP
+    uid
+    friend_name
+    '''
+    ret = {
+        'state': 200,
+        'message': 'Got the response!'
+    }
     return ret
 
 @require_http_methods(["POST"])
@@ -218,16 +246,13 @@ def post_data(request):
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
-                ret = FetchFriend(data.get('uid'))
+                ret = FetchFriends(data.get('uid'))
             elif data['type'] == 'ADD_NEW_FRIEND':
-                ret = add_friend(data)
+                ret = add_friend(data) # may need improvement
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
-                '''
-                in data:
-                    uid
-                    friend_name
-                '''
-                pass
+                ret = add_friend(data) # may need improvement
+            elif data['type'] == 'RESPONSE':
+                ret = response_handle(data)
             elif data['type'] == 'CREATE_NEW_GROUP':
                 ret = init_chat(data)
             elif data['type'] == 'ADD_NEW_GROUP':
