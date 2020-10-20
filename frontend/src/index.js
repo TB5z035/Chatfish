@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== 'production') {
 const store = createStore(chat, applyMiddleware(...middleware))
 
 const notistackRef = React.createRef()
-const onClickDismiss = key => () => {
+const onClickDismiss = (key) => () => {
   notistackRef.current.closeSnackbar(key)
 }
 
@@ -28,13 +28,13 @@ ReactDOM.render(
     <Provider store={store}>
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <SnackbarProvider
-          maxSnack={3} ref={notistackRef}
+          maxSnack={3}
+          ref={notistackRef}
           action={(key) => (
-            <Button onClick={onClickDismiss(key)}>
-                            Dismiss
-            </Button>
-          )}>
-          <App/>
+            <Button onClick={onClickDismiss(key)}>Dismiss</Button>
+          )}
+        >
+          <App />
         </SnackbarProvider>
       </BrowserRouter>
     </Provider>

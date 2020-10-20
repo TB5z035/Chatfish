@@ -27,3 +27,8 @@ export const setSocket = (socket) => ({
   type: types.SET_WEBSOCKET,
   socket
 })
+
+export const setTheme = (theme) => ({
+  type: types.SET_THEME,
+  theme
+})
