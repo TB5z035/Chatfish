@@ -82,3 +82,16 @@ def FetchChatMessage(cid, number = 20):
     msgs = Message.objects.filter(cid = cid)
     ret = [ msg.mid for msg in msgs ]
     return ret
+
+def FindUidByName(username):
+    user = User.objects.filter(name = name)
+    if user.count() == 0:
+        ret = {
+            'find': 0
+        }
+    else :
+        ret = {
+            'find': 1,
+            'uid': user[0].uid
+        }
+    return ret

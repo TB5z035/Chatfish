@@ -125,7 +125,6 @@ def init_message(data):
         }
     return ret
 
-
 def insert_offline_message(data):
     try:
         new_offl_msg = OfflineMessage(ruid = data.get('ruid'), mid = data.get('mid'))
@@ -145,15 +144,20 @@ def insert_offline_message(data):
     return ret
 
 def insert_user_meta(uid, meta_name, meta_val):
-    new_meta = UserMeta(uid = uid, meta_name = meta_name, meta_value = meta_val)
-    new_meta.full_clean()
-    new_meta.save()
-    ret = {
-        'state': 200,
-        'uid': uid,
-        'meta_name': meta_name,
-        'meta_value': meta_val
-    }
+    try:
+        new_meta = UserMeta(uid = uid, meta_name = meta_name, meta_value = meta_val)
+        new_meta.full_clean()
+        new_meta.save()
+        ret = {
+            'status': 1,
+            'uid': uid,
+            'meta_name': meta_name,
+            'meta_value': meta_val
+        }
+    except:
+        ret ={
+            'status': 0
+        }
     return ret
 
 def insert_chat_meta(cid, meta_name, meta_val):
@@ -166,6 +170,32 @@ def insert_chat_meta(cid, meta_name, meta_val):
         'meta_name': meta_name,
         'meta_value': meta_val
     }
+    return ret
+
+def add_friend(data):
+    '''
+    in data:
+        uid
+        friend_name
+    '''
+    name_ret = FindUidByName(data.get('friend_name'))
+    if name_ret['find'] == 0 :
+        ret = {
+            'state': 405,
+            'message': 'Invalid token or username or friend name!'
+        }
+    else :
+        status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
+        if status == 1 :
+            ret = {
+                'state': 200,
+                'message': 'Successfully requested!'
+            }
+        else :
+            ret ={
+                'state': 405,
+                'message': 'Invalid token or username or friend name!'
+            }
     return ret
 
 @require_http_methods(["POST"])
@@ -190,7 +220,14 @@ def post_data(request):
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
                 ret = FetchFriend(data.get('uid'))
             elif data['type'] == 'ADD_NEW_FRIEND':
-                ret = insert_user_meta(data)
+                ret = add_friend(data)
+            elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
+                '''
+                in data:
+                    uid
+                    friend_name
+                '''
+                pass
             elif data['type'] == 'CREATE_NEW_GROUP':
                 ret = init_chat(data)
             elif data['type'] == 'ADD_NEW_GROUP':

@@ -24,7 +24,7 @@ var get_token = function(cookie, url) {
 var get_username = function(cookie) {
     if (cookie == undefined || cookie == null) {
         var params = URL.parse(url, true).query
-        username = params.usernbame
+        username = params.username
         return username
     }
     var cookies = cookie_parse(cookie)
