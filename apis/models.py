@@ -109,7 +109,7 @@ def FetchAllMessage(data):
 
         ret = {
             'state': 200,
-            'message': 'All message required successfully.'
+            'message': 'All message required successfully.',
             'message_list': message_list
         }
     except:

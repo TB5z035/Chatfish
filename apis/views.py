@@ -230,7 +230,7 @@ def message_upload(data):
         this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.filter(cid = cid).ctype == 0 ][0]
         init_message({
             'cid': this_cid,
-            'uid': data.get('uid')
+            'uid': data.get('uid'),
             'mtype': 'normal',
             'content': data.get('content')
         })
