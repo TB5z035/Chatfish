@@ -12,7 +12,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { SnackbarProvider } from 'notistack'
 import Button from '@material-ui/core/Button'
 import { ThemeProvider } from '@material-ui/core'
-import { darkTheme } from './themes'
 
 let middleware = [thunk]
 if (process.env.NODE_ENV !== 'production') {
@@ -29,7 +28,7 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider theme={store.getState().theme}>
           <SnackbarProvider
             maxSnack={3}
             ref={notistackRef}
