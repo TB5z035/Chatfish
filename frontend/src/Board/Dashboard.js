@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMessageList, setSocket } from '../actions'
+import { messageReceived, setMyName, setMessageList, setSocket, addFriend } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -33,6 +33,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
+import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import {
   orange,
@@ -186,33 +187,23 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const [darkState, setDarkState] = useState(true)
   const theme = darkState ? darkTheme() : lightTheme()
+  const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
+  const myName = useSelector((state) => state.myName)
   const dispatch = useDispatch()
-  // const [currentChat, setCurrentChat] = useState(friendList[0])
-  const theme1 = useTheme()
-
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState([
-    'friesdfndA',
-    'friendB',
-    'frien22f2dC',
-    'friendadsfasdfafD'
-  ])
+  const [friendToAddList, setFriendToAddList] = useState([])
 
-  // const [friendRequst, setFriendRequest] = useState('')
-  let socket
-  let username
-
-  const handleRequireFriendList = useCallback(async () => {
+  const handleAddFriendRequest = useCallback(async (friendName) => {
     const params = {
-      username: username
+      username: myName,
+      friend_name: friendName
     }
 
-    fetch('/?action=require_friend_list', {
+    fetch('/?action=agree_add_friend', {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
@@ -223,47 +214,17 @@ export default function Dashboard() {
         .then((data) => {
           if (
             data != null &&
-            Object.prototype.hasOwnProperty.call(data, 'state') &&
-            data['state'] === 200
+              Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200
           ) {
-            dispatch(setMessageList(data['message_list']))
+            dispatch(addFriend(friendName))
+            enqueueSnackbar('Successful add friend: ' + friendName
+              , { variant: 'success' })
           }
         })
     )
-  }, [username, dispatch])
-
-  const handleAddFriendRequest = useCallback(
-    async (fiendName) => {
-      const params = {
-        username: username,
-        friend_name: fiendName
-      }
-
-      fetch('/?action=agree_add_friend', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res) =>
-        res
-          .json()
-          .catch((error) => console.error('Error:', error))
-          .then((data) => {
-            if (
-              data != null &&
-              Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200
-            ) {
-              dispatch(
-                setMessageList([
-                  ...friendList,
-                  { user: username, message_list: [] }
-                ])
-              )
-            }
-          })
-      )
-    },
-    [username, friendList, dispatch]
+  },
+  [myName, dispatch, enqueueSnackbar]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
@@ -304,68 +265,87 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
-    const localCookie = Cookies.get('token')
-    const nameCookie = Cookies.get('username')
-    if (localCookie != null && nameCookie != null) {
+    async function setWebSocket() {
+      const localCookie = Cookies.get('token')
+      const nameCookie = Cookies.get('username')
+      if (localCookie != null && nameCookie != null) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      username = nameCookie
+        const socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        await dispatch(setMyName(nameCookie))
+        const params = {
+          username: nameCookie
+        }
+        // Connection opened
+        socket.addEventListener('open', function (event) {
+          dispatch(setSocket(socket))
+          fetch('/?action=require_friend_list', {
+            method: 'POST',
+            body: JSON.stringify(params),
+            headers: { 'Content-Type': 'application/json' }
+          }).then((res) =>
+            res
+              .json()
+              .catch((error) => console.error('Error:', error))
+              .then((data) => {
+                if (
+                  data != null &&
+                        Object.prototype.hasOwnProperty.call(data, 'state') &&
+                        data['state'] === 200
+                ) {
+                  dispatch(setMessageList(data['message_list']))
+                }
+              })
+          )
+        })
 
-      // Connection opened
-      socket.addEventListener('open', function (event) {
-        handleRequireFriendList().then()
-        dispatch(setSocket(socket))
-      })
-
-      // Listen for messages
-      socket.addEventListener('message', function (event) {
-        const receivedData = JSON.parse(event.data)
-        if (
-          receivedData != null &&
+        // Listen for messages
+        socket.addEventListener('message', function (event) {
+          const receivedData = JSON.parse(event.data)
+          if (
+            receivedData != null &&
           Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
           receivedData['state'] === 200
-        ) {
-          switch (receivedData['type']) {
-            case 'MESSAGE_NOTIFY':
-              handleReply('NOTIFY_MESSAGE_NOTIFY').then()
-              dispatch(
-                messageReceived(
-                  receivedData['content'],
-                  receivedData['friend_name']
+          ) {
+            switch (receivedData['type']) {
+              case 'MESSAGE_NOTIFY':
+                handleReply('NOTIFY_MESSAGE_NOTIFY').then()
+                dispatch(
+                  messageReceived(
+                    receivedData['content'],
+                    receivedData['friend_name']
+                  )
                 )
-              )
-              break
-            case 'NEW_ADD_FRIEND':
-              handleReply('NOTIFY_NEW_ADD_FRIEND').then()
-              setFriendToAddList([
-                ...friendToAddList,
-                receivedData['friend_name']
-              ])
-              break
-            case 'AGREE_ADD_FRIEND':
-              handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-              dispatch(
-                setMessageList([
-                  friendList,
-                  { user: receivedData['friend_name'], message_list: [] }
+                break
+              case 'NEW_ADD_FRIEND':
+                handleReply('NOTIFY_NEW_ADD_FRIEND').then()
+                setFriendToAddList([
+                  ...friendToAddList,
+                  receivedData['friend_name']
                 ])
-              )
-              break
-            default:
-              break
+                break
+              case 'AGREE_ADD_FRIEND':
+                handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
+                dispatch(addFriend(receivedData['friend_name']))
+                enqueueSnackbar('Successful add friend: ' + receivedData['friend_name']
+                  , { variant: 'success' })
+                break
+              default:
+                break
+            }
           }
+        })
+        socket.onerror = function (event) {
+          console.error('WebSocket error observed:', event)
+          history.push('/sign')
         }
-      })
-
-      socket.onerror = function (event) {
-        console.error('WebSocket error observed:', event)
-        // history.push('/sign')
+      } else {
+        history.push('/sign')
       }
-    } else {
-      // history.push('/sign')
     }
-  }, [history])
+    setWebSocket().then()
+    // eslint-disable-next-line
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
@@ -407,7 +387,6 @@ export default function Dashboard() {
                 name="checkedDarkTheme"
                 checked={darkState}
                 onChange={() => {
-                  console.log(theme1)
                   setDarkState(!darkState)
                   // dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
                 }}
@@ -440,7 +419,7 @@ export default function Dashboard() {
                 className={classes.appBarIcon}
                 onClick={handleAvatarClick}
               >
-                <Avatar>S</Avatar>
+                <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
               </IconButton>
             </div>
             <Menu

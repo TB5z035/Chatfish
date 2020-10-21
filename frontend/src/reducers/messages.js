@@ -3,15 +3,18 @@ const messages = (state = initialState, action) => {
   let j = 0
   const len = newList.length
   switch (action.type) {
+    case 'ADD_FRIEND':
+      return [...state, { user: action.friendName,
+        message_list: [] }]
     case 'SET_MESSAGE_LIST':
       return action.messageList
     case 'NEW_MESSAGE_SEND':
       for (; j < len; j++) {
         if (newList[j].user === action.receiver) {
           newList[j].message_list.push({
-            from: '_self',
+            from: action.author,
             content: action.message,
-            time: new Date(),
+            time: new Date().toLocaleTimeString(),
             type: 'normal'
           })
         }
@@ -23,7 +26,7 @@ const messages = (state = initialState, action) => {
           newList[j].message_list.push({
             from: action.author,
             content: action.message,
-            time: new Date(),
+            time: new Date().toLocaleTimeString(),
             type: 'normal'
           })
         }
@@ -34,17 +37,6 @@ const messages = (state = initialState, action) => {
   }
 }
 
-const initialState = [
-  {
-    user: 'TB5',
-    message_list: [
-      { type: 'normal', content: 'Hi!', time: new Date(), from: 'TB5' }
-    ]
-  },
-  { user: 'TB6', message_list: [] },
-  { user: 'TB7', message_list: [] },
-  { user: 'TB8', message_list: [] },
-  { user: 'TB9', message_list: [] }
-]
+const initialState = []
 
 export default messages

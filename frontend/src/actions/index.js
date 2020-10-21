@@ -19,7 +19,7 @@ export const setFocusUser = (username) => ({
 })
 
 export const setMessageList = (messageList) => ({
-  type: types.SET_WEBSOCKET,
+  type: types.SET_MESSAGE_LIST,
   messageList
 })
 
@@ -28,7 +28,12 @@ export const setSocket = (socket) => ({
   socket
 })
 
-export const setTheme = (theme) => ({
-  type: types.SET_THEME,
-  theme
+export const setMyName = (myName) => ({
+  type: types.SET_MY_NAME,
+  myName
+})
+
+export const addFriend = (friendName) => ({
+  type: types.ADD_FRIEND,
+  friendName
 })
