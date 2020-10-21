@@ -91,16 +91,12 @@ const useStyles = makeStyles((theme) => ({
     padding: 5
   },
   menuButton: {
-    marginRight: 36
+    marginRight: theme.spacing(1)
   },
   menuButtonHidden: {
     display: 'none'
   },
-  titleLight: {
-    flexGrow: 1,
-    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
-  },
-  titleDark: {
+  title: {
     flexGrow: 1,
     color: theme.palette.text.primary
   },
@@ -374,7 +370,8 @@ export default function Dashboard() {
             variant="h6"
             // color={darkState ? '#ffffff' : '#000000'}
             noWrap
-            className={darkState ? classes.titleLight : classes.titleDark}
+            // className={darkState ? classes.titleLight : classes.titleDark}
+            className={classes.title}
           >
             Chat Fish
           </Typography>
