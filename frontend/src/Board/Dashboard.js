@@ -19,7 +19,13 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem, ThemeProvider, createMuiTheme } from '@material-ui/core'
+import {
+  Menu,
+  MenuItem,
+  ThemeProvider,
+  createMuiTheme,
+  useMediaQuery
+} from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -34,6 +40,8 @@ import {
   deepPurple,
   deepOrange
 } from '@material-ui/core/colors'
+
+import { lightTheme, darkTheme } from '../themes'
 
 // function Copyright() {
 //   return (
@@ -58,7 +66,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   toolbar: {
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    // background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    background: theme.palette.primary.light,
     paddingRight: 24 // keep right padding when drawer closed
   },
   toolbarIcon: {
@@ -93,7 +102,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'none'
   },
   title: {
-    flexGrow: 1
+    flexGrow: 1,
+    color: theme.palette.text.primary
   },
   drawerPaper: {
     position: 'relative',
@@ -163,25 +173,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function Dashboard () {
+export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [darkState, setDarkState] = useState(false)
-  const palletType = darkState ? 'dark' : 'light'
-  const mainPrimaryColor = darkState ? orange[500] : lightBlue[500]
-  const mainSecondaryColor = darkState ? deepOrange[900] : deepPurple[500]
-  const darkTheme = createMuiTheme({
-    palette: {
-      type: palletType,
-      primary: {
-        main: mainPrimaryColor
-      },
-      secondary: {
-        main: mainSecondaryColor
-      }
-    }
-  })
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [darkState, setDarkState] = useState(prefersDarkMode)
+  const theme = darkState ? darkTheme() : lightTheme()
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
@@ -352,18 +350,17 @@ export default function Dashboard () {
 
       socket.onerror = function (event) {
         console.error('WebSocket error observed:', event)
-        history.push('/sign')
+        // history.push('/sign')
       }
     } else {
-      history.push('/sign')
+      // history.push('/sign')
     }
   }, [history])
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <div className={classes.root}>
         <CssBaseline />
-
         <AppBar
           position="absolute"
           className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -385,11 +382,11 @@ export default function Dashboard () {
             <Typography
               component="h1"
               variant="h6"
-              color="inherit"
+              // color="inherit"
               noWrap
               className={classes.title}
             >
-            Chat Fish
+              Chat Fish
             </Typography>
 
             <div>
