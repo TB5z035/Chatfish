@@ -28,7 +28,7 @@ export const setSocket = (socket) => ({
   socket
 })
 
-export const setTheme = (theme) => ({
-  type: types.SET_THEME,
-  theme
+export const setMyName = (myName) => ({
+  type: types.SET_MY_NAME,
+  myName
 })
