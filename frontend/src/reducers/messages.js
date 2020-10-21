@@ -14,7 +14,7 @@ const messages = (state = initialState, action) => {
           newList[j].message_list.push({
             from: action.author,
             content: action.message,
-            time: new Date().toLocaleTimeString(),
+            time: new Date().getTime(),
             type: 'normal'
           })
         }
@@ -26,7 +26,7 @@ const messages = (state = initialState, action) => {
           newList[j].message_list.push({
             from: action.author,
             content: action.message,
-            time: new Date().toLocaleTimeString(),
+            time: new Date().getTime(),
             type: 'normal'
           })
         }
