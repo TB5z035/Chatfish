@@ -118,6 +118,14 @@ def init_message(data):
             'cid': data.get('cid'),
             'mid': new_msg.mid
         }
+        post_to_nodejs({
+            'state': 200,
+            'type': 'MESSAGE_NOTIFY',
+            'content': data.get('content'),
+            'username': data.get('friend_name'),
+            'friend_name': data.get('username'),
+            'uid': FindUidByName(data.get('friend_name')).get('uid')
+        })
     except:
         ret = {
             'state': 403,
@@ -180,16 +188,18 @@ def add_friend(data):
             'message': 'Invalid token or username or friend name!'
         }
     else :
-        if status == 1 :
-            ret = {
-                'state': 200,
-                'message': 'Successfully requested!'
-            }
-        else :
-            ret ={
-                'state': 405,
-                'message': 'Invalid token or username or friend name!'
-            }
+        ret = {
+            'state': 200,
+            'message': 'Successfully requested!'
+        }
+        post_to_nodejs({
+            'state': 200,
+            'type': 'NEW_ADD_FRIEND',
+            'content': 'Add friend request sent.',
+            'uid': name_ret.get('uid'),
+            'username': data.get('friend_name'),
+            'friend_name': FindNameByUid(data.get('uid')).get('name')
+        })
     return ret
 
 def accept_friend_request(data):
@@ -205,21 +215,31 @@ def accept_friend_request(data):
             {
                 'ctype': 0,
                 'name': 'private chat',
-                'users': [ data.get('uid'), name_ret.get('uid' ) ]
+                'users': [ data.get('uid'), name_ret.get('uid') ]
             }
         )
-        status = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get['status']
-        status = insert_user_meta(name_ret.get('uid'), 'friend', data.get('uid')).get['status']
-        if status == 1 :
+        s1 = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get('status')
+        s2 = insert_user_meta(name_ret.get('uid'), 'friend', data.get('uid')).get('status')
+        if s1 == 1 and s2 == 1 :
             ret = {
                 'state': 200,
                 'message': 'Successfully requested!'
             }
+            post_to_nodejs({
+                'state': 200,
+                'type': 'AGREE_ADD_FRIEND',
+                'content': 'Add friend request agreed.',
+                'uid': name_ret.get('uid'),
+                'username': data.get('friend_name'),
+                'friend_name': FindNameByUid(data.get('uid')).get('name')
+            })
         else :
             ret ={
                 'state': 405,
                 'message': 'Invalid token or username or friend name!'
             }
+    print('accept friend request.')
+    print(ret)
     return ret
 
 def message_upload(data):
@@ -227,12 +247,14 @@ def message_upload(data):
         ruid = User.objects.filter(name = data.get('friend_name'))[0].uid
         chats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid')))]
         rchats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid))]
-        this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.filter(cid = cid).ctype == 0 ][0]
+        this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.filter(cid = cid)[0].ctype == 0 ][0]
         init_message({
             'cid': this_cid,
             'uid': data.get('uid'),
             'mtype': 'normal',
-            'content': data.get('content')
+            'content': data.get('content'),
+            'username': data.get('userName'),
+            'friend_name': data.get('friend_name')
         })
         ret = {
             'state': 200,
@@ -260,7 +282,7 @@ def response_handle(data):
 @require_http_methods(["POST"])
 @csrf_exempt
 def post_data(request):
-    body = request.body.decode()
+    body = request.body.decode('utf-8')
     sha1 = hashlib.sha1((body + ' post from ChatFish Server').encode('utf-8'))
     ret = {}
     if (sha1.hexdigest() == request.META.get('HTTP_DATA_KEY')):
@@ -285,7 +307,7 @@ def post_data(request):
             elif data['type'] == 'ADD_NEW_FRIEND':
                 ret = add_friend(data) # may need improvement
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
-                ret = agree_add_friend(data) # may need improvement
+                ret = accept_friend_request(data) # may need improvement
             elif data['type'] == 'RESPONSE':
                 ret = response_handle(data)
             elif data['type'] == 'CREATE_NEW_GROUP':
@@ -317,6 +339,8 @@ def post_data(request):
                     'message': 'undefined API.'
                 }
         except Exception as e:
+            print("Exception happened.")
+            print(str(e))
             ret = {
                 'state': 399,
                 'message': str(e)
@@ -335,7 +359,7 @@ def post_to_nodejs(data):
     sha1 = hashlib.sha1(text_bytes)
     key = sha1.hexdigest()
     headers = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key
     }
     r = requests.post('http://localhost:3000', json = data, headers = headers)
