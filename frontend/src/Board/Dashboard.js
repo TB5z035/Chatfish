@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMyName, setMessageList, setSocket } from '../actions'
+import { messageReceived, setMyName, setMessageList, setSocket, addFriend } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -212,19 +212,14 @@ export default function Dashboard () {
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
           ) {
-            dispatch(
-              setMessageList([
-                ...friendList,
-                { user: friendName, message_list: [] }
-              ])
-            )
+            dispatch(addFriend(friendName))
             enqueueSnackbar('Successful add friend: ' + friendName
               , { variant: 'success' })
           }
         })
     )
   },
-  [myName, friendList, dispatch]
+  [myName, dispatch, enqueueSnackbar]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
@@ -273,14 +268,12 @@ export default function Dashboard () {
         const socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
-
+        const params = {
+          username: nameCookie
+        }
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          const params = {
-            username: nameCookie
-          }
-
           fetch('/?action=require_friend_list', {
             method: 'POST',
             body: JSON.stringify(params),
@@ -328,12 +321,7 @@ export default function Dashboard () {
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-                dispatch(
-                  setMessageList([
-                    ...friendList,
-                    { user: receivedData['friend_name'], message_list: [] }
-                  ])
-                )
+                dispatch(addFriend(receivedData['friend_name']))
                 enqueueSnackbar('Successful add friend: ' + receivedData['friend_name']
                   , { variant: 'success' })
                 break
@@ -352,6 +340,7 @@ export default function Dashboard () {
       }
     }
     setWebSocket().then()
+    // eslint-disable-next-line
   }, [])
 
   return (

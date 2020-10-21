@@ -32,3 +32,8 @@ export const setMyName = (myName) => ({
   type: types.SET_MY_NAME,
   myName
 })
+
+export const addFriend = (friendName) => ({
+  type: types.ADD_FRIEND,
+  friendName
+})
