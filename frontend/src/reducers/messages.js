@@ -4,8 +4,7 @@ const messages = (state = initialState, action) => {
   const len = newList.length
   switch (action.type) {
     case 'ADD_FRIEND':
-      return [...state, { user: action.friendName,
-        message_list: [] }]
+      return [...state, { user: action.friendName, message_list: [] }]
     case 'SET_MESSAGE_LIST':
       return action.messageList
     case 'NEW_MESSAGE_SEND':
@@ -37,6 +36,6 @@ const messages = (state = initialState, action) => {
   }
 }
 
-const initialState = []
+const initialState = [{ user: 'ddd', message_list: [] }]
 
 export default messages
