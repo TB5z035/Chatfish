@@ -1,8 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
-import { makeStyles, useTheme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMyName, setMessageList, setSocket, addFriend } from '../actions'
+import {
+  messageReceived,
+  setMyName,
+  setMessageList,
+  setSocket,
+  addFriend
+} from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -19,13 +25,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import {
-  Menu,
-  MenuItem,
-  ThemeProvider,
-  createMuiTheme,
-  useMediaQuery
-} from '@material-ui/core'
+import { Menu, MenuItem, ThemeProvider } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -35,12 +35,6 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
-import {
-  orange,
-  lightBlue,
-  deepPurple,
-  deepOrange
-} from '@material-ui/core/colors'
 
 import { lightTheme, darkTheme } from '../themes'
 
@@ -197,34 +191,36 @@ export default function Dashboard() {
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
 
-  const handleAddFriendRequest = useCallback(async (friendName) => {
-    const params = {
-      username: myName,
-      friend_name: friendName
-    }
+  const handleAddFriendRequest = useCallback(
+    async (friendName) => {
+      const params = {
+        username: myName,
+        friend_name: friendName
+      }
 
-    fetch('/?action=agree_add_friend', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) =>
-      res
-        .json()
-        .catch((error) => console.error('Error:', error))
-        .then((data) => {
-          if (
-            data != null &&
+      fetch('/?action=agree_add_friend', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
-          ) {
-            dispatch(addFriend(friendName))
-            enqueueSnackbar('Successful add friend: ' + friendName
-              , { variant: 'success' })
-          }
-        })
-    )
-  },
-  [myName, dispatch, enqueueSnackbar]
+            ) {
+              dispatch(addFriend(friendName))
+              enqueueSnackbar('Successful add friend: ' + friendName, {
+                variant: 'success'
+              })
+            }
+          })
+      )
+    },
+    [myName, dispatch, enqueueSnackbar]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
@@ -269,8 +265,10 @@ export default function Dashboard() {
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const socket = new WebSocket(
+          'wss://chatfish-gojellyfish.app.secoder.net/ws'
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
         const params = {
@@ -290,8 +288,8 @@ export default function Dashboard() {
               .then((data) => {
                 if (
                   data != null &&
-                        Object.prototype.hasOwnProperty.call(data, 'state') &&
-                        data['state'] === 200
+                  Object.prototype.hasOwnProperty.call(data, 'state') &&
+                  data['state'] === 200
                 ) {
                   dispatch(setMessageList(data['message_list']))
                 }
@@ -304,8 +302,8 @@ export default function Dashboard() {
           const receivedData = JSON.parse(event.data)
           if (
             receivedData != null &&
-          Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
-          receivedData['state'] === 200
+            Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
+            receivedData['state'] === 200
           ) {
             switch (receivedData['type']) {
               case 'MESSAGE_NOTIFY':
@@ -327,8 +325,10 @@ export default function Dashboard() {
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
                 dispatch(addFriend(receivedData['friend_name']))
-                enqueueSnackbar('Successful add friend: ' + receivedData['friend_name']
-                  , { variant: 'success' })
+                enqueueSnackbar(
+                  'Successful add friend: ' + receivedData['friend_name'],
+                  { variant: 'success' }
+                )
                 break
               default:
                 break
