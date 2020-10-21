@@ -65,12 +65,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex'
   },
-  toolbar: {
-    // background:
-    //   theme.palette.type === 'light'
-    //     ? 'linear-gradient(45deg, #FEABAB 30%, #FFCC80 90%)'
-    //     : theme.palette.primary.dark,
-    background: theme.palette.dashboard,
+  toolbarLight: {
+    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    // background: theme.palette.dashboard,
+    paddingRight: theme.spacing(1) // keep right padding when drawer closed
+  },
+  toolbarDark: {
+    // background: 'linear-gradient(45deg, #FEABAB 30%, #FFCC80 90%)',
+    background: theme.palette.grey[900],
     paddingRight: theme.spacing(1) // keep right padding when drawer closed
   },
   toolbarIcon: {
@@ -106,7 +108,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
-    color: theme.palette.text.primary
+    // color: theme.palette.text.primary
   },
   drawerPaper: {
     position: 'relative',
@@ -369,8 +371,10 @@ export default function Dashboard() {
           position="absolute"
           className={clsx(classes.appBar, open && classes.appBarShift)}
         >
-
-          <Toolbar id="toolbar" className={classes.toolbar}>
+          <Toolbar
+            id="toolbar"
+            className={darkState ? classes.toolbarDark : classes.toolbarLight}
+          >
             <IconButton
               edge="start"
               // color="inherit"
