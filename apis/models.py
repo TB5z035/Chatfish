@@ -64,22 +64,26 @@ def Test():
 
 def FetchFriends(uid, number = -1):
     try:
-        if number == -1:
-            friends = UserMeta.objects.filter(meta_name = 'friend', uid = uid)
-        uid_list = [ int(friend.meta_value) for friend in friends ] # invert to integer id.
+        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid))
+        cid_list = [ chat.cid for chat in chats ]
+        # user can be multiple if delete [0]
+        message_list = [ {
+            'user': [ User.objects.filter(uid = member)[0].name for member in FetchChatMember(cid) if member != uid ][0],
+            'message_list': FetchChatMessage(cid)
+        } for cid in cid_list ]
+
         ret = {
             'state': 200,
-            'message': 'Successfully obtain friend list.',
-            'message_list': [{
-                    'uid': uid,
-                    'name': FindNameByUid(uid).get('name'),
-                    'message_list': []} for uid in uid_list]
+            'message': 'All message required successfully.',
+            'message_list': message_list
         }
     except:
         ret = {
-            'state': 406,
-            'message': 'Fail to fetch friend list.'
+            'state': 400,
+            'message': 'Failed in fetching all message.'
         }
+    print('fetching friend.')
+    print(ret)
     return ret
 
 def FetchOfflineMessage(ruid):
@@ -94,7 +98,7 @@ def FetchChatMember(cid):
 
 def FetchChatMessage(cid, number = 20):
     msgs = Message.objects.filter(cid = cid)
-    ret = [ { 'time':msg.time, 'sender': msg.uid, 'content': msg.content } for msg in msgs ]
+    ret = [ { 'type': msg.mtype, 'time': msg.time, 'from': FindNameByUid(msg.uid).get('name'), 'content': msg.content } for msg in msgs ]
     return ret
 
 def FetchAllMessage(data):
@@ -121,7 +125,7 @@ def FetchAllMessage(data):
 
 
 
-def FindUidByName(username):
+def FindUidByName(name):
     user = User.objects.filter(name = name)
     if user.count() == 0 :
         ret = {
