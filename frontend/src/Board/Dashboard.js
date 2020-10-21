@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles, useTheme } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
 import { messageReceived, setMessageList, setSocket } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -66,9 +66,12 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   toolbar: {
-    // background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-    background: theme.palette.primary.light,
-    paddingRight: 24 // keep right padding when drawer closed
+    // background:
+    //   theme.palette.type === 'light'
+    //     ? 'linear-gradient(45deg, #FEABAB 30%, #FFCC80 90%)'
+    //     : theme.palette.primary.dark,
+    background: theme.palette.dashboard,
+    paddingRight: theme.spacing(1) // keep right padding when drawer closed
   },
   toolbarIcon: {
     display: 'flex',
@@ -177,13 +180,14 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkState, setDarkState] = useState(prefersDarkMode)
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+  const [darkState, setDarkState] = useState(true)
   const theme = darkState ? darkTheme() : lightTheme()
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const dispatch = useDispatch()
   // const [currentChat, setCurrentChat] = useState(friendList[0])
+  const theme1 = useTheme()
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([
@@ -365,10 +369,11 @@ export default function Dashboard() {
           position="absolute"
           className={clsx(classes.appBar, open && classes.appBarShift)}
         >
+
           <Toolbar id="toolbar" className={classes.toolbar}>
             <IconButton
               edge="start"
-              color="inherit"
+              // color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               className={clsx(
@@ -394,6 +399,7 @@ export default function Dashboard() {
                 name="checkedDarkTheme"
                 checked={darkState}
                 onChange={() => {
+                  console.log(theme1)
                   setDarkState(!darkState)
                   // dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
                 }}
@@ -406,7 +412,7 @@ export default function Dashboard() {
                 setNotificationDialogOpen(true)
               }}
             >
-              <IconButton color="inherit">
+              <IconButton>
                 {friendToAddList.length !== 0 ? (
                   <Badge
                     badgeContent={friendToAddList.length.toString()}
@@ -422,7 +428,10 @@ export default function Dashboard() {
 
             <div className={classes.appBarIcon}>
               {/* user icon */}
-              <IconButton onClick={handleAvatarClick}>
+              <IconButton
+                className={classes.appBarIcon}
+                onClick={handleAvatarClick}
+              >
                 <Avatar>S</Avatar>
               </IconButton>
             </div>
