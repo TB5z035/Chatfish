@@ -43,8 +43,8 @@ exports.post = function post(path, data, on_data_callback, on_err_callback) {
         path: path,
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': content.length,
+            'Content-Type': 'application/json;charset=utf8',
+            'Content-Length': Buffer.byteLength(content),
             'Data-Key': key
         }
     }
