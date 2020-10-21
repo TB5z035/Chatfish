@@ -27,6 +27,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
+import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import {
   orange,
@@ -171,6 +172,7 @@ export default function Dashboard () {
   const palletType = darkState ? 'dark' : 'light'
   const mainPrimaryColor = darkState ? orange[500] : lightBlue[500]
   const mainSecondaryColor = darkState ? deepOrange[900] : deepPurple[500]
+  const { enqueueSnackbar } = useSnackbar()
   const darkTheme = createMuiTheme({
     palette: {
       type: palletType,
@@ -188,17 +190,12 @@ export default function Dashboard () {
   const dispatch = useDispatch()
 
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState([
-    'Alice',
-    'Bob',
-    'Carol',
-    'Dave'
-  ])
+  const [friendToAddList, setFriendToAddList] = useState([])
 
-  const handleAddFriendRequest = useCallback(async (fiendName) => {
+  const handleAddFriendRequest = useCallback(async (friendName) => {
     const params = {
       username: myName,
-      friend_name: fiendName
+      friend_name: friendName
     }
 
     fetch('/?action=agree_add_friend', {
@@ -218,9 +215,11 @@ export default function Dashboard () {
             dispatch(
               setMessageList([
                 ...friendList,
-                { user: fiendName, message_list: [] }
+                { user: friendName, message_list: [] }
               ])
             )
+            enqueueSnackbar('Successful add friend: ' + friendName
+              , { variant: 'success' })
           }
         })
     )
@@ -335,6 +334,8 @@ export default function Dashboard () {
                     { user: receivedData['friend_name'], message_list: [] }
                   ])
                 )
+                enqueueSnackbar('Successful add friend: ' + receivedData['friend_name']
+                  , { variant: 'success' })
                 break
               default:
                 break
