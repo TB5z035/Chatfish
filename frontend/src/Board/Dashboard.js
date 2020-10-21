@@ -106,9 +106,13 @@ const useStyles = makeStyles((theme) => ({
   menuButtonHidden: {
     display: 'none'
   },
-  title: {
+  titleLight: {
     flexGrow: 1,
-    // color: theme.palette.text.primary
+    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+  },
+  titleDark: {
+    flexGrow: 1,
+    color: theme.palette.text.primary
   },
   drawerPaper: {
     position: 'relative',
@@ -391,9 +395,9 @@ export default function Dashboard() {
             <Typography
               component="h1"
               variant="h6"
-              // color="inherit"
+              // color={darkState ? '#ffffff' : '#000000'}
               noWrap
-              className={classes.title}
+              className={darkState ? classes.titleLight : classes.titleDark}
             >
               Chat Fish
             </Typography>
