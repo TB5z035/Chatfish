@@ -73,7 +73,7 @@ var login_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         if (res.state === 200) {
@@ -85,7 +85,7 @@ var login_request = function(request, response, body) {
             if (manager.find(res.id) !== undefined)
                 manager.close(res.id)
             manager.add_user(res.id, res.token, json_data.username)
-            manager.close_ws(res.id)
+            // manager.close(res.id)
             delete res.id
         }
         console.log(res)
@@ -103,7 +103,7 @@ var register_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         console.log(res)
@@ -119,6 +119,7 @@ var require_friend_list_request = function(request, response, body) {
     if (user === undefined || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
     var data = {
         type: 'REQUIRE_FRIEND_LIST',
@@ -126,7 +127,7 @@ var require_friend_list_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         response.end(JSON.stringify(res))
@@ -149,7 +150,7 @@ var add_friend_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         response.end(JSON.stringify(res))
@@ -172,7 +173,7 @@ var agree_add_friend_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         response.end(JSON.stringify(res))
@@ -196,7 +197,7 @@ var response_request = function(request, response, body) {
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=utf8',
             'Access-Control-Allow-Origin': '*'
         })
         response.end(JSON.stringify(res))
@@ -210,8 +211,9 @@ var django_request = function(request, response, body) {
     var text = encoder.encode(body + ' post from ChatFish Server')
     var key = sha1.update(text).digest('hex')
     response.writeHead(200, {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json;charset=utf8'
     })
+    var ret = {}
     if (key == request.headers['data-key']) {
         var data = JSON.parse(body)
         var ws = manager.get_ws(data.uid)
