@@ -34,18 +34,6 @@ const messages = (state = initialState, action) => {
   }
 }
 
-const initialState = [
-  {
-    user: 'TB5',
-    message_list: [
-      { type: 'normal', content: 'Hi!', time: new Date().toLocaleTimeString(), from: 'TB5' }
-    ]
-  },
-  { user: 'UB6', message_list: [] },
-  { user: 'VB7', message_list: [] },
-  { user: 'WB8', message_list: [] },
-  { user: 'XB9', message_list: [] },
-  { user: 'YB10', message_list: [] }
-]
+const initialState = []
 
 export default messages
