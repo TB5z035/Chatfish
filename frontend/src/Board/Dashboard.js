@@ -267,7 +267,7 @@ export default function Dashboard() {
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new WebSocket(
-          'wss://chatfish-gojellyfish.app.secoder.net/ws'
+          'wss://' + window.location.host + '/ws'
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
