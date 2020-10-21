@@ -337,7 +337,7 @@ export default function Dashboard () {
               handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
               dispatch(
                 setMessageList([
-                  friendList,
+                  ...friendList,
                   { user: receivedData['friend_name'], message_list: [] }
                 ])
               )
