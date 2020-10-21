@@ -19,7 +19,7 @@ export const setFocusUser = (username) => ({
 })
 
 export const setMessageList = (messageList) => ({
-  type: types.SET_WEBSOCKET,
+  type: types.SET_MESSAGE_LIST,
   messageList
 })
 
