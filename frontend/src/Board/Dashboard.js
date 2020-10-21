@@ -37,7 +37,7 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 
-import { THEME_LIGHT, THEME_DARK } from '../themes'
+import { THEME_LIGHT, THEME_DARK, THEME_WHITE } from '../themes'
 
 // function Copyright() {
 //   return (
@@ -173,7 +173,6 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [darkState, setDarkState] = useState(true)
-  // const theme = darkState ? darkTheme() : lightTheme()
   const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
@@ -383,7 +382,6 @@ export default function Dashboard() {
               onChange={() => {
                 setDarkState(!darkState)
                 dispatch(setTheme(darkState ? THEME_LIGHT : THEME_DARK))
-                // dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
