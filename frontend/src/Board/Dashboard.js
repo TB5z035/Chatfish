@@ -2,7 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
-import { messageReceived, setMyName, setMessageList, setSocket } from '../actions'
+import {
+  messageReceived,
+  setMyName,
+  setMessageList,
+  setSocket,
+  addFriend
+} from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -19,7 +25,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem, ThemeProvider, createMuiTheme } from '@material-ui/core'
+import { Menu, MenuItem, ThemeProvider } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -27,13 +33,10 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
+import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
-import {
-  orange,
-  lightBlue,
-  deepPurple,
-  deepOrange
-} from '@material-ui/core/colors'
+
+import { lightTheme, darkTheme } from '../themes'
 
 // function Copyright() {
 //   return (
@@ -57,9 +60,15 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex'
   },
-  toolbar: {
+  toolbarLight: {
     background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-    paddingRight: 24 // keep right padding when drawer closed
+    // background: theme.palette.dashboard,
+    paddingRight: theme.spacing(1) // keep right padding when drawer closed
+  },
+  toolbarDark: {
+    // background: 'linear-gradient(45deg, #FEABAB 30%, #FFCC80 90%)',
+    background: theme.palette.grey[900],
+    paddingRight: theme.spacing(1) // keep right padding when drawer closed
   },
   toolbarIcon: {
     display: 'flex',
@@ -92,8 +101,13 @@ const useStyles = makeStyles((theme) => ({
   menuButtonHidden: {
     display: 'none'
   },
-  title: {
-    flexGrow: 1
+  titleLight: {
+    flexGrow: 1,
+    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
+  },
+  titleDark: {
+    flexGrow: 1,
+    color: theme.palette.text.primary
   },
   drawerPaper: {
     position: 'relative',
@@ -163,69 +177,50 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function Dashboard () {
+export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [darkState, setDarkState] = useState(false)
-  const palletType = darkState ? 'dark' : 'light'
-  const mainPrimaryColor = darkState ? orange[500] : lightBlue[500]
-  const mainSecondaryColor = darkState ? deepOrange[900] : deepPurple[500]
-  const darkTheme = createMuiTheme({
-    palette: {
-      type: palletType,
-      primary: {
-        main: mainPrimaryColor
-      },
-      secondary: {
-        main: mainSecondaryColor
-      }
-    }
-  })
+  const [darkState, setDarkState] = useState(true)
+  const theme = darkState ? darkTheme() : lightTheme()
+  const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
   const dispatch = useDispatch()
-
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState([
-    'Alice',
-    'Bob',
-    'Carol',
-    'Dave'
-  ])
+  const [friendToAddList, setFriendToAddList] = useState([])
 
-  const handleAddFriendRequest = useCallback(async (fiendName) => {
-    const params = {
-      username: myName,
-      friend_name: fiendName
-    }
+  const handleAddFriendRequest = useCallback(
+    async (friendName) => {
+      const params = {
+        username: myName,
+        friend_name: friendName
+      }
 
-    fetch('/?action=agree_add_friend', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) =>
-      res
-        .json()
-        .catch((error) => console.error('Error:', error))
-        .then((data) => {
-          if (
-            data != null &&
+      fetch('/?action=agree_add_friend', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
-          ) {
-            dispatch(
-              setMessageList([
-                ...friendList,
-                { user: fiendName, message_list: [] }
-              ])
-            )
-          }
-        })
-    )
-  },
-  [myName, friendList, dispatch]
+            ) {
+              dispatch(addFriend(friendName))
+              enqueueSnackbar('Successful add friend: ' + friendName, {
+                variant: 'success'
+              })
+            }
+          })
+      )
+    },
+    [myName, dispatch, enqueueSnackbar]
   )
   const refuseAddRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
@@ -270,18 +265,18 @@ export default function Dashboard () {
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket('wss://chatfish-gojellyfish.app.secoder.net/ws')
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const socket = new WebSocket(
+          'wss://chatfish-gojellyfish.app.secoder.net/ws'
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
-
+        const params = {
+          username: nameCookie
+        }
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          const params = {
-            username: nameCookie
-          }
-
           fetch('/?action=require_friend_list', {
             method: 'POST',
             body: JSON.stringify(params),
@@ -293,8 +288,8 @@ export default function Dashboard () {
               .then((data) => {
                 if (
                   data != null &&
-                        Object.prototype.hasOwnProperty.call(data, 'state') &&
-                        data['state'] === 200
+                  Object.prototype.hasOwnProperty.call(data, 'state') &&
+                  data['state'] === 200
                 ) {
                   dispatch(setMessageList(data['message_list']))
                 }
@@ -307,8 +302,8 @@ export default function Dashboard () {
           const receivedData = JSON.parse(event.data)
           if (
             receivedData != null &&
-          Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
-          receivedData['state'] === 200
+            Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
+            receivedData['state'] === 200
           ) {
             switch (receivedData['type']) {
               case 'MESSAGE_NOTIFY':
@@ -329,11 +324,10 @@ export default function Dashboard () {
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-                dispatch(
-                  setMessageList([
-                    ...friendList,
-                    { user: receivedData['friend_name'], message_list: [] }
-                  ])
+                dispatch(addFriend(receivedData['friend_name']))
+                enqueueSnackbar(
+                  'Successful add friend: ' + receivedData['friend_name'],
+                  { variant: 'success' }
                 )
                 break
               default:
@@ -341,7 +335,6 @@ export default function Dashboard () {
             }
           }
         })
-
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
           history.push('/sign')
@@ -351,21 +344,24 @@ export default function Dashboard () {
       }
     }
     setWebSocket().then()
+    // eslint-disable-next-line
   }, [])
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <div className={classes.root}>
         <CssBaseline />
-
         <AppBar
           position="absolute"
           className={clsx(classes.appBar, open && classes.appBarShift)}
         >
-          <Toolbar id="toolbar" className={classes.toolbar}>
+          <Toolbar
+            id="toolbar"
+            className={darkState ? classes.toolbarDark : classes.toolbarLight}
+          >
             <IconButton
               edge="start"
-              color="inherit"
+              // color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
               className={clsx(
@@ -379,11 +375,11 @@ export default function Dashboard () {
             <Typography
               component="h1"
               variant="h6"
-              color="inherit"
+              // color={darkState ? '#ffffff' : '#000000'}
               noWrap
-              className={classes.title}
+              className={darkState ? classes.titleLight : classes.titleDark}
             >
-            Chat Fish
+              Chat Fish
             </Typography>
 
             <div>
@@ -403,7 +399,7 @@ export default function Dashboard () {
                 setNotificationDialogOpen(true)
               }}
             >
-              <IconButton color="inherit">
+              <IconButton>
                 {friendToAddList.length !== 0 ? (
                   <Badge
                     badgeContent={friendToAddList.length.toString()}
@@ -419,7 +415,10 @@ export default function Dashboard () {
 
             <div className={classes.appBarIcon}>
               {/* user icon */}
-              <IconButton onClick={handleAvatarClick}>
+              <IconButton
+                className={classes.appBarIcon}
+                onClick={handleAvatarClick}
+              >
                 <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
               </IconButton>
             </div>
