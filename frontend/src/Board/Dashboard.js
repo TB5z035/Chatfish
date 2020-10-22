@@ -185,8 +185,9 @@ export default function Dashboard() {
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState([])
-
+  const [friendToAddList, setFriendToAddList] = useState(['Alice', 'bob'])
+  const [groupToAddList, setGroupToAddList] = useState([{ friendName: 'a', groupName: 'dsa' },
+    { friendName: 'b', groupName: 'saga' }])
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
       const params = {
@@ -218,11 +219,49 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddRequest = (refusedUsername) => {
+
+  const handleAddGroupRequest = useCallback(
+    async (groupName) => {
+      const params = {
+        username: myName,
+        group_name: groupName
+      }
+      console.log(params)
+      fetch('/?action=agree_add_group', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
+                      Object.prototype.hasOwnProperty.call(data, 'state') &&
+                      data['state'] === 200
+            ) {
+              dispatch(addFriend(groupName))
+              enqueueSnackbar('Successful add group: ' + groupName, {
+                variant: 'success'
+              })
+            }
+          })
+      )
+    },
+    [myName, dispatch, enqueueSnackbar]
+  )
+  const refuseAddFriendRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
     const newArray = [...friendToAddList]
     newArray.splice(index, 1)
     setFriendToAddList(newArray)
+  }
+  const refuseAddGroupRequest = (refusedGroupName) => {
+    const index = groupToAddList.indexOf(refusedGroupName)
+    const newArray = [...groupToAddList]
+    newArray.splice(index, 1)
+    setGroupToAddList(newArray)
   }
   const handleReply = async (message) => {
     const params = {
@@ -412,7 +451,7 @@ export default function Dashboard() {
             <IconButton>
               {friendToAddList.length !== 0 ? (
                 <Badge
-                  badgeContent={friendToAddList.length.toString()}
+                  badgeContent={(friendToAddList.length + groupToAddList.length).toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -524,9 +563,21 @@ export default function Dashboard() {
               {friendToAddList.map((name) => (
                 <NotificationListItem
                   name={name}
-                  refuse={refuseAddRequest}
+                  isGroup={false}
+                  friendName={''}
+                  refuse={refuseAddFriendRequest}
                   accept={handleAddFriendRequest}
                   key={name}
+                />
+              ))}
+              {groupToAddList.map((note) => (
+                <NotificationListItem
+                  name={note.groupName}
+                  isGroup={true}
+                  friendName={note.friendName}
+                  refuse={refuseAddGroupRequest}
+                  accept={handleAddGroupRequest}
+                  key={note.groupName}
                 />
               ))}
             </List>
