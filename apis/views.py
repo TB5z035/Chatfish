@@ -187,6 +187,11 @@ def add_friend(data):
             'state': 405,
             'message': 'Invalid token or username or friend name!'
         }
+    elif JudgeFriend(data.get('uid'), name_ret.get('uid')):
+        ret = {
+            'state': 400,
+            'message': 'They are already friends!' 
+        }
     else :
         ret = {
             'state': 200,
