@@ -46,18 +46,18 @@ export default function UserListItem(user) {
               className={classes.inline}
               noWrap
             >
-              <Typography
-                component="span"
-                variant="body2"
-                color="textPrimary"
-                noWrap
-              >
-                {user.message_list.length > 0 && user.message_list.slice(-1)[0].time
-                  ? new Date(
-                    user.message_list.slice(-1)[0].time
-                  ).toLocaleTimeString() + ' - '
-                  : undefined }
-              </Typography>
+              {/*<Typography*/}
+              {/*  component="span"*/}
+              {/*  variant="body2"*/}
+              {/*  color="textPrimary"*/}
+              {/*  noWrap*/}
+              {/*>*/}
+              {/*  {user.message_list.length > 0 && user.message_list.slice(-1)[0].time*/}
+              {/*    ? new Date(*/}
+              {/*      user.message_list.slice(-1)[0].time*/}
+              {/*    ).toLocaleTimeString() + ' - '*/}
+              {/*    : undefined }*/}
+              {/*</Typography>*/}
               <Typography
                 component="span"
                 variant="body2"
