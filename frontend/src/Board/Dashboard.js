@@ -271,9 +271,7 @@ export default function Dashboard() {
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket(
-          'wss://chatfish-gojellyfish.app.secoder.net/ws'
-        )
+        const socket = new WebSocket('wss://' + window.location.host + '/ws')
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
         const params = {
@@ -342,10 +340,10 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
+          history.push('/sign')
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()

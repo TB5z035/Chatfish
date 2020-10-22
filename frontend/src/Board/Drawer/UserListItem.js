@@ -46,21 +46,28 @@ export default function UserListItem(user) {
               className={classes.inline}
               noWrap
             >
-              <Typography
-                component="span"
-                variant="body2"
-                color="textPrimary"
-                noWrap
-              >
-                {user.time ? user.time : 'time'} -
-              </Typography>
+              {/* <Typography */}
+              {/*  component="span" */}
+              {/*  variant="body2" */}
+              {/*  color="textPrimary" */}
+              {/*  noWrap */}
+              {/* > */}
+              {/*  {user.message_list.length > 0 && user.message_list.slice(-1)[0].time */}
+              {/*    ? new Date( */}
+              {/*      user.message_list.slice(-1)[0].time */}
+              {/*    ).toLocaleTimeString() + ' - ' */}
+              {/*    : undefined } */}
+              {/* </Typography> */}
               <Typography
                 component="span"
                 variant="body2"
                 color="textSecondary"
                 noWrap
               >
-                {user.recent ? user.recent : 'recent messages blah blah blah'}
+                {user.message_list.length > 0 && user.message_list.slice(-1)[0].content
+                  ? user.message_list.slice(-1)[0].content
+                  : undefined}
+                {/* {user.recent ? user.recent : 'recent messages blah blah blah'} */}
               </Typography>
             </Typography>
           </React.Fragment>
