@@ -13,8 +13,8 @@ const messages = (state = initialState, action) => {
         } else if (b.message_list.length === 0) {
           return -1
         } else {
-          return Date.parse(a.message_list.slice(-1)[0].time) -
-              Date.parse(b.message_list.slice(-1)[0].time)
+          return Date.parse(b.message_list.slice(-1)[0].time) -
+              Date.parse(a.message_list.slice(-1)[0].time)
         }
       })
       return newList
