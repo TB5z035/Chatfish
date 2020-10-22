@@ -8,7 +8,7 @@ import {
   setMessageList,
   setSocket,
   addFriend,
-  setTheme
+  setTheme, setFocusUser
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
@@ -38,6 +38,7 @@ import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
+import socket from "../reducers/socket";
 
 // function Copyright() {
 //   return (
@@ -239,6 +240,10 @@ export default function Dashboard() {
   const handleLogout = (e) => {
     e.preventDefault()
     Cookies.remove('token')
+    dispatch(setMessageList([]))
+    dispatch(setFocusUser(null))
+    dispatch(setSocket(null))
+    dispatch(setMyName(null))
     history.push('/sign')
   }
   const handleDrawerOpen = () => {
