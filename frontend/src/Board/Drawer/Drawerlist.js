@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import SettingsIcon from '@material-ui/icons/Settings'
 import PersonAddIcon from '@material-ui/icons/PersonAdd'
+import GroupAddIcon from '@material-ui/icons/GroupAdd'
 import UserListItem from './UserListItem'
 import {
   Avatar,
@@ -19,6 +20,12 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import Cookies from 'js-cookie'
+import FormLabel from '@material-ui/core/FormLabel'
+import FormControl from '@material-ui/core/FormControl'
+import FormGroup from '@material-ui/core/FormGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Checkbox from '@material-ui/core/Checkbox'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
   pink: {
     color: theme.palette.getContrastText(pink[500]),
-    backgroundColor: theme.palette.random,
+    backgroundColor: theme.palette.random
   },
   green: {
     color: '#fff',
@@ -53,6 +60,10 @@ export function useSecondaryListItems() {
   const classes = useStyles()
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')
+  const [groupName, setGroupName] = useState('')
+  const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
+  const friendList = useSelector(state => state.messages)
+  const [selectState, setSelectState] = React.useState({})
 
   const handleAddFriend = useCallback(async () => {
     setAddFriendDialogOpen(false)
@@ -78,6 +89,17 @@ export function useSecondaryListItems() {
     [handleAddFriend]
   )
 
+  const handleCreateGroup = useCallback(async () => {
+    setCreateGroupDialogOpen(false)
+    console.log(selectState)
+    console.log(groupName)
+    setSelectState({})
+  }, [groupName, selectState])
+
+  const handleChange = (event) => {
+    setSelectState({ ...selectState, [event.target.name]: event.target.checked })
+  }
+
   return (
     <>
       <ListSubheader inset component="li">
@@ -95,6 +117,19 @@ export function useSecondaryListItems() {
           </Avatar>
         </ListItemAvatar>
         <ListItemText primary="Add Friends" />
+      </ListItem>
+      <ListItem
+        button
+        onClick={() => {
+          setCreateGroupDialogOpen(true)
+        }}
+      >
+        <ListItemAvatar>
+          <Avatar className={classes.green}>
+            <GroupAddIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText primary="Add Groups" />
       </ListItem>
       <ListItem button>
         <ListItemAvatar>
@@ -126,6 +161,41 @@ export function useSecondaryListItems() {
         <DialogActions>
           <Button color="primary" onClick={handleAddFriend}>
             Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={createGroupDialogOpen}
+        onClose={() => {
+          setCreateGroupDialogOpen(false)
+        }}
+      >
+        <DialogTitle> Creat new group</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Group Name"
+            autoFocus
+            fullWidth
+            onChange={(e) => {
+              setGroupName(e.target.value)
+            }}
+          />
+          <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">Select friends</FormLabel>
+            <FormGroup>
+              {friendList.map((user) => (
+                <FormControlLabel
+                  control={<Checkbox onChange={handleChange} name={user.user} />}
+                  label={user.user}
+                  key={user.user}
+                />
+              ))}
+            </FormGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button color="primary" onClick={handleCreateGroup}>
+            Creat
           </Button>
         </DialogActions>
       </Dialog>
