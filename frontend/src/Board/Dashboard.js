@@ -258,10 +258,14 @@ export default function Dashboard() {
     setFriendToAddList(newArray)
   }
   const refuseAddGroupRequest = (refusedGroupName) => {
-    const index = groupToAddList.indexOf(refusedGroupName)
     const newArray = [...groupToAddList]
-    newArray.splice(index, 1)
-    setGroupToAddList(newArray)
+    for (var i = 0; i < groupToAddList.length; i++) {
+      if (groupToAddList[i]['groupName'] === refusedGroupName) {
+        newArray.splice(i, 1)
+        setGroupToAddList(newArray)
+        break
+      }
+    }
   }
   const handleReply = async (message) => {
     const params = {
@@ -368,6 +372,13 @@ export default function Dashboard() {
                   receivedData['friend_name']
                 ])
                 break
+              case 'NEW_ADD_GROUP':
+                handleReply('NOTIFY_NEW_ADD_GROUP').then()
+                setGroupToAddList([
+                  ...groupToAddList,
+                  { groupName: receivedData['group_name'], friendName: receivedData['friend_name'] }
+                ])
+                break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
                 dispatch(addFriend(receivedData['friend_name']))
@@ -449,7 +460,7 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 ? (
+              {(friendToAddList.length !== 0 || friendToAddList.length !== 0) ? (
                 <Badge
                   badgeContent={(friendToAddList.length + groupToAddList.length).toString()}
                   color="secondary"
@@ -577,7 +588,7 @@ export default function Dashboard() {
                   friendName={note.friendName}
                   refuse={refuseAddGroupRequest}
                   accept={handleAddGroupRequest}
-                  key={note.groupName}
+                  key={note.groupName + '$' + note.friendName}
                 />
               ))}
             </List>
