@@ -52,11 +52,11 @@ export default function UserListItem(user) {
                 color="textPrimary"
                 noWrap
               >
-                {user.message_list.slice(-1)[0].time
+                {user.message_list.length > 0 && user.message_list.slice(-1)[0].time
                   ? new Date(
-                      user.message_list.slice(-1)[0].time
-                    ).toLocaleTimeString() + ' - '
-                  : undefined}
+                    user.message_list.slice(-1)[0].time
+                  ).toLocaleTimeString() + ' - '
+                  : undefined }
               </Typography>
               <Typography
                 component="span"
@@ -64,7 +64,7 @@ export default function UserListItem(user) {
                 color="textSecondary"
                 noWrap
               >
-                {user.message_list.slice(-1)[0].content
+                {user.message_list.length > 0 && user.message_list.slice(-1)[0].content
                   ? user.message_list.slice(-1)[0].content
                   : undefined}
                 {/* {user.recent ? user.recent : 'recent messages blah blah blah'} */}
