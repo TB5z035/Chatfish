@@ -37,14 +37,7 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
-import {
-  THEME_LIGHT,
-  THEME_DARK,
-  THEME_WHITE,
-  themesAvailable,
-  themeLightDefault,
-  themeDarkDefault
-} from '../themes'
+import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 
 // function Copyright() {
 //   return (
@@ -401,7 +394,9 @@ export default function Dashboard() {
               checked={darkState}
               onChange={() => {
                 setDarkState(!darkState)
-                dispatch(setTheme(!darkState ? previousDarkTheme : previousLightTheme))
+                dispatch(
+                  setTheme(!darkState ? previousDarkTheme : previousLightTheme)
+                )
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
@@ -444,10 +439,13 @@ export default function Dashboard() {
           >
             {themesAvailable.map((theme) => (
               <MenuItem
+                key={theme.name}
                 onClick={() => {
                   handleThemeMenuClose()
                   dispatch(setTheme(theme))
-                  theme.type === 'light' ? setPreviousLightTheme(theme) : setPreviousDarkTheme(theme)
+                  theme.type === 'light'
+                    ? setPreviousLightTheme(theme)
+                    : setPreviousDarkTheme(theme)
                   setDarkState(theme.type === 'dark')
                 }}
               >
