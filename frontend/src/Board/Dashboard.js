@@ -38,7 +38,6 @@ import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
-import socket from "../reducers/socket";
 
 // function Copyright() {
 //   return (
