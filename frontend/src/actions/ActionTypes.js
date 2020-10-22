@@ -8,3 +8,5 @@ export const NEW_MESSAGE_RECEIVE = 'NEW_MESSAGE_RECEIVE'
 export const SET_MY_NAME = 'SET_MY_NAME'
 
 export const ADD_FRIEND = 'ADD_FRIEND'
+
+export const SET_THEME = 'SET_THEME'
