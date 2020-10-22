@@ -38,7 +38,7 @@ export const addFriend = (friendName) => ({
   friendName
 })
 
-export const setTheme = (themeName) => ({
+export const setTheme = (theme) => ({
   type: types.SET_THEME,
-  theme: themeName
+  theme: theme
 })

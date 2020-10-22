@@ -11,8 +11,10 @@ const theme = (state = null, action) => {
     //   default:
     //     return state
     // }
-    if (action.theme in themes.themesAvailable) {
-      return themes.themesAvailable[action.theme]()
+    console.log("yes1")
+    if (themes.themesAvailable.includes(action.theme)) {
+      console.log("yes2")
+      return action.theme.setTheme()
     } else {
       return state
     }

@@ -36,8 +36,15 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
-
-import { THEME_LIGHT, THEME_DARK, THEME_WHITE } from '../themes'
+import PaletteIcon from '@material-ui/icons/Palette'
+import {
+  THEME_LIGHT,
+  THEME_DARK,
+  THEME_WHITE,
+  themesAvailable,
+  themeLightDefault,
+  themeDarkDefault
+} from '../themes'
 
 // function Copyright() {
 //   return (
@@ -172,9 +179,14 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [darkState, setDarkState] = useState(true)
+  const [darkState, setDarkState] = useState(false)
+  const [previousLightTheme, setPreviousLightTheme] = useState(
+    themeLightDefault
+  )
+  const [previousDarkTheme, setPreviousDarkTheme] = useState(themeDarkDefault)
   const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
+  const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
   // const theme = useTheme()
@@ -243,6 +255,14 @@ export default function Dashboard() {
     setOpen(false)
   }
 
+  const handleThemeIconClick = (event) => {
+    setAnchorThemeMenu(event.currentTarget)
+  }
+
+  const handleThemeMenuClose = () => {
+    setAnchorThemeMenu(null)
+  }
+
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
   }
@@ -252,7 +272,7 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
-    dispatch(setTheme(THEME_DARK))
+    dispatch(setTheme(darkState ? themeDarkDefault : themeLightDefault))
     async function setWebSocket() {
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
@@ -381,7 +401,7 @@ export default function Dashboard() {
               checked={darkState}
               onChange={() => {
                 setDarkState(!darkState)
-                dispatch(setTheme(darkState ? THEME_LIGHT : THEME_DARK))
+                dispatch(setTheme(!darkState ? previousDarkTheme : previousLightTheme))
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
@@ -405,6 +425,39 @@ export default function Dashboard() {
               )}
             </IconButton>
           </div>
+
+          <div className={classes.appBarIcon}>
+            {/* user icon */}
+            <IconButton
+              className={classes.appBarIcon}
+              onClick={handleThemeIconClick}
+            >
+              <PaletteIcon></PaletteIcon>
+            </IconButton>
+          </div>
+          <Menu
+            id="theme-menu"
+            anchorEl={anchorThemeMenu}
+            keepMounted
+            open={Boolean(anchorThemeMenu)}
+            onClose={handleThemeMenuClose}
+          >
+            {themesAvailable.map((theme) => (
+              <MenuItem
+                onClick={() => {
+                  handleThemeMenuClose()
+                  dispatch(setTheme(theme))
+                  theme.type === 'light' ? setPreviousLightTheme(theme) : setPreviousDarkTheme(theme)
+                  setDarkState(theme.type === 'dark')
+                }}
+              >
+                {theme.name}
+              </MenuItem>
+            ))}
+            {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
+            {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+            {/* <MenuItem onClick={handleLogout}>Logout</MenuItem> */}
+          </Menu>
 
           <div className={classes.appBarIcon}>
             {/* user icon */}
