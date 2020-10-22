@@ -7,7 +7,8 @@ import {
   setMyName,
   setMessageList,
   setSocket,
-  addFriend
+  addFriend,
+  setTheme
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
@@ -25,7 +26,7 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem, ThemeProvider } from '@material-ui/core'
+import { Menu, MenuItem } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -35,8 +36,8 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
-
-import { lightTheme, darkTheme } from '../themes'
+import PaletteIcon from '@material-ui/icons/Palette'
+import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 
 // function Copyright() {
 //   return (
@@ -58,17 +59,11 @@ const drawerWidth = 240
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex'
+    display: 'flex',
+    background: theme.palette.test
   },
-  toolbarLight: {
-    background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-    // background: theme.palette.dashboard,
-    paddingRight: theme.spacing(1) // keep right padding when drawer closed
-  },
-  toolbarDark: {
-    // background: 'linear-gradient(45deg, #FEABAB 30%, #FFCC80 90%)',
-    background: theme.palette.grey[900],
-    paddingRight: theme.spacing(1) // keep right padding when drawer closed
+  toolbar: {
+    background: theme.palette.toolbarBackground
   },
   toolbarIcon: {
     display: 'flex',
@@ -96,16 +91,12 @@ const useStyles = makeStyles((theme) => ({
     padding: 5
   },
   menuButton: {
-    marginRight: 36
+    marginRight: theme.spacing(1)
   },
   menuButtonHidden: {
     display: 'none'
   },
-  titleLight: {
-    flexGrow: 1,
-    color: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)'
-  },
-  titleDark: {
+  title: {
     flexGrow: 1,
     color: theme.palette.text.primary
   },
@@ -182,11 +173,16 @@ export default function Dashboard() {
   const history = useHistory()
   const [open, setOpen] = useState(false)
   const [darkState, setDarkState] = useState(false)
-  const theme = darkState ? darkTheme() : lightTheme()
+  const [previousLightTheme, setPreviousLightTheme] = useState(
+    themeLightDefault
+  )
+  const [previousDarkTheme, setPreviousDarkTheme] = useState(themeDarkDefault)
   const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
+  const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
+  // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
@@ -252,6 +248,14 @@ export default function Dashboard() {
     setOpen(false)
   }
 
+  const handleThemeIconClick = (event) => {
+    setAnchorThemeMenu(event.currentTarget)
+  }
+
+  const handleThemeMenuClose = () => {
+    setAnchorThemeMenu(null)
+  }
+
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
   }
@@ -261,14 +265,13 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
+    dispatch(setTheme(darkState ? themeDarkDefault : themeLightDefault))
     async function setWebSocket() {
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket(
-          'wss://' + window.location.host + '/ws'
-        )
+        const socket = new WebSocket('wss://' + window.location.host + '/ws')
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
         const params = {
@@ -348,146 +351,184 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={clsx(classes.appBar, open && classes.appBarShift)}
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar
+        position="absolute"
+        className={clsx(classes.appBar, open && classes.appBarShift)}
+      >
+        <Toolbar
+          id="toolbar"
+          // className={darkState ? classes.toolbarDark : classes.toolbarLight}
+          className={classes.toolbar}
         >
-          <Toolbar
-            id="toolbar"
-            className={darkState ? classes.toolbarDark : classes.toolbarLight}
+          <IconButton
+            edge="start"
+            // color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            className={clsx(
+              classes.menuButton,
+              open && classes.menuButtonHidden
+            )}
           >
-            <IconButton
-              edge="start"
-              // color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(
-                classes.menuButton,
-                open && classes.menuButtonHidden
-              )}
-            >
-              <MenuIcon />
-            </IconButton>
+            <MenuIcon />
+          </IconButton>
 
-            <Typography
-              component="h1"
-              variant="h6"
-              // color={darkState ? '#ffffff' : '#000000'}
-              noWrap
-              className={darkState ? classes.titleLight : classes.titleDark}
-            >
-              Chat Fish
-            </Typography>
+          <Typography
+            component="h1"
+            variant="h6"
+            // color={darkState ? '#ffffff' : '#000000'}
+            noWrap
+            // className={darkState ? classes.titleLight : classes.titleDark}
+            className={classes.title}
+          >
+            Chat Fish
+          </Typography>
 
-            <div>
-              <Switch
-                name="checkedDarkTheme"
-                checked={darkState}
-                onChange={() => {
-                  setDarkState(!darkState)
-                  // dispatch(setTheme(event.target.checked ? darkTheme : lightTheme))
-                }}
-                inputProps={{ 'aria-label': 'secondary checkbox' }}
-              />
-            </div>
-            <div
-              className={classes.appBarIcon}
-              onClick={() => {
-                setNotificationDialogOpen(true)
+          <div>
+            <Switch
+              name="checkedDarkTheme"
+              checked={darkState}
+              onChange={() => {
+                setDarkState(!darkState)
+                dispatch(
+                  setTheme(!darkState ? previousDarkTheme : previousLightTheme)
+                )
               }}
-            >
-              <IconButton>
-                {friendToAddList.length !== 0 ? (
-                  <Badge
-                    badgeContent={friendToAddList.length.toString()}
-                    color="secondary"
-                  >
-                    <NotificationsIcon />
-                  </Badge>
-                ) : (
+              inputProps={{ 'aria-label': 'secondary checkbox' }}
+            />
+          </div>
+          <div
+            className={classes.appBarIcon}
+            onClick={() => {
+              setNotificationDialogOpen(true)
+            }}
+          >
+            <IconButton>
+              {friendToAddList.length !== 0 ? (
+                <Badge
+                  badgeContent={friendToAddList.length.toString()}
+                  color="secondary"
+                >
                   <NotificationsIcon />
-                )}
-              </IconButton>
-            </div>
-
-            <div className={classes.appBarIcon}>
-              {/* user icon */}
-              <IconButton
-                className={classes.appBarIcon}
-                onClick={handleAvatarClick}
-              >
-                <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
-              </IconButton>
-            </div>
-            <Menu
-              id="simple-menu"
-              anchorEl={anchorMenu}
-              keepMounted
-              open={Boolean(anchorMenu)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-              <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
-          </Toolbar>
-        </AppBar>
-
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-          }}
-          open={open}
-        >
-          <div className={classes.toolbarIcon}>
-            <Typography>Friends</Typography>
-            <IconButton onClick={handleDrawerClose}>
-              <ChevronLeftIcon />
+                </Badge>
+              ) : (
+                <NotificationsIcon />
+              )}
             </IconButton>
           </div>
-          <Divider />
-          <List className={classes.listStyles}>{userList(friendList)}</List>
-          <Divider />
-          <List>{useSecondaryListItems()}</List>
-        </Drawer>
 
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Box display="flex" flexDirection="row" justifyContent="center">
-            <Box className={classes.box}>
-              {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
-              <Chatroom />
-            </Box>
+          <div className={classes.appBarIcon}>
+            {/* user icon */}
+            <IconButton
+              className={classes.appBarIcon}
+              onClick={handleThemeIconClick}
+            >
+              <PaletteIcon></PaletteIcon>
+            </IconButton>
+          </div>
+          <Menu
+            id="theme-menu"
+            anchorEl={anchorThemeMenu}
+            keepMounted
+            open={Boolean(anchorThemeMenu)}
+            onClose={handleThemeMenuClose}
+          >
+            {themesAvailable.map((theme) => (
+              <MenuItem
+                key={theme.name}
+                onClick={() => {
+                  handleThemeMenuClose()
+                  dispatch(setTheme(theme))
+                  theme.type === 'light'
+                    ? setPreviousLightTheme(theme)
+                    : setPreviousDarkTheme(theme)
+                  setDarkState(theme.type === 'dark')
+                }}
+              >
+                {theme.name}
+              </MenuItem>
+            ))}
+            {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
+            {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
+            {/* <MenuItem onClick={handleLogout}>Logout</MenuItem> */}
+          </Menu>
+
+          <div className={classes.appBarIcon}>
+            {/* user icon */}
+            <IconButton
+              className={classes.appBarIcon}
+              onClick={handleAvatarClick}
+            >
+              <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
+            </IconButton>
+          </div>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorMenu}
+            keepMounted
+            open={Boolean(anchorMenu)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        variant="permanent"
+        classes={{
+          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
+        }}
+        open={open}
+      >
+        <div className={classes.toolbarIcon}>
+          <Typography>Friends</Typography>
+          <IconButton onClick={handleDrawerClose}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <Divider />
+        <List className={classes.listStyles}>{userList(friendList)}</List>
+        <Divider />
+        <List>{useSecondaryListItems()}</List>
+      </Drawer>
+
+      <main className={classes.content}>
+        <div className={classes.appBarSpacer} />
+        <Box display="flex" flexDirection="row" justifyContent="center">
+          <Box className={classes.box}>
+            {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
+            <Chatroom />
           </Box>
-        </main>
-        <Dialog
-          open={notificationDialogOpen}
-          onClose={() => {
-            setNotificationDialogOpen(false)
-          }}
-        >
-          <DialogTitle> Notifications </DialogTitle>
-          <DialogContent>
-            <DialogContentText>New friend requests</DialogContentText>
-            <Box className={classes.notificationText}>
-              <List className={classes.notificationList}>
-                {friendToAddList.map((name) => (
-                  <NotificationListItem
-                    name={name}
-                    refuse={refuseAddRequest}
-                    accept={handleAddFriendRequest}
-                    key={name}
-                  />
-                ))}
-              </List>
-            </Box>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </ThemeProvider>
+        </Box>
+      </main>
+      <Dialog
+        open={notificationDialogOpen}
+        onClose={() => {
+          setNotificationDialogOpen(false)
+        }}
+      >
+        <DialogTitle> Notifications </DialogTitle>
+        <DialogContent>
+          <DialogContentText>New friend requests</DialogContentText>
+          <Box className={classes.notificationText}>
+            <List className={classes.notificationList}>
+              {friendToAddList.map((name) => (
+                <NotificationListItem
+                  name={name}
+                  refuse={refuseAddRequest}
+                  accept={handleAddFriendRequest}
+                  key={name}
+                />
+              ))}
+            </List>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 }

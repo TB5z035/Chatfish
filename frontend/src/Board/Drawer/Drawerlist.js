@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
   pink: {
     color: theme.palette.getContrastText(pink[500]),
-    backgroundColor: pink[500]
+    backgroundColor: theme.palette.random,
   },
   green: {
     color: '#fff',
