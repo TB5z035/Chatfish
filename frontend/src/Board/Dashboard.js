@@ -8,7 +8,7 @@ import {
   setMessageList,
   setSocket,
   addFriend,
-  setTheme, setFocusUser
+  setTheme, setFocusUser, addGroup
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
@@ -226,7 +226,6 @@ export default function Dashboard() {
         username: myName,
         group_name: groupName
       }
-      console.log(params)
       fetch('/?action=agree_add_group', {
         method: 'POST',
         body: JSON.stringify(params),
@@ -241,7 +240,7 @@ export default function Dashboard() {
                       Object.prototype.hasOwnProperty.call(data, 'state') &&
                       data['state'] === 200
             ) {
-              dispatch(addFriend(groupName))
+              dispatch(addGroup(groupName))
               enqueueSnackbar('Successful add group: ' + groupName, {
                 variant: 'success'
               })

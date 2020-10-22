@@ -25,7 +25,8 @@ import FormControl from '@material-ui/core/FormControl'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { addGroup } from '../../actions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,7 +66,7 @@ export function useSecondaryListItems() {
   const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
   const friendList = useSelector(state => state.messages)
   const [selectState, setSelectState] = React.useState({})
-
+  const dispatch = useDispatch()
   const handleAddFriend = useCallback(async () => {
     setAddFriendDialogOpen(false)
     const username = Cookies.get('username')
@@ -108,9 +109,10 @@ export function useSecondaryListItems() {
         body: JSON.stringify(params),
         headers: { 'Content-Type': 'application/json' }
       }).then()
+      dispatch(addGroup(groupName))
       setSelectState({})
     },
-    [selectState, groupName, myName]
+    [selectState, groupName, myName, dispatch]
   )
 
   const handleChange = (event) => {
