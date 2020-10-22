@@ -60,6 +60,7 @@ export function useSecondaryListItems() {
   const classes = useStyles()
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')
+  const myName = useSelector((state) => state.myName)
   const [groupName, setGroupName] = useState('')
   const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
   const friendList = useSelector(state => state.messages)
@@ -77,7 +78,7 @@ export function useSecondaryListItems() {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
-    })
+    }).then()
   }, [friendToAdd])
 
   const onKeyPressAddFriend = useCallback(
@@ -89,12 +90,28 @@ export function useSecondaryListItems() {
     [handleAddFriend]
   )
 
-  const handleCreateGroup = useCallback(async () => {
-    setCreateGroupDialogOpen(false)
-    console.log(selectState)
-    console.log(groupName)
-    setSelectState({})
-  }, [groupName, selectState])
+  const handleCreateGroup = useCallback(
+    async () => {
+      setCreateGroupDialogOpen(false)
+      const friendList = []
+      Object.getOwnPropertyNames(selectState).forEach(function(key) {
+        if (selectState[key]) { friendList.push(key) }
+      })
+
+      const params = {
+        username: myName,
+        groupName_name: groupName,
+        friend_list: friendList
+      }
+      fetch('/?action=add_group', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then()
+      setSelectState({})
+    },
+    [selectState, groupName, myName]
+  )
 
   const handleChange = (event) => {
     setSelectState({ ...selectState, [event.target.name]: event.target.checked })
