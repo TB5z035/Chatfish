@@ -181,7 +181,7 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [darkState, setDarkState] = useState(true)
+  const [darkState, setDarkState] = useState(false)
   const theme = darkState ? darkTheme() : lightTheme()
   const { enqueueSnackbar } = useSnackbar()
   const [anchorMenu, setAnchorMenu] = useState(null)
