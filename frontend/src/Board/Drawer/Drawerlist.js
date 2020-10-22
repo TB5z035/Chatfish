@@ -201,11 +201,12 @@ export function useSecondaryListItems() {
             <FormLabel component="legend">Select friends</FormLabel>
             <FormGroup>
               {friendList.map((user) => (
-                <FormControlLabel
-                  control={<Checkbox onChange={handleChange} name={user.user} />}
-                  label={user.user}
-                  key={user.user}
-                />
+                user.isGroup === 0
+                  ? <FormControlLabel
+                    control={<Checkbox onChange={handleChange} name={user.user} />}
+                    label={user.user}
+                    key={user.user}
+                  /> : null
               ))}
             </FormGroup>
           </FormControl>
