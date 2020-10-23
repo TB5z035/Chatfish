@@ -23,22 +23,27 @@ const onClickDismiss = (key) => () => {
   notistackRef.current.closeSnackbar(key)
 }
 
+function Index() {
+  return (
+    <React.StrictMode>
+      <Provider store={store}>
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
+          <SnackbarProvider
+            maxSnack={3}
+            ref={notistackRef}
+            action={(key) => (
+              <Button onClick={onClickDismiss(key)}>Dismiss</Button>
+            )}
+          >
+            <App />
+          </SnackbarProvider>
+        </BrowserRouter>
+      </Provider>
+    </React.StrictMode>
+  )
+}
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <SnackbarProvider
-          maxSnack={3}
-          ref={notistackRef}
-          action={(key) => (
-            <Button onClick={onClickDismiss(key)}>Dismiss</Button>
-          )}
-        >
-          <App />
-        </SnackbarProvider>
-      </BrowserRouter>
-    </Provider>
-  </React.StrictMode>,
+  <Index/>,
   document.getElementById('root')
 )
 
@@ -46,3 +51,5 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister()
+
+export default Index
