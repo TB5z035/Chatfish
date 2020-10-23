@@ -8,7 +8,8 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  ListSubheader
+  ListSubheader,
+  Typography
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { green, pink } from '@material-ui/core/colors'
@@ -54,7 +55,15 @@ const useStyles = makeStyles((theme) => ({
 // )
 
 export function userList(users, setChat) {
-  return <>{users.map((user) => UserListItem(user, setChat))}</>
+  return (
+    <>
+      {users.length !== 0 ? (
+        users.map((user) => UserListItem(user, setChat))
+      ) : (
+        <Typography> hi</Typography>
+      )}
+    </>
+  )
 }
 
 export function useSecondaryListItems() {
@@ -64,7 +73,7 @@ export function useSecondaryListItems() {
   const myName = useSelector((state) => state.myName)
   const [groupName, setGroupName] = useState('')
   const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
-  const friendList = useSelector(state => state.messages)
+  const friendList = useSelector((state) => state.messages)
   const [selectState, setSelectState] = React.useState({})
   const dispatch = useDispatch()
   const handleAddFriend = useCallback(async () => {
@@ -91,32 +100,34 @@ export function useSecondaryListItems() {
     [handleAddFriend]
   )
 
-  const handleCreateGroup = useCallback(
-    async () => {
-      setCreateGroupDialogOpen(false)
-      const friendList = []
-      Object.getOwnPropertyNames(selectState).forEach(function(key) {
-        if (selectState[key]) { friendList.push(key) }
-      })
-
-      const params = {
-        username: myName,
-        groupName_name: groupName,
-        friend_list: friendList
+  const handleCreateGroup = useCallback(async () => {
+    setCreateGroupDialogOpen(false)
+    const friendList = []
+    Object.getOwnPropertyNames(selectState).forEach(function (key) {
+      if (selectState[key]) {
+        friendList.push(key)
       }
-      fetch('/?action=add_group', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then()
-      dispatch(addGroup(groupName))
-      setSelectState({})
-    },
-    [selectState, groupName, myName, dispatch]
-  )
+    })
+
+    const params = {
+      username: myName,
+      groupName_name: groupName,
+      friend_list: friendList
+    }
+    fetch('/?action=add_group', {
+      method: 'POST',
+      body: JSON.stringify(params),
+      headers: { 'Content-Type': 'application/json' }
+    }).then()
+    dispatch(addGroup(groupName))
+    setSelectState({})
+  }, [selectState, groupName, myName, dispatch])
 
   const handleChange = (event) => {
-    setSelectState({ ...selectState, [event.target.name]: event.target.checked })
+    setSelectState({
+      ...selectState,
+      [event.target.name]: event.target.checked
+    })
   }
 
   return (
@@ -202,14 +213,17 @@ export function useSecondaryListItems() {
           <FormControl component="fieldset" className={classes.formControl}>
             <FormLabel component="legend">Select friends</FormLabel>
             <FormGroup>
-              {friendList.map((user) => (
-                user.isGroup === 0
-                  ? <FormControlLabel
-                    control={<Checkbox onChange={handleChange} name={user.user} />}
+              {friendList.map((user) =>
+                user.isGroup === 0 ? (
+                  <FormControlLabel
+                    control={
+                      <Checkbox onChange={handleChange} name={user.user} />
+                    }
                     label={user.user}
                     key={user.user}
-                  /> : null
-              ))}
+                  />
+                ) : null
+              )}
             </FormGroup>
           </FormControl>
         </DialogContent>
