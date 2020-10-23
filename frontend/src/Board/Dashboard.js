@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -46,6 +46,8 @@ import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
+// import socket from '../reducers/socket'
+import ReconnectingWebSocket from 'reconnecting-websocket'
 
 // function Copyright() {
 //   return (
@@ -185,7 +187,7 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
-  const [online, setOnline] = useState(false)
+  // const [online, setOnline] = useState(false)
   const [darkState, setDarkState] = useState(false)
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
@@ -196,6 +198,7 @@ export default function Dashboard() {
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
+  const nowSocket = useSelector((state) => state.socket)
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
@@ -204,6 +207,12 @@ export default function Dashboard() {
     { friendName: 'a', groupName: 'dsa' },
     { friendName: 'b', groupName: 'saga' }
   ])
+
+  const online = useMemo(() => {
+    if (nowSocket && nowSocket.readyState === 1) return true
+    else return false
+  }, [nowSocket])
+
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
       const params = {
@@ -337,7 +346,9 @@ export default function Dashboard() {
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket('wss://' + window.location.host + '/ws')
+        const socket = new ReconnectingWebSocket(
+          'wss://' + window.location.host + '/ws'
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
         const params = {
@@ -346,7 +357,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          setOnline(true)
+          // setOnline(true)
 
           fetch('/?action=require_friend_list', {
             method: 'POST',
@@ -418,14 +429,14 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          history.push('/sign')
-          setOnline(false)
+          // history.push('/sign')
+          // setOnline(false)
         }
         socket.onclose = (event) => {
-          setOnline(false)
+          // setOnline(false)
         }
       } else {
-        history.push('/sign')
+        // history.push('/sign')
       }
     }
     setWebSocket().then()
