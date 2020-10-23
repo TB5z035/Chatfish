@@ -27,6 +27,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test src --coverage --testResultsProcessor=jest-sonar-reporter --silent --watchAll=false",
     "lint": "eslint src/**/*.js src/**/**/*.js",
+    "lint-fix": "eslint --fix src/**/*.js src/**/**/*.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
