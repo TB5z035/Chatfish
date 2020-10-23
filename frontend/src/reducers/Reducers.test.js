@@ -265,7 +265,13 @@ describe('chat reducer', () => {
     expect(reducer({
       socket: 'socket',
       focusUser: 'focusUser',
-      messages: [],
+      messages: [{ user: 'name',
+        message_list: [{ type: 'normal',
+          time: '2019-10-21T06:38:03.063Z',
+          from: 'alice',
+          content: 'hello' }] },
+      { user: 'bob',
+        message_list: [] }],
       myName: 'name',
       theme: null
     }, {
