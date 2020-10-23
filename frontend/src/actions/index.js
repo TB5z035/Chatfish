@@ -45,5 +45,5 @@ export const addGroup = (groupName) => ({
 
 export const setTheme = (theme) => ({
   type: types.SET_THEME,
-  theme: theme
+  theme
 })
