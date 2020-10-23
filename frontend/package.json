@@ -37,9 +37,12 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,ts,tsx}",
+      "src/**/**/*.{js,jsx,ts,tsx}",
       "!<rootDir>/node_modules/",
       "!<rootDir>/path/to/dir/",
-      "!src/serviceWorker.js"
+      "!src/serviceWorker.js",
+      "!src/setupTests.js",
+      "!src/testUtils.js"
     ],
     "coverageReporters": [
       "text",
@@ -76,6 +79,7 @@
     "jest-sonar-reporter": "^2.0.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
-    "react-test-renderer": "^17.0.1"
+    "react-test-renderer": "^17.0.1",
+    "@testing-library/react": "^11.1.0"
   }
 }
