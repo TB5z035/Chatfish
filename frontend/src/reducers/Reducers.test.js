@@ -1,6 +1,5 @@
 import reducer from './index'
 import * as types from '../actions/ActionTypes'
-import * as themes from '../themes'
 import { THEME_LIGHT } from '../themes'
 
 describe('chat reducer', () => {
