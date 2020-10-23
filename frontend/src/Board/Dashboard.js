@@ -12,6 +12,7 @@ import {
   setFocusUser,
   addGroup
 } from '../actions'
+import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
@@ -28,7 +29,11 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem } from '@material-ui/core'
+import {
+  // CircularProgress,
+  Menu,
+  MenuItem
+} from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -39,6 +44,7 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
+import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 
 // function Copyright() {
@@ -90,7 +96,12 @@ const useStyles = makeStyles((theme) => ({
     })
   },
   appBarIcon: {
-    padding: 5
+    padding: theme.spacing(1)
+    // paddingRight: theme.spacing(1),
+    // paddingLeft: theme.spacing(1)
+  },
+  themeSwitch: {
+    padding: theme.spacing(1)
   },
   menuButton: {
     marginRight: theme.spacing(1)
@@ -174,6 +185,7 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
+  const [online, setOnline] = useState(false)
   const [darkState, setDarkState] = useState(false)
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
@@ -306,6 +318,10 @@ export default function Dashboard() {
     setAnchorThemeMenu(null)
   }
 
+  // const handleOnlineIconClick = () => {
+  //   setOnline(!online)
+  // }
+
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
   }
@@ -330,6 +346,8 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
+          setOnline(true)
+
           fetch('/?action=require_friend_list', {
             method: 'POST',
             body: JSON.stringify(params),
@@ -400,10 +418,13 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
+          history.push('/sign')
+        }
+        socket.onclose = (event) => {
+          setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()
@@ -417,11 +438,7 @@ export default function Dashboard() {
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
       >
-        <Toolbar
-          id="toolbar"
-          // className={darkState ? classes.toolbarDark : classes.toolbarLight}
-          className={classes.toolbar}
-        >
+        <Toolbar id="toolbar" className={classes.toolbar}>
           <IconButton
             edge="start"
             // color="inherit"
@@ -434,19 +451,15 @@ export default function Dashboard() {
           >
             <MenuIcon />
           </IconButton>
-
           <Typography
             component="h1"
             variant="h6"
-            // color={darkState ? '#ffffff' : '#000000'}
             noWrap
-            // className={darkState ? classes.titleLight : classes.titleDark}
             className={classes.title}
           >
             Chat Fish
           </Typography>
-
-          <div>
+          <div className={classes.themeSwitch}>
             <Switch
               name="checkedDarkTheme"
               checked={darkState}
@@ -458,6 +471,17 @@ export default function Dashboard() {
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
+          </div>
+          <div
+            className={classes.appBarIcon}
+            // onClick={handleOnlineIconClick}
+          >
+            <IconButton
+            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
+            >
+              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
+            </IconButton>
+            {/* <CircularProgress></CircularProgress> */}
           </div>
           <div
             className={classes.appBarIcon}
@@ -480,13 +504,8 @@ export default function Dashboard() {
               )}
             </IconButton>
           </div>
-
-          <div className={classes.appBarIcon}>
-            {/* user icon */}
-            <IconButton
-              className={classes.appBarIcon}
-              onClick={handleThemeIconClick}
-            >
+          <div className={classes.appBarIcon} onClick={handleThemeIconClick}>
+            <IconButton>
               <PaletteIcon></PaletteIcon>
             </IconButton>
           </div>
@@ -512,20 +531,13 @@ export default function Dashboard() {
                 {theme.name}
               </MenuItem>
             ))}
-            {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem> */}
-            {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-            {/* <MenuItem onClick={handleLogout}>Logout</MenuItem> */}
           </Menu>
-
-          <div className={classes.appBarIcon}>
-            {/* user icon */}
-            <IconButton
-              className={classes.appBarIcon}
-              onClick={handleAvatarClick}
-            >
-              <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
-            </IconButton>
-          </div>
+          <IconButton
+            className={classes.appBarIcon}
+            onClick={handleAvatarClick}
+          >
+            <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
+          </IconButton>
           <Menu
             id="simple-menu"
             anchorEl={anchorMenu}
