@@ -11,12 +11,16 @@ const messages = (state = initialState, action) => {
       newList = action.messageList
       newList.sort((a, b) => {
         if (a.message_list.length === 0) {
-          if (b.message_list.length === 0) { return 0 } else return 1
+          if (b.message_list.length === 0) {
+            return 0
+          } else return 1
         } else if (b.message_list.length === 0) {
           return -1
         } else {
-          return Date.parse(b.message_list.slice(-1)[0].time) -
-              Date.parse(a.message_list.slice(-1)[0].time)
+          return (
+            Date.parse(b.message_list.slice(-1)[0].time) -
+            Date.parse(a.message_list.slice(-1)[0].time)
+          )
         }
       })
       return newList
@@ -55,6 +59,6 @@ const messages = (state = initialState, action) => {
   }
 }
 
-const initialState = []
+const initialState = [{ user: 'tb5', message_list: [] }]
 
 export default messages
