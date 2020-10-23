@@ -29,7 +29,11 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import { userList, useSecondaryListItems } from './Drawer/Drawerlist'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
-import { Menu, MenuItem } from '@material-ui/core'
+import {
+  // CircularProgress,
+  Menu,
+  MenuItem
+} from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
 import Cookies from 'js-cookie'
@@ -40,6 +44,7 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
+import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 
 // function Copyright() {
@@ -94,6 +99,9 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1)
     // paddingRight: theme.spacing(1),
     // paddingLeft: theme.spacing(1)
+  },
+  themeSwitch: {
+    padding: theme.spacing(1)
   },
   menuButton: {
     marginRight: theme.spacing(1)
@@ -177,6 +185,7 @@ export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
   const [open, setOpen] = useState(false)
+  const [online, setOnline] = useState(false)
   const [darkState, setDarkState] = useState(false)
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
@@ -309,6 +318,10 @@ export default function Dashboard() {
     setAnchorThemeMenu(null)
   }
 
+  // const handleOnlineIconClick = () => {
+  //   setOnline(!online)
+  // }
+
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
   }
@@ -333,6 +346,8 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
+          setOnline(true)
+
           fetch('/?action=require_friend_list', {
             method: 'POST',
             body: JSON.stringify(params),
@@ -403,10 +418,13 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
+          history.push('/sign')
+        }
+        socket.onclose = (event) => {
+          setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()
@@ -420,10 +438,7 @@ export default function Dashboard() {
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
       >
-        <Toolbar
-          id="toolbar"
-          className={classes.toolbar}
-        >
+        <Toolbar id="toolbar" className={classes.toolbar}>
           <IconButton
             edge="start"
             // color="inherit"
@@ -444,7 +459,7 @@ export default function Dashboard() {
           >
             Chat Fish
           </Typography>
-          <div>
+          <div className={classes.themeSwitch}>
             <Switch
               name="checkedDarkTheme"
               checked={darkState}
@@ -456,6 +471,17 @@ export default function Dashboard() {
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
+          </div>
+          <div
+            className={classes.appBarIcon}
+            // onClick={handleOnlineIconClick}
+          >
+            <IconButton
+            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
+            >
+              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
+            </IconButton>
+            {/* <CircularProgress></CircularProgress> */}
           </div>
           <div
             className={classes.appBarIcon}
