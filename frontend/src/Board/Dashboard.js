@@ -46,7 +46,8 @@ import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
-import socket from '../reducers/socket'
+// import socket from '../reducers/socket'
+import ReconnectingWebSocket from 'reconnecting-websocket'
 
 // function Copyright() {
 //   return (
@@ -208,8 +209,8 @@ export default function Dashboard() {
   ])
 
   const online = useMemo(() => {
-    if (!nowSocket || nowSocket.readyState !== 1) return false
-    else return true
+    if (nowSocket && nowSocket.readyState === 1) return true
+    else return false
   }, [nowSocket])
 
   const handleAddFriendRequest = useCallback(
@@ -345,7 +346,9 @@ export default function Dashboard() {
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        const socket = new WebSocket('wss://' + window.location.host + '/ws')
+        const socket = new ReconnectingWebSocket(
+          'wss://' + window.location.host + '/ws'
+        )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
         const params = {
