@@ -62,6 +62,13 @@ class OfflineMessage(models.Model):
 def Test():
     pass
 
+def JudgeFriend(uid1, uid2):
+    friends = [ friend.meta_value for friend in UserMeta.objects.filter(meta_name = 'friend', meta_value = str(uid1)) ]
+    if str(uid2) in friend2 :
+        return True
+    else :
+        return False
+
 def FetchFriends(uid, number = -1):
     try:
         chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid))
