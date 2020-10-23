@@ -1,6 +1,6 @@
 import reducer from './index'
 import * as types from '../actions/ActionTypes'
-import { THEME_LIGHT } from '../themes'
+import { THEME_LIGHT, THEME_DARK, THEME_WHITE } from '../themes'
 
 describe('chat reducer', () => {
   it('should return the initial state', () => {
@@ -43,6 +43,26 @@ describe('chat reducer', () => {
     }, {
       type: types.SET_THEME,
       theme: THEME_LIGHT
+    })
+    reducer({
+      socket: 'socket',
+      focusUser: 'focusUser',
+      messages: [],
+      myName: 'name',
+      theme: null
+    }, {
+      type: types.SET_THEME,
+      theme: THEME_DARK
+    })
+    reducer({
+      socket: 'socket',
+      focusUser: 'focusUser',
+      messages: [],
+      myName: 'name',
+      theme: null
+    }, {
+      type: types.SET_THEME,
+      theme: THEME_WHITE
     })
   })
 

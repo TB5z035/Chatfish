@@ -52,8 +52,8 @@ const useStyles = makeStyles((theme) => ({
 //   </div>
 // )
 
-export function userList(users, setChat) {
-  return <>{users.map((user) => UserListItem(user, setChat))}</>
+export function userList(users) {
+  return <>{users.map((user) => UserListItem(user))}</>
 }
 
 export function useSecondaryListItems() {
