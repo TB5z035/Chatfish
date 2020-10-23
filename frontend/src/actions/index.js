@@ -38,6 +38,11 @@ export const addFriend = (friendName) => ({
   friendName
 })
 
+export const addGroup = (groupName) => ({
+  type: types.ADD_GROUP,
+  groupName
+})
+
 export const setTheme = (theme) => ({
   type: types.SET_THEME,
   theme: theme

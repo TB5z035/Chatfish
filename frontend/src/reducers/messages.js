@@ -4,7 +4,9 @@ const messages = (state = initialState, action) => {
   const len = newList.length
   switch (action.type) {
     case 'ADD_FRIEND':
-      return [...state, { user: action.friendName, message_list: [] }]
+      return [...state, { user: action.friendName, message_list: [], isGroup: 0 }]
+    case 'ADD_GROUP':
+      return [...state, { user: action.groupName, message_list: [], isGroup: 1 }]
     case 'SET_MESSAGE_LIST':
       newList = action.messageList
       newList.sort((a, b) => {

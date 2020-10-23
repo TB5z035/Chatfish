@@ -10,7 +10,9 @@ export default class NotificationListItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      name: props.name
+      name: props.name,
+      friendName: props.friendName,
+      isGroup: props.isGroup
     }
   }
 
@@ -25,7 +27,8 @@ export default class NotificationListItem extends React.Component {
               </Avatar>
             </Box>
             <Box flexGrow={1}>
-              <Typography variant="h6">{this.state.name}</Typography>
+              <Typography variant="h6">{(this.state.isGroup ? this.state.friendName +
+                  ' invites you to ' : '') + this.state.name}</Typography>
             </Box>
             <IconButton
               onClick={() => {
@@ -52,5 +55,7 @@ export default class NotificationListItem extends React.Component {
 NotificationListItem.propTypes = {
   name: PropTypes.string,
   refuse: PropTypes.func,
-  accept: PropTypes.func
+  accept: PropTypes.func,
+  isGroup: PropTypes.bool,
+  friendName: PropTypes.string
 }

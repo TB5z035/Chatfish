@@ -8,7 +8,7 @@ import {
   setMessageList,
   setSocket,
   addFriend,
-  setTheme, setFocusUser
+  setTheme, setFocusUser, addGroup
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
@@ -185,8 +185,9 @@ export default function Dashboard() {
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState([])
-
+  const [friendToAddList, setFriendToAddList] = useState(['Alice', 'bob'])
+  const [groupToAddList, setGroupToAddList] = useState([{ friendName: 'a', groupName: 'dsa' },
+    { friendName: 'b', groupName: 'saga' }])
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
       const params = {
@@ -218,11 +219,52 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddRequest = (refusedUsername) => {
+
+  const handleAddGroupRequest = useCallback(
+    async (groupName) => {
+      const params = {
+        username: myName,
+        group_name: groupName
+      }
+      fetch('/?action=agree_add_group', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
+                      Object.prototype.hasOwnProperty.call(data, 'state') &&
+                      data['state'] === 200
+            ) {
+              dispatch(addGroup(groupName))
+              enqueueSnackbar('Successful add group: ' + groupName, {
+                variant: 'success'
+              })
+            }
+          })
+      )
+    },
+    [myName, dispatch, enqueueSnackbar]
+  )
+  const refuseAddFriendRequest = (refusedUsername) => {
     const index = friendToAddList.indexOf(refusedUsername)
     const newArray = [...friendToAddList]
     newArray.splice(index, 1)
     setFriendToAddList(newArray)
+  }
+  const refuseAddGroupRequest = (refusedGroupName) => {
+    const newArray = [...groupToAddList]
+    for (var i = 0; i < groupToAddList.length; i++) {
+      if (groupToAddList[i]['groupName'] === refusedGroupName) {
+        newArray.splice(i, 1)
+        setGroupToAddList(newArray)
+        break
+      }
+    }
   }
   const handleReply = async (message) => {
     const params = {
@@ -329,6 +371,13 @@ export default function Dashboard() {
                   receivedData['friend_name']
                 ])
                 break
+              case 'NEW_ADD_GROUP':
+                handleReply('NOTIFY_NEW_ADD_GROUP').then()
+                setGroupToAddList([
+                  ...groupToAddList,
+                  { groupName: receivedData['group_name'], friendName: receivedData['friend_name'] }
+                ])
+                break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
                 dispatch(addFriend(receivedData['friend_name']))
@@ -410,9 +459,9 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 ? (
+              {(friendToAddList.length !== 0 || friendToAddList.length !== 0) ? (
                 <Badge
-                  badgeContent={friendToAddList.length.toString()}
+                  badgeContent={(friendToAddList.length + groupToAddList.length).toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -524,9 +573,21 @@ export default function Dashboard() {
               {friendToAddList.map((name) => (
                 <NotificationListItem
                   name={name}
-                  refuse={refuseAddRequest}
+                  isGroup={false}
+                  friendName={''}
+                  refuse={refuseAddFriendRequest}
                   accept={handleAddFriendRequest}
                   key={name}
+                />
+              ))}
+              {groupToAddList.map((note) => (
+                <NotificationListItem
+                  name={note.groupName}
+                  isGroup={true}
+                  friendName={note.friendName}
+                  refuse={refuseAddGroupRequest}
+                  accept={handleAddGroupRequest}
+                  key={note.groupName + '$' + note.friendName}
                 />
               ))}
             </List>
