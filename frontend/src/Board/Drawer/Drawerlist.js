@@ -55,15 +55,7 @@ const useStyles = makeStyles((theme) => ({
 // )
 
 export function userList(users, setChat) {
-  return (
-    <>
-      {users.length !== 0 ? (
-        users.map((user) => UserListItem(user, setChat))
-      ) : (
-        <Typography> hi</Typography>
-      )}
-    </>
-  )
+  return <>{users.map((user) => UserListItem(user, setChat))}</>
 }
 
 export function useSecondaryListItems() {
@@ -132,9 +124,9 @@ export function useSecondaryListItems() {
 
   return (
     <>
-      <ListSubheader inset component="li">
+      {/* <ListSubheader inset component="li">
         Tools
-      </ListSubheader>
+      </ListSubheader> */}
       <ListItem
         button
         onClick={() => {

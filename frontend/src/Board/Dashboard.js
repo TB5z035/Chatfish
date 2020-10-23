@@ -8,7 +8,9 @@ import {
   setMessageList,
   setSocket,
   addFriend,
-  setTheme, setFocusUser, addGroup
+  setTheme,
+  setFocusUser,
+  addGroup
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Drawer from '@material-ui/core/Drawer'
@@ -186,8 +188,10 @@ export default function Dashboard() {
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState(['Alice', 'bob'])
-  const [groupToAddList, setGroupToAddList] = useState([{ friendName: 'a', groupName: 'dsa' },
-    { friendName: 'b', groupName: 'saga' }])
+  const [groupToAddList, setGroupToAddList] = useState([
+    { friendName: 'a', groupName: 'dsa' },
+    { friendName: 'b', groupName: 'saga' }
+  ])
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
       const params = {
@@ -237,8 +241,8 @@ export default function Dashboard() {
           .then((data) => {
             if (
               data != null &&
-                      Object.prototype.hasOwnProperty.call(data, 'state') &&
-                      data['state'] === 200
+              Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200
             ) {
               dispatch(addGroup(groupName))
               enqueueSnackbar('Successful add group: ' + groupName, {
@@ -375,7 +379,10 @@ export default function Dashboard() {
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
                 setGroupToAddList([
                   ...groupToAddList,
-                  { groupName: receivedData['group_name'], friendName: receivedData['friend_name'] }
+                  {
+                    groupName: receivedData['group_name'],
+                    friendName: receivedData['friend_name']
+                  }
                 ])
                 break
               case 'AGREE_ADD_FRIEND':
@@ -459,9 +466,11 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {(friendToAddList.length !== 0 || friendToAddList.length !== 0) ? (
+              {friendToAddList.length !== 0 || friendToAddList.length !== 0 ? (
                 <Badge
-                  badgeContent={(friendToAddList.length + groupToAddList.length).toString()}
+                  badgeContent={(
+                    friendToAddList.length + groupToAddList.length
+                  ).toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -544,8 +553,14 @@ export default function Dashboard() {
             <ChevronLeftIcon />
           </IconButton>
         </div>
-        <Divider />
-        <List className={classes.listStyles}>{userList(friendList)}</List>
+        {friendList.length !== 0 ? (
+          <>
+            <Divider />
+            <List className={classes.listStyles}>{userList(friendList)}</List>
+          </>
+        ) : (
+          <></>
+        )}
         <Divider />
         <List>{useSecondaryListItems()}</List>
       </Drawer>

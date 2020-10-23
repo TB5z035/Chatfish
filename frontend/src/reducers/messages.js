@@ -66,7 +66,7 @@ const messages = (state = initialState, action) => {
 }
 
 const initialState = [
-  { user: 'tb5', message_list: [] }
+  // { user: 'tb5', message_list: [] }
 ]
 
 export default messages
