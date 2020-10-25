@@ -100,6 +100,7 @@ export function useSecondaryListItems() {
     })
 
     const params = {
+      type: 0,
       username: myName,
       groupName_name: groupName,
       friend_list: friendList
