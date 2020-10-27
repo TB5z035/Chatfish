@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -198,7 +198,7 @@ export default function Dashboard() {
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
-  const nowSocket = useSelector((state) => state.socket)
+  // const nowSocket = useSelector((state) => state.socket)
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
