@@ -82,7 +82,11 @@ export function useSecondaryListItems(users) {
         })
         .includes(friendToAdd)
     )
-      enqueueSnackbar('You are already friend with ' + friendName, {
+      enqueueSnackbar('You are already friend with ' + friendToAdd, {
+        variant: 'fail'
+      })
+    else if (username === friendToAdd)
+      enqueueSnackbar('You cannot add yourself as a friend', {
         variant: 'fail'
       })
     else
