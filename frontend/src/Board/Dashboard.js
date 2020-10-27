@@ -220,27 +220,42 @@ export default function Dashboard() {
         friend_name: friendName
       }
 
-      fetch('/?action=agree_add_friend', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res) =>
-        res
-          .json()
-          .catch((error) => console.error('Error:', error))
-          .then((data) => {
-            if (
-              data != null &&
-              Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200
-            ) {
-              dispatch(addFriend(friendName))
-              enqueueSnackbar('Successful add friend: ' + friendName, {
-                variant: 'success'
-              })
-            }
+      if (myName === friendName)
+        enqueueSnackbar('You cannot accept yourself as a friend', {
+          variant: 'fail'
+        })
+      else if (
+        friendList
+          .map((user) => {
+            return user.user
           })
+          .contains(friendName)
       )
+        enqueueSnackbar('You are already friend with ' + friendName, {
+          variant: 'fail'
+        })
+      else
+        fetch('/?action=agree_add_friend', {
+          method: 'POST',
+          body: JSON.stringify(params),
+          headers: { 'Content-Type': 'application/json' }
+        }).then((res) =>
+          res
+            .json()
+            .catch((error) => console.error('Error:', error))
+            .then((data) => {
+              if (
+                data != null &&
+                Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200
+              ) {
+                dispatch(addFriend(friendName))
+                enqueueSnackbar('Successful add friend: ' + friendName, {
+                  variant: 'success'
+                })
+              }
+            })
+        )
     },
     [myName, dispatch, enqueueSnackbar]
   )
