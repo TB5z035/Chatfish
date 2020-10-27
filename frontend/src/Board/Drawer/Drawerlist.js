@@ -27,6 +27,7 @@ import Checkbox from '@material-ui/core/Checkbox'
 import { useDispatch, useSelector } from 'react-redux'
 import { addGroup } from '../../actions'
 import { useSnackbar } from 'notistack'
+import { postAddFriend } from '../../fetch/friend/addFriend'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,10 +72,7 @@ export function useSecondaryListItems(users) {
   const handleAddFriend = useCallback(async () => {
     setAddFriendDialogOpen(false)
     const username = Cookies.get('username')
-    const params = {
-      username: username,
-      friend_name: friendToAdd
-    }
+
     if (
       users
         .map((user) => {
@@ -90,11 +88,7 @@ export function useSecondaryListItems(users) {
         variant: 'warning'
       })
     } else {
-      fetch('/?action=add_friend', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then()
+      postAddFriend(username, friendToAdd).then()
     }
   }, [friendToAdd, enqueueSnackbar, users])
 
