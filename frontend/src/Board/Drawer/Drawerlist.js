@@ -26,6 +26,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import { useDispatch, useSelector } from 'react-redux'
 import { addGroup } from '../../actions'
+import { useSnackbar } from 'notistack'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,8 +57,9 @@ export function userList(users) {
   return <>{users.map((user) => UserListItem(user))}</>
 }
 
-export function useSecondaryListItems() {
+export function useSecondaryListItems(users) {
   const classes = useStyles()
+  const { enqueueSnackbar } = useSnackbar()
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')
   const myName = useSelector((state) => state.myName)
@@ -73,12 +75,26 @@ export function useSecondaryListItems() {
       username: username,
       friend_name: friendToAdd
     }
-
-    fetch('/?action=add_friend', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then()
+    if (
+      users
+        .map((user) => {
+          return user.user
+        })
+        .includes(friendToAdd)
+    )
+      enqueueSnackbar('You are already friend with ' + friendToAdd, {
+        variant: 'fail'
+      })
+    else if (username === friendToAdd)
+      enqueueSnackbar('You cannot add yourself as a friend', {
+        variant: 'fail'
+      })
+    else
+      fetch('/?action=add_friend', {
+        method: 'POST',
+        body: JSON.stringify(params),
+        headers: { 'Content-Type': 'application/json' }
+      }).then()
   }, [friendToAdd])
 
   const onKeyPressAddFriend = useCallback(
