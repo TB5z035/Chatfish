@@ -208,10 +208,11 @@ export default function Dashboard() {
     { friendName: 'b', groupName: 'saga' }
   ])
 
-  const online = useMemo(() => {
-    if (nowSocket && nowSocket.readyState === 1) return true
-    else return false
-  }, [nowSocket])
+  // const online = useMemo(() => {
+  //   if (nowSocket && nowSocket.readyState === 1) return true
+  //   else return false
+  // }, [nowSocket])
+  const [online, setOnline] = useState(false)
 
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
@@ -373,7 +374,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          // setOnline(true)
+          setOnline(true)
 
           fetch('/?action=require_friend_list', {
             method: 'POST',
@@ -445,14 +446,14 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
-          // setOnline(false)
+          history.push('/sign')
+          setOnline(false)
         }
         socket.onclose = (event) => {
-          // setOnline(false)
+          setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()

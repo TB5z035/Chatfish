@@ -66,7 +66,7 @@ const messages = (state = initialState, action) => {
 }
 
 const initialState = [
-  // { user: 'testuser', message_list: [] },
+  // { user: 'testuser', message_list: [] }
   // { user: 'Alice', message_list: [] }
 ]
 
