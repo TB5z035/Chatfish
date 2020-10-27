@@ -48,6 +48,7 @@ import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 // import socket from '../reducers/socket'
 import ReconnectingWebSocket from 'reconnecting-websocket'
+import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 
 // function Copyright() {
 //   return (
@@ -216,11 +217,6 @@ export default function Dashboard() {
 
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
-      const params = {
-        username: myName,
-        friend_name: friendName
-      }
-
       if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
@@ -236,27 +232,12 @@ export default function Dashboard() {
           variant: 'warning'
         })
       } else {
-        fetch('/?action=agree_add_friend', {
-          method: 'POST',
-          body: JSON.stringify(params),
-          headers: { 'Content-Type': 'application/json' }
-        }).then((res) =>
-          res
-            .json()
-            .catch((error) => console.error('Error:', error))
-            .then((data) => {
-              if (
-                data != null &&
-                Object.prototype.hasOwnProperty.call(data, 'state') &&
-                data['state'] === 200
-              ) {
-                dispatch(addFriend(friendName))
-                enqueueSnackbar('Successful add friend: ' + friendName, {
-                  variant: 'success'
-                })
-              }
-            })
-        )
+        if (await postAgreeAddFriend(myName, friendName)) {
+          dispatch(addFriend(friendName))
+          enqueueSnackbar('Successful add friend: ' + friendName, {
+            variant: 'success'
+          })
+        }
       }
     },
     [myName, dispatch, enqueueSnackbar, friendList]
