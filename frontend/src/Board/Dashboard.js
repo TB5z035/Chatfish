@@ -586,7 +586,7 @@ export default function Dashboard() {
           <></>
         )}
         <Divider />
-        <List>{useSecondaryListItems()}</List>
+        <List>{useSecondaryListItems(friendList)}</List>
       </Drawer>
 
       <main className={classes.content}>
