@@ -222,7 +222,7 @@ export default function Dashboard() {
 
       if (myName === friendName)
         enqueueSnackbar('You cannot accept yourself as a friend', {
-          variant: 'fail'
+          variant: 'warning'
         })
       else if (
         friendList
@@ -232,7 +232,7 @@ export default function Dashboard() {
           .includes(friendName)
       )
         enqueueSnackbar('You are already friend with ' + friendName, {
-          variant: 'fail'
+          variant: 'warning'
         })
       else
         fetch('/?action=agree_add_friend', {
