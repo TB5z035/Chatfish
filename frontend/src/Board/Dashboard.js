@@ -220,21 +220,21 @@ export default function Dashboard() {
         friend_name: friendName
       }
 
-      if (myName === friendName)
+      if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
         })
-      else if (
+      } else if (
         friendList
           .map((user) => {
             return user.user
           })
           .includes(friendName)
-      )
+      ) {
         enqueueSnackbar('You are already friend with ' + friendName, {
           variant: 'warning'
         })
-      else
+      } else {
         fetch('/?action=agree_add_friend', {
           method: 'POST',
           body: JSON.stringify(params),
@@ -256,8 +256,9 @@ export default function Dashboard() {
               }
             })
         )
+      }
     },
-    [myName, dispatch, enqueueSnackbar]
+    [myName, dispatch, enqueueSnackbar, friendList]
   )
 
   const handleAddGroupRequest = useCallback(

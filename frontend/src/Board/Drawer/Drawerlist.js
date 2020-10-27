@@ -81,21 +81,22 @@ export function useSecondaryListItems(users) {
           return user.user
         })
         .includes(friendToAdd)
-    )
+    ) {
       enqueueSnackbar('You are already friend with ' + friendToAdd, {
         variant: 'warning'
       })
-    else if (username === friendToAdd)
+    } else if (username === friendToAdd) {
       enqueueSnackbar('You cannot add yourself as a friend', {
         variant: 'warning'
       })
-    else
+    } else {
       fetch('/?action=add_friend', {
         method: 'POST',
         body: JSON.stringify(params),
         headers: { 'Content-Type': 'application/json' }
       }).then()
-  }, [friendToAdd])
+    }
+  }, [friendToAdd, enqueueSnackbar, users])
 
   const onKeyPressAddFriend = useCallback(
     async (e) => {
