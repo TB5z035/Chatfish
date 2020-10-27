@@ -229,7 +229,7 @@ export default function Dashboard() {
           .map((user) => {
             return user.user
           })
-          .contains(friendName)
+          .includes(friendName)
       )
         enqueueSnackbar('You are already friend with ' + friendName, {
           variant: 'fail'
