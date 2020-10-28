@@ -19,7 +19,7 @@ describe('chat reducer', () => {
       reducer(
         {
           socket: 'socket',
-          focusUser: 'focusUser',
+          focusUser: { user: 'name', isGroup: 0 },
           messages: [],
           myName: 'name',
           theme: null,
@@ -32,7 +32,7 @@ describe('chat reducer', () => {
       )
     ).toEqual({
       socket: 'socket',
-      focusUser: 'focusUser',
+      focusUser: { user: 'name', isGroup: 0 },
       messages: [],
       myName: 'name',
       theme: null,

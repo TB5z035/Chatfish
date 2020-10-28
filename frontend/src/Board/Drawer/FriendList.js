@@ -61,7 +61,7 @@ export default function FriendList() {
             key={user.user}
             alignItems="flex-start"
             onClick={() => {
-              dispatch(setFocusUser(user.user))
+              dispatch(setFocusUser({ user: user.user, isGroup: user.isGroup }))
             }}
           >
             <ListItemAvatar>

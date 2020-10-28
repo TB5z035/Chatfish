@@ -18,7 +18,7 @@ it('Renders the connected app with initialState', () => {
     </Provider>
   </div>, { initialState: {
     socket: null,
-    focusUser: 'name',
+    focusUser: { user: 'name', isGroup: 0 },
     messages: [{ user: 'name',
       message_list: [{ type: 'normal',
         time: '2019-10-21T06:38:03.063Z',
