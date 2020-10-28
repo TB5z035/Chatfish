@@ -384,15 +384,29 @@ export default function Dashboard() {
             Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200
           ) {
+            console.log(receivedData)
             switch (receivedData['type']) {
               case 'MESSAGE_NOTIFY':
                 handleReply('NOTIFY_MESSAGE_NOTIFY').then()
-                dispatch(
-                  messageReceived(
-                    receivedData['content'],
-                    receivedData['friend_name']
+                if (receivedData['is_group'] === 1) {
+                  dispatch(
+                    messageReceived(
+                      receivedData['content'],
+                      receivedData['friend_name'],
+                      receivedData['username'],
+                      1
+                    )
                   )
-                )
+                } else {
+                  dispatch(
+                    messageReceived(
+                      receivedData['content'],
+                      receivedData['friend_name'],
+                      null,
+                      0
+                    )
+                  )
+                }
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
@@ -426,7 +440,7 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
+          history.push('/sign')
           // setOnline(false)
         }
         socket.onclose = (event) => {
