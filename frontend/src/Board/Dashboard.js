@@ -200,6 +200,7 @@ export default function Dashboard() {
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
+  const [initWebSocket, setInitWebSocket] = useState(false)
 
   const [online, setOnline] = useState(false)
 
@@ -296,6 +297,7 @@ export default function Dashboard() {
     dispatch(setFocusUser(null))
     dispatch(setSocket(null))
     dispatch(setMyName(null))
+    setInitWebSocket(false)
     history.push('/sign')
   }
   const handleDrawerOpen = () => {
@@ -344,6 +346,7 @@ export default function Dashboard() {
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
           setOnline(true)
+          setInitWebSocket(true)
 
           fetch('/?action=require_friend_list', {
             method: 'POST',
@@ -429,14 +432,14 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // history.push('/sign')
+          if (!initWebSocket) { history.push('/sign') }
           setOnline(false)
         }
         socket.onclose = (event) => {
           setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()
