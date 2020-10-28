@@ -45,7 +45,6 @@ export default function MyDrawer() {
   const classes = useStyles()
   const dispatch = useDispatch()
   const open = useSelector((state) => state.drawerOpen)
-  const friendList = useSelector((state) => state.messages)
 
   return (
     <Drawer
@@ -71,7 +70,7 @@ export default function MyDrawer() {
       <FriendList />
 
       {/* Additional options in Drawer */}
-      <SecondaryList user={friendList} />
+      <SecondaryList />
     </Drawer>
   )
 }
