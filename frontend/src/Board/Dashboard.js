@@ -506,7 +506,7 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 || friendToAddList.length !== 0 ? (
+              {friendToAddList.length !== 0 || groupToAddList.length !== 0 ? (
                 <Badge
                   badgeContent={(
                     friendToAddList.length + groupToAddList.length
