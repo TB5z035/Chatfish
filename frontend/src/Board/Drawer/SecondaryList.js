@@ -68,7 +68,7 @@ export default function SecondaryList() {
     if (
       friendList
         .map((user) => {
-          return user.user
+          if (user.isGroup === 0) { return user.user } else return ''
         })
         .includes(friendToAdd)
     ) {
