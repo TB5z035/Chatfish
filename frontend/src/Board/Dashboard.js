@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import { useSelector, useDispatch } from 'react-redux'
@@ -198,7 +198,7 @@ export default function Dashboard() {
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
-  const nowSocket = useSelector((state) => state.socket)
+  // const nowSocket = useSelector((state) => state.socket)
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
@@ -208,11 +208,11 @@ export default function Dashboard() {
     { friendName: 'b', groupName: 'saga' }
   ])
 
-  const online = useMemo(() => {
-    if (nowSocket && nowSocket.readyState === nowSocket.OPEN) return true
-    else return false
-  }, [nowSocket])
-  // const [online, setOnline] = useState(false)
+  // const online = useMemo(() => {
+  //   if (nowSocket && nowSocket.readyState === nowSocket.OPEN) return true
+  //   else return false
+  // }, [nowSocket])
+  const [online, setOnline] = useState(false)
 
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
@@ -354,7 +354,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          // setOnline(true)
+          setOnline(true)
 
           fetch('/?action=require_friend_list', {
             method: 'POST',
@@ -427,10 +427,10 @@ export default function Dashboard() {
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
           // history.push('/sign')
-          // setOnline(false)
+          setOnline(false)
         }
         socket.onclose = (event) => {
-          // setOnline(false)
+          setOnline(false)
         }
       } else {
         history.push('/sign')
