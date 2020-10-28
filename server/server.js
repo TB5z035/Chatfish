@@ -182,6 +182,67 @@ var agree_add_friend_request = function(request, response, body) {
     })
 }
 
+var add_group_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+
+    console.log('Receive add group request!')
+    console.log(json_data)
+    
+    if (json_data.type == 1) {
+        var data = {
+            type: 'ADD_GROUP',
+            uid: user.id,
+            friend_list: json_data.friend_list,
+            group_name: json_data.group_name
+        }
+    }
+    else {
+        var data = {
+            type: 'ADD_GROUP',
+            uid: user.id,
+            friend_list: json_data.friend_list,
+            group_name: json_data.group_name
+        }
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var agree_add_group_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+    }
+    var data = {
+        type: 'AGREE_ADD_GROUP',
+        uid: user.id,
+        group_name: json_data.group_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
 var response_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
@@ -268,6 +329,10 @@ request_server.on('request', function(request, response) {
                     add_friend_request(request, response, body)
                 else if (params.action === 'agree_add_friend')
                     agree_add_friend_request(request, response, body)
+                else if (params.action === 'add_group')
+                    add_group_request(request, response, body)
+                else if (params.action === 'agree_add_group')
+                    agree_add_group_request(request, response, body)
                 else if (params.action === 'response')
                     response_request(request, response, body)
             }
