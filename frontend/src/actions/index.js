@@ -1,3 +1,4 @@
+import drawerOpen from '../reducers/drawerOpen'
 import * as types from './ActionTypes'
 
 export const addMessage = (message, author, receiver, isGroup) => ({
@@ -49,4 +50,9 @@ export const addGroup = (groupName) => ({
 export const setTheme = (theme) => ({
   type: types.SET_THEME,
   theme: theme
+})
+
+export const setDrawerOpen = (drawerOpen) => ({
+  type: types.SET_DRAWER_OPEN,
+  open: drawerOpen
 })
