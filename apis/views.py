@@ -18,11 +18,11 @@ def get_data(request):
     return JsonResponse(data, safe = False)
 
 def login_varify(data):
-    user = User.objects.filter(name = data['username'])
-    if user.count() == 1:
-        if user[0].pwd == data['password']:
+    try:
+        user = User.objects.get(name = data['username'])
+        if user.pwd == data['password']:
             ret = {
-                'id': user[0].uid,
+                'id': user.uid,
                 'state': 200,
                 'meesage': 'Successfully verified!'
             }
@@ -31,7 +31,7 @@ def login_varify(data):
                 'state': 401,
                 'message': 'Invalid password!'
             }
-    else:
+    except:
         ret = {
             'state': 400,
             'message': 'Invalid username!'
@@ -65,46 +65,20 @@ def register_in(data):
         }
     return ret
 
-def init_chat(data):
-    '''
-    key:
-        ctype
-        name
-        users
-    '''
-    try:
-        new_chat = Chat(ctype = data.get('ctype'), name = data.get('name'))
-        new_chat.full_clean()
-        new_chat.save()
-        for uid in data.get('users'):
-            insert_user_to_chat(uid, new_chat.cid)
-        ret = {
-            'state': 200,
-            'cid': data.get('uid'),
-            'users': data.get('users')
-        }
-    except:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in chat initialization.'
-        }
-    return ret
-
-
-def insert_user_to_chat(data):
-    try:
-        ret = insert_chat_meta(cid = data.get('cid'), meta_name = 'member', meta_val = data.get('uid'))
-    except:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in insertion to chat.'
-        }
-    return ret
+# def insert_user_to_chat(data):
+#     try:
+#         ret = insert_chat_meta(cid = data.get('cid'), meta_name = 'member', meta_val = data.get('uid'))
+#     except:
+#         ret = {
+#             'state': 403,
+#             'message': 'Something wrong in insertion to chat.'
+#         }
+#     return ret
 
 def insert_user_to_chat(uid, cid):
-    insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
+    ret = insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
 
-def init_message(data):
+def init_message(data): # depreciated API
     try:
         new_msg = Message(cid = data.get('cid'), \
                         uid = data.get('uid'), \
@@ -130,6 +104,68 @@ def init_message(data):
         ret = {
             'state': 403,
             'message': 'Something wrong in message initialization.'
+        }
+    return ret
+
+def init_private_message(data):
+    try:
+        new_msg = Message(cid = data.get('cid'), \
+                        uid = data.get('uid'), \
+                        mtype = data.get('mtype'), \
+                        content = data.get('content'))
+        new_msg.full_clean()
+        new_msg.save()
+        ret = {
+            'state': 200,
+            'uid': data.get('uid'),
+            'cid': data.get('cid'),
+            'mid': new_msg.mid
+        }
+        post_to_nodejs({
+            'state': 200,
+            'type': 'MESSAGE_NOTIFY',
+            'content': data.get('content'),
+            'username': data.get('friend_name'),
+            'friend_name': data.get('username'),
+            'uid': FindUidByName(data.get('friend_name')).get('uid')
+        })
+    except:
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in private message initialization.'
+        }
+    return ret
+
+def init_group_message(data):
+    try:
+        new_msg = Message(cid = data.get('cid'), \
+                        uid = data.get('uid'), \
+                        mtype = data.get('mtype'), \
+                        content = data.get('content'))
+        new_msg.full_clean()
+        new_msg.save()
+        ret = {
+            'state': 200,
+            'uid': data.get('uid'),
+            'cid': data.get('cid'),
+            'mid': new_msg.mid
+        }
+        members = FetchChatMember(data.get('cid'))
+        for member in members:
+            if member != data.get('uid'):
+                post_to_nodejs({
+                    'state': 200,
+                    'type': 'MESSAGE_NOTIFY',
+                    'is_group': 1,
+                    'content': data.get('content'),
+                    'username': data.get('group_name'),
+                    'friend_name': data.get('username'),
+                    'uid': member
+                })
+    except:
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in group message initialization.'
         }
     return ret
 
@@ -180,19 +216,122 @@ def insert_chat_meta(cid, meta_name, meta_val):
     }
     return ret
 
+def init_chat(data): # depreciated API
+    '''
+    key:
+        ctype
+        name
+        users
+    '''
+    try:
+        new_chat = Chat(ctype = data.get('ctype'), name = data.get('name'))
+        new_chat.full_clean()
+        new_chat.save()
+        for uid in data.get('users'):
+            insert_user_to_chat(uid, new_chat.cid)
+        ret = {
+            'state': 200,
+            'cid': data.get('uid'),
+            'users': data.get('users')
+        }
+    except:
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in chat initialization.'
+        }
+    return ret
+
+def init_private_chat(data):
+    try:
+        new_chat = Chat(ctype = 0, name = data.get('name'))
+        new_chat.full_clean()
+        new_chat.save()
+        insert_user_to_chat(data.get('user1'), new_chat.cid)
+        insert_user_to_chat(data.get('user2'), new_chat.cid)
+        ret = {
+            'state': 200,
+            'message': 'Successfully init private chat.',
+            'cid': new_chat.cid,
+            'user1': data.get('user1'),
+            'user2': data.get('user2')
+        }
+    except:
+        print('Something wrong in chat initialization.')
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in private chat initialization.'
+        }
+    return ret
+
+def init_group_chat(data): # one man group
+    try:
+        # check if all in the list are the users' friends.
+        for friend in data.get('friend_list'):
+            if not JudgeFriend(data.get('user'), FindUidByName(friend).get('uid')):
+                print('not friend.')
+                return {
+                    'state': 403,
+                    'message': 'Someone not friend.'
+                }
+
+        if FindCidByName(data.get('name')).get('find') == 1:
+            print('Same group name.')
+            return {
+                'state': 403,
+                'message': 'Same group name.'
+            }
+        new_chat = Chat(ctype = 1, name = data.get('name'))
+        new_chat.full_clean()
+        new_chat.save()
+        insert_user_to_chat(data.get('user'), new_chat.cid)
+        ret = {
+            'state': 200,
+            'message': 'Successfully init group chat.',
+            'cid': new_chat.cid,
+            'uid': data.get('user')
+        }
+
+        for friend in data.get('friend_list'):
+            post_to_nodejs({
+                'state': 200,
+                'type': 'NEW_ADD_GROUP',
+                'content': 'Add friend to group request sent.',
+                'uid': FindUidByName(friend).get('uid'),
+                'username': friend,
+                'group_name': data.get('name'),
+                'friend_name': FindNameByUid(data.get('user')).get('name')
+            })
+            print({
+                'state': 200,
+                'type': 'NEW_ADD_GROUP',
+                'content': 'Add friend to group request sent.',
+                'uid': FindUidByName(friend).get('uid'),
+                'username': friend,
+                'group_name': data.get('name'),
+                'friend_name': FindNameByUid(data.get('user')).get('name')
+            })
+        print('info above')
+    except:
+        print('Something wrong in group chat initialization.')
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in chat initialization.'
+        }
+    return ret
+
 def add_friend(data):
-    name_ret = FindUidByName(data.get('friend_name'))
-    if name_ret['find'] == 0 :
+    uid_ret = FindUidByName(data.get('friend_name'))
+    if uid_ret.get('find') == 0 :
         ret = {
             'state': 405,
             'message': 'Invalid token or username or friend name!'
         }
-    elif data.get('uid') == name_ret.get('uid'):
+    elif data.get('uid') == uid_ret.get('uid'):
         ret = {
             'state': 400,
             'message': 'Cannot add yourself as friend!'
         }
-    elif JudgeFriend(data.get('uid'), name_ret.get('uid')):
+    elif JudgeFriend(data.get('uid'), uid_ret.get('uid')):
         ret = {
             'state': 400,
             'message': 'They are already friends!' 
@@ -206,30 +345,42 @@ def add_friend(data):
             'state': 200,
             'type': 'NEW_ADD_FRIEND',
             'content': 'Add friend request sent.',
-            'uid': name_ret.get('uid'),
+            'uid': uid_ret.get('uid'),
             'username': data.get('friend_name'),
             'friend_name': FindNameByUid(data.get('uid')).get('name')
         })
     return ret
 
 def accept_friend_request(data):
-    name_ret = FindUidByName(data.get('friend_name'))
-    if name_ret['find'] == 0 :
+    uid_ret = FindUidByName(data.get('friend_name'))
+    if uid_ret.get('find') == 0 :
         ret = {
             'state': 405,
             'message': 'Invalid token or username or friend name!'
         }
     else :
+        if JudgeFriend(data.get('uid'), uid_ret.get('uid')):
+            ret = {
+                'state': 405,
+                'message': 'They are already friends!' 
+            }
+            return ret
+        elif data.get('uid') == uid_ret.get('uid'):
+            ret = {
+                'state': 405,
+                'message': 'Cannot add yourself as friend!'
+            }
+            return ret
         # set up the chat.
-        init_chat(
+        init_private_chat(
             {
-                'ctype': 0,
                 'name': 'private chat',
-                'users': [ data.get('uid'), name_ret.get('uid') ]
+                'user1': data.get('uid'),
+                'user2': uid_ret.get('uid')
             }
         )
-        s1 = insert_user_meta(data.get('uid'), 'friend', name_ret.get('uid')).get('status')
-        s2 = insert_user_meta(name_ret.get('uid'), 'friend', data.get('uid')).get('status')
+        s1 = insert_user_meta(data.get('uid'), 'friend', uid_ret.get('uid')).get('status')
+        s2 = insert_user_meta(uid_ret.get('uid'), 'friend', data.get('uid')).get('status')
         if s1 == 1 and s2 == 1 :
             ret = {
                 'state': 200,
@@ -239,7 +390,7 @@ def accept_friend_request(data):
                 'state': 200,
                 'type': 'AGREE_ADD_FRIEND',
                 'content': 'Add friend request agreed.',
-                'uid': name_ret.get('uid'),
+                'uid': uid_ret.get('uid'),
                 'username': data.get('friend_name'),
                 'friend_name': FindNameByUid(data.get('uid')).get('name')
             })
@@ -252,20 +403,125 @@ def accept_friend_request(data):
     print(ret)
     return ret
 
+def add_user_to_chat(data, cid): # depreciated API
+    uid_ret = FindUidByName(data.get('friend_name'))
+    if uid_ret.get('find') == 0 :
+        ret = {
+            'state': 405,
+            'message': 'Invalid token or username or friend name!'
+        }
+    elif not JudgeFriend(data.get('uid'), uid_ret.get('uid')): # check friends' relation.
+        ret = {
+            'state': 405,
+            'message': 'Not friend of the user.'
+        }
+    elif JudgeMember(uid_ret.get('uid'), cid) :
+        ret = {
+            'state': 405,
+            'message': 'Already member of the group.'
+        }
+    else :
+        ret = {
+            'state': 200,
+            'message': 'Successfully requested!'
+        }
+        post_to_nodejs({
+            'state': 200,
+            'type': 'NEW_ADD_GROUP',
+            'content': 'Add friend to group request sent.',
+            'uid': uid_ret.get('uid'),
+            'username': data.get('friend_name'),
+            'group_name': data.get('group_name'),
+            'friend_name': FindNameByUid(data.get('uid')).get('name')
+        })
+    return ret
+
+def add_users_to_chat(data, cid):
+    if 'friend_list' not in data:
+        ret = {
+            'state': 405,
+            'message': 'No friend list available!'
+        }
+        return ret
+    for friend in data.get('friend_list'):
+        uid_ret = FindUidByName(friend)
+        if uid_ret.get('find') == 0:
+            continue
+        elif not JudgeFriend(data.get('uid'), uid_ret.get('uid')): # check friends' relation.
+            continue
+        elif JudgeMember(uid_ret.get('uid'), cid):
+            continue
+        else :
+            post_to_nodejs({
+                'state': 200,
+                'type': 'NEW_ADD_GROUP',
+                'content': 'Add friend to group request sent.',
+                'uid': uid_ret.get('uid'),
+                'username': friend,
+                'group_name': data.get('group_name'),
+                'friend_name': FindNameByUid(data.get('uid')).get('name')
+            })
+    ret = {
+        'state': 200,
+        'message': 'Successfully requested!'
+    }
+    return ret
+
+def accept_add_to_chat_request(data):
+    cid_ret = FindCidByName(data.get('group_name'))
+    if cid_ret.get('find') == 0 :
+        ret = {
+            'state': 405,
+            'message': 'No group with this name!'
+        }
+    else :
+        ret = {
+            'state': 200,
+            'message': 'Successfully requested!'
+        }
+        insert_user_to_chat(data.get('uid'), cid_ret.get('cid'))
+        # post_to_nodejs({
+        #     'state': 200,
+        #     'type': 'AGREE_ADD_GROUP',
+        #     'content': 'Add GROUP request agreed.',
+        #     'uid': FindUidByName(data.get('friend_name')).get('uid'),
+        #     'username': data.get('friend_name'),
+        #     'friend_name': data.get('username')
+        # })
+    return ret
+
+
 def message_upload(data):
     try:
-        ruid = User.objects.filter(name = data.get('friend_name'))[0].uid
-        chats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid')))]
-        rchats = [ meta.cid for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid))]
-        this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.filter(cid = cid)[0].ctype == 0 ][0]
-        init_message({
-            'cid': this_cid,
-            'uid': data.get('uid'),
-            'mtype': 'normal',
-            'content': data.get('content'),
-            'username': data.get('userName'),
-            'friend_name': data.get('friend_name')
-        })
+        if 'is_group' in data and data.get('is_group') == 1:
+            '''
+            For group message
+            '''
+            this_cid = FindCidByName(data.get('friend_name')).get('cid')
+            init_group_message({
+                'cid': this_cid,
+                'uid': data.get('uid'),
+                'mtype': 'normal',
+                'content': data.get('content'),
+                'username': data.get('userName'),
+                'group_name': data.get('friend_name')
+            })
+        else:
+            '''
+            For private message
+            '''
+            ruid = User.objects.get(name = data.get('friend_name')).uid
+            chats = [ meta['cid'] for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')]
+            rchats = [ meta['cid'] for meta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid)).values('cid')]
+            this_cid = [ cid for cid in chats if cid in rchats and Chat.objects.get(cid = cid).ctype == 0 ][0]
+            init_private_message({
+                'cid': this_cid,
+                'uid': data.get('uid'),
+                'mtype': 'normal',
+                'content': data.get('content'),
+                'username': data.get('userName'),
+                'friend_name': data.get('friend_name')
+            })
         ret = {
             'state': 200,
             'message': 'Successfully uploaded.'
@@ -295,13 +551,19 @@ def post_data(request):
     body = request.body.decode('utf-8')
     sha1 = hashlib.sha1((body + ' post from ChatFish Server').encode('utf-8'))
     ret = {}
+    print('Receive post request from nodejs: ')
+    print(body)
     if (sha1.hexdigest() == request.META.get('HTTP_DATA_KEY')):
         ret = {
             'state': 200,
             'message': 'Successfuly post!'
         }
         try:
+            print('Try to json.loads...')
             data = json.loads(body)
+            print('Json loading completed.')
+            print(data)
+            print('Json print ended.')
             if 'type' not in data:
                 raise Exception("No type info!")
             if data['type'] == 'LOGIN_VERIFY':
@@ -309,21 +571,32 @@ def post_data(request):
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))
             elif data['type'] == 'ALL_MESSAGE':
-                ret = FetchAllMessage(data)
+                ret = FetchAllMessage(data.get('uid'))
             elif data['type'] == 'MESSAGE_UPLOAD':
                 ret = message_upload(data)
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
-                ret = FetchFriends(data.get('uid'))
+                # ret = FetchFriends(data.get('uid'))
+                ret = FetchAllMessage(data.get('uid'))
             elif data['type'] == 'ADD_NEW_FRIEND':
-                ret = add_friend(data) # may need improvement
+                ret = add_friend(data)
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
-                ret = accept_friend_request(data) # may need improvement
+                ret = accept_friend_request(data)
+            elif data['type'] == 'ADD_GROUP':
+                cid_ret = FindCidByName(data.get('group_name'))
+                if cid_ret.get('find') == 0:
+                    # init a chat
+                    ret = init_group_chat({
+                        'name': data.get('group_name'),
+                        'user': data.get('uid'),
+                        'friend_list': data.get('friend_list')
+                    })
+                else :
+                    # add user to chat
+                    ret = add_users_to_chat(data, cid_ret.get('cid'))
+            elif data['type'] == 'AGREE_ADD_GROUP':
+                ret = accept_add_to_chat_request(data)
             elif data['type'] == 'RESPONSE':
                 ret = response_handle(data)
-            elif data['type'] == 'CREATE_NEW_GROUP':
-                ret = init_chat(data)
-            elif data['type'] == 'ADD_NEW_GROUP':
-                ret = insert_user_to_chat(data)
             elif data['type'] == 'LEAVE_GROUP':
                 ret = {
                     'state': 399,
@@ -360,8 +633,6 @@ def post_data(request):
             'state': 399,
             'message': 'Wrong data key!'
         }
-    print('Receive post request from nodejs: ')
-    print(body)
     return JsonResponse(ret, safe = False)
 
 def post_to_nodejs(data):

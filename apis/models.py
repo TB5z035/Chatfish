@@ -63,19 +63,26 @@ def Test():
     pass
 
 def JudgeFriend(uid1, uid2):
-    friends = [ friend.meta_value for friend in UserMeta.objects.filter(meta_name = 'friend', meta_value = str(uid1)) ]
-    if str(uid2) in friend2 :
+    try:
+        friend = UserMeta.objects.get(meta_name = 'friend', uid = uid1, meta_value = str(uid2))
         return True
-    else :
+    except:
         return False
 
-def FetchFriends(uid, number = -1):
+def JudgeMember(uid, cid):
     try:
-        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid))
-        cid_list = [ chat.cid for chat in chats ]
+        member = ChatMeta.objects.get(meta_name = 'member', cid = cid, meta_value = str(uid))
+        return True
+    except:
+        return False
+
+def FetchFriends(uid, number = -1): #depreciated api
+    try:
+        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
+        cid_list = [ chat['cid'] for chat in chats ]
         # user can be multiple if delete [0]
         message_list = [ {
-            'user': [ User.objects.filter(uid = member)[0].name for member in FetchChatMember(cid) if member != uid ][0],
+            'user': [ User.objects.get(uid = member).name for member in FetchChatMember(cid) if member != uid ][0],
             'message_list': FetchChatMessage(cid)
         } for cid in cid_list ]
 
@@ -87,37 +94,42 @@ def FetchFriends(uid, number = -1):
     except:
         ret = {
             'state': 400,
-            'message': 'Failed in fetching all message.'
+            'message': 'Failed in fetching friend.'
         }
     print('fetching friend.')
     print(ret)
     return ret
 
 def FetchOfflineMessage(ruid):
-    OfflineMsgs = OfflineMessage.objects.filter(ruid = ruid)
-    ret = [ Offline_Msg.mid for Offline_Msg in Offline_Msgs ]
+    OfflineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
+    ret = [ Offline_Msg['mid'] for Offline_Msg in Offline_Msgs ]
     return ret
 
+def FetchChatType(cid):
+    pass
+
 def FetchChatMember(cid):
-    ChatMembers = ChatMeta.objects.filter(meta_name = 'member', cid = cid)
-    ret = [ int(ChatMember.meta_value) for ChatMember in  ChatMembers ] # invert to integer id.
+    ChatMembers = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
+    ret = [ int(ChatMember['meta_value']) for ChatMember in  ChatMembers ] # invert to integer id.
     return ret
 
 def FetchChatMessage(cid, number = 20):
-    msgs = Message.objects.filter(cid = cid)
-    ret = [ { 'type': msg.mtype, 'time': msg.time, 'from': FindNameByUid(msg.uid).get('name'), 'content': msg.content } for msg in msgs ]
+    msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
+    ret = [ { 'type': msg['mtype'], 'time': msg['time'], 'from': FindNameByUid(msg['uid']).get('name'), 'content': msg['content'] } for msg in msgs ]
     return ret
 
-def FetchAllMessage(data):
+def FetchAllMessage(uid, number = -1):
     try:
-        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = data.get('uid'))
-        cid_list = [ chat.cid for chat in chats ]
+        chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
+        cid_list = [ chat_info['cid'] for chat_info in chats_info ]
+        chats = [ Chat.objects.get(cid = cid) for cid in cid_list ]
+        print(chats)
         # user can be multiple if delete [0]
-        message_list = [ {
-            'user': [ User.objects.filter(uid = member)[0].name for member in FetchChatMember(cid) if member != data.get('uid') ],
-            'message_list': FetchChatMessage(cid)
-        } for cid in cid_list ]
-
+        message_list = [{
+            'isGroup': int(chat.ctype),
+            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in FetchChatMember(chat.cid) if member != uid ][0],
+            'message_list': FetchChatMessage(chat.cid)
+        } for chat in chats ]
         ret = {
             'state': 200,
             'message': 'All message required successfully.',
@@ -128,32 +140,58 @@ def FetchAllMessage(data):
             'state': 400,
             'message': 'Failed in fetching all message.'
         }
+    print('fetch all message.')
+    print(ret)
     return ret
 
-
-
 def FindUidByName(name):
-    user = User.objects.filter(name = name)
-    if user.count() == 0 :
-        ret = {
-            'find': 0
-        }
-    else :
+    try:
+        user = User.objects.get(name = name)
         ret = {
             'find': 1,
-            'uid': user[0].uid
+            'uid': user.uid
+        }
+    except:
+        ret = {
+            'find': 0
         }
     return ret
 
 def FindNameByUid(uid):
-    user = User.objects.filter(uid = uid)
-    if user.count() == 0 :
+    try:
+        user = User.objects.get(uid = uid)
+        ret = {
+            'find': 1,
+            'name': user.name
+        }
+    except:
         ret = {
             'find': 0
         }
-    else :
+    return ret
+
+def FindCidByName(name):
+    try:
+        chat = Chat.objects.get(name = name)
         ret = {
             'find': 1,
-            'name': user[0].name
+            'cid': chat.cid
+        }
+    except:
+        ret = {
+            'find': 0
+        }
+    return ret
+
+def FindNameByCid(cid):
+    try:
+        chat = Chat.objects.get(cid = cid)
+        ret = {
+            'find': 1,
+            'name': chat.name
+        }
+    except:
+        ret = {
+            'find': 0
         }
     return ret
