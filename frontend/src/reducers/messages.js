@@ -32,7 +32,7 @@ const messages = (state = initialState, action) => {
       return newList
     case 'NEW_MESSAGE_SEND':
       for (; j < len; j++) {
-        if (newList[j].user === action.receiver) {
+        if (newList[j].user === action.receiver && newList[j].isGroup === action.isGroup) {
           const temp = newList[j]
           newList.splice(j, 1)
           temp.message_list.push({
@@ -47,7 +47,12 @@ const messages = (state = initialState, action) => {
       return newList
     case 'NEW_MESSAGE_RECEIVE':
       for (; j < len; j++) {
-        if (newList[j].user === action.author) {
+        if ((newList[j].isGroup === 1 &&
+            action.isGroup === 1 &&
+            newList[j].user === action.group) ||
+            (newList[j].isGroup === 0 &&
+                action.isGroup === 0 &&
+                newList[j].user === action.author)) {
           const temp = newList[j]
           newList.splice(j, 1)
           temp.message_list.push({
