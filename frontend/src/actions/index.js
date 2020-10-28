@@ -50,3 +50,8 @@ export const setTheme = (theme) => ({
   type: types.SET_THEME,
   theme: theme
 })
+
+export const setDrawerOpen = (drawerOpen) => ({
+  type: types.SET_DRAWER_OPEN,
+  open: drawerOpen
+})

@@ -11,3 +11,5 @@ export const ADD_FRIEND = 'ADD_FRIEND'
 export const ADD_GROUP = 'ADD_GROUP'
 
 export const SET_THEME = 'SET_THEME'
+
+export const SET_DRAWER_OPEN = 'SET_DRAWER_OPEN'
