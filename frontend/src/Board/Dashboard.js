@@ -202,11 +202,8 @@ export default function Dashboard() {
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState(['Alice', 'bob'])
-  const [groupToAddList, setGroupToAddList] = useState([
-    { friendName: 'a', groupName: 'dsa' },
-    { friendName: 'b', groupName: 'saga' }
-  ])
+  const [friendToAddList, setFriendToAddList] = useState([])
+  const [groupToAddList, setGroupToAddList] = useState([])
 
   const online = useMemo(() => {
     if (nowSocket && nowSocket.readyState === nowSocket.OPEN) return true
