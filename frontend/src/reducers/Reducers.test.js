@@ -353,7 +353,8 @@ describe('chat reducer', () => {
       focusUser: 'carol',
       messages: [],
       myName: 'name',
-      theme: null
+      theme: null,
+      drawerOpen: false
     })
   })
 
