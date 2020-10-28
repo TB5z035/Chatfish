@@ -202,11 +202,8 @@ export default function Dashboard() {
   // const theme = useTheme()
   const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
-  const [friendToAddList, setFriendToAddList] = useState(['Alice', 'bob'])
-  const [groupToAddList, setGroupToAddList] = useState([
-    { friendName: 'a', groupName: 'dsa' },
-    { friendName: 'b', groupName: 'saga' }
-  ])
+  const [friendToAddList, setFriendToAddList] = useState([])
+  const [groupToAddList, setGroupToAddList] = useState([])
 
   // const online = useMemo(() => {
   //   if (nowSocket && nowSocket.readyState === nowSocket.OPEN) return true
@@ -387,15 +384,29 @@ export default function Dashboard() {
             Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200
           ) {
+            console.log(receivedData)
             switch (receivedData['type']) {
               case 'MESSAGE_NOTIFY':
                 handleReply('NOTIFY_MESSAGE_NOTIFY').then()
-                dispatch(
-                  messageReceived(
-                    receivedData['content'],
-                    receivedData['friend_name']
+                if (receivedData['is_group'] === 1) {
+                  dispatch(
+                    messageReceived(
+                      receivedData['content'],
+                      receivedData['friend_name'],
+                      receivedData['username'],
+                      1
+                    )
                   )
-                )
+                } else {
+                  dispatch(
+                    messageReceived(
+                      receivedData['content'],
+                      receivedData['friend_name'],
+                      null,
+                      0
+                    )
+                  )
+                }
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
