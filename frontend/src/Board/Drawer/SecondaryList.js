@@ -112,8 +112,27 @@ export default function SecondaryList(users) {
       method: 'POST',
       body: JSON.stringify(params),
       headers: { 'Content-Type': 'application/json' }
-    }).then()
-    dispatch(addGroup(groupName))
+    }).then((res) =>
+      res
+        .json()
+        .catch((error) => console.error('Error:', error))
+        .then((data) => {
+          if (
+            data != null &&
+                  Object.prototype.hasOwnProperty.call(data, 'state') &&
+                  data['state'] === 200
+          ) {
+            dispatch(addGroup(groupName))
+            enqueueSnackbar('Successful create group: ' + groupName, {
+              variant: 'success'
+            })
+          } else {
+            enqueueSnackbar('The name of group already exists: ' + groupName, {
+              variant: 'error'
+            })
+          }
+        })
+    )
     setSelectState({})
   }, [selectState, groupName, myName, dispatch])
 
