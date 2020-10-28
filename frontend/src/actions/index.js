@@ -1,4 +1,3 @@
-import drawerOpen from '../reducers/drawerOpen'
 import * as types from './ActionTypes'
 
 export const addMessage = (message, author, receiver, isGroup) => ({

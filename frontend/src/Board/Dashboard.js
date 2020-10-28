@@ -15,7 +15,6 @@ import {
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import Drawer from '@material-ui/core/Drawer'
 import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -301,9 +300,6 @@ export default function Dashboard() {
   }
   const handleDrawerOpen = () => {
     dispatch(setDrawerOpen(true))
-  }
-  const handleDrawerClose = () => {
-    dispatch(setDrawerOpen(false))
   }
 
   const handleThemeIconClick = (event) => {

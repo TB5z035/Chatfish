@@ -7,7 +7,8 @@ import {
   Avatar,
   ListItem,
   ListItemAvatar,
-  ListItemText
+  ListItemText,
+  Divider
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { green, pink } from '@material-ui/core/colors'
@@ -49,14 +50,17 @@ const useStyles = makeStyles((theme) => ({
 export default function SecondaryList(users) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
+
+  const dispatch = useDispatch()
+  const myName = useSelector((state) => state.myName)
+  const friendList = useSelector((state) => state.messages)
+
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')
-  const myName = useSelector((state) => state.myName)
   const [groupName, setGroupName] = useState('')
   const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
-  const friendList = useSelector((state) => state.messages)
   const [selectState, setSelectState] = React.useState({})
-  const dispatch = useDispatch()
+
   const handleAddFriend = useCallback(async () => {
     setAddFriendDialogOpen(false)
     const username = Cookies.get('username')
@@ -125,6 +129,7 @@ export default function SecondaryList(users) {
       {/* <ListSubheader inset component="li">
         Tools
       </ListSubheader> */}
+      <Divider />
       <List>
         <ListItem
           button
