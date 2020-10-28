@@ -10,7 +10,8 @@ import {
   addFriend,
   setTheme,
   setFocusUser,
-  addGroup
+  addGroup,
+  setDrawerOpen
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -49,6 +50,7 @@ import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 // import socket from '../reducers/socket'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
+import MyDrawer from './Drawer/MyDrawer'
 
 // function Copyright() {
 //   return (
@@ -100,8 +102,6 @@ const useStyles = makeStyles((theme) => ({
   },
   appBarIcon: {
     padding: theme.spacing(1)
-    // paddingRight: theme.spacing(1),
-    // paddingLeft: theme.spacing(1)
   },
   themeSwitch: {
     padding: theme.spacing(1)
@@ -187,28 +187,24 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard() {
   const classes = useStyles()
   const history = useHistory()
-  const [open, setOpen] = useState(false)
+  const dispatch = useDispatch()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const open = useSelector((state) => state.drawerOpen)
+  const friendList = useSelector((state) => state.messages)
+  const myName = useSelector((state) => state.myName)
+
   const [darkState, setDarkState] = useState(false)
+  const [anchorMenu, setAnchorMenu] = useState(null)
+  const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
+  const [previousDarkTheme, setPreviousDarkTheme] = useState(themeDarkDefault)
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
   )
-  const [previousDarkTheme, setPreviousDarkTheme] = useState(themeDarkDefault)
-  const { enqueueSnackbar } = useSnackbar()
-  const [anchorMenu, setAnchorMenu] = useState(null)
-  const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
-  const friendList = useSelector((state) => state.messages)
-  const myName = useSelector((state) => state.myName)
-  // const nowSocket = useSelector((state) => state.socket)
-  // const theme = useTheme()
-  const dispatch = useDispatch()
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
 
-  // const online = useMemo(() => {
-  //   if (nowSocket && nowSocket.readyState === nowSocket.OPEN) return true
-  //   else return false
-  // }, [nowSocket])
   const [online, setOnline] = useState(false)
 
   const handleAddFriendRequest = useCallback(
@@ -307,10 +303,10 @@ export default function Dashboard() {
     history.push('/sign')
   }
   const handleDrawerOpen = () => {
-    setOpen(true)
+    dispatch(setDrawerOpen(true))
   }
   const handleDrawerClose = () => {
-    setOpen(false)
+    dispatch(setDrawerOpen(false))
   }
 
   const handleThemeIconClick = (event) => {
@@ -457,6 +453,7 @@ export default function Dashboard() {
   return (
     <div className={classes.root}>
       <CssBaseline />
+
       <AppBar
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
@@ -575,40 +572,17 @@ export default function Dashboard() {
         </Toolbar>
       </AppBar>
 
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <Typography>Friends</Typography>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        {friendList.length !== 0 ? (
-          <>
-            <Divider />
-            <List className={classes.listStyles}>{userList(friendList)}</List>
-          </>
-        ) : (
-          <></>
-        )}
-        <Divider />
-        <List>{useSecondaryListItems(friendList)}</List>
-      </Drawer>
+      <MyDrawer></MyDrawer>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Box display="flex" flexDirection="row" justifyContent="center">
           <Box className={classes.box}>
-            {/* <Chatroom ref={chatBoxRef} usr={friendList[0]} /> fixme */}
             <Chatroom />
           </Box>
         </Box>
       </main>
+
       <Dialog
         open={notificationDialogOpen}
         onClose={() => {
