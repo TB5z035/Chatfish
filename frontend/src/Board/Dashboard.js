@@ -337,7 +337,10 @@ export default function Dashboard() {
   // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight)
 
   useEffect(() => {
+    // * Set default theme
     dispatch(setTheme(darkState ? themeDarkDefault : themeLightDefault))
+
+    // * Set up WebSocket
     async function setWebSocket() {
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
@@ -601,34 +604,62 @@ export default function Dashboard() {
           setNotificationDialogOpen(false)
         }}
       >
-        <DialogTitle> Notifications </DialogTitle>
-        <DialogContent>
-          <DialogContentText>New friend requests</DialogContentText>
-          <Box className={classes.notificationText}>
-            <List className={classes.notificationList}>
-              {friendToAddList.map((name) => (
-                <NotificationListItem
-                  name={name}
-                  isGroup={false}
-                  friendName={''}
-                  refuse={refuseAddFriendRequest}
-                  accept={handleAddFriendRequest}
-                  key={name}
-                />
-              ))}
-              {groupToAddList.map((note) => (
-                <NotificationListItem
-                  name={note.groupName}
-                  isGroup={true}
-                  friendName={note.friendName}
-                  refuse={refuseAddGroupRequest}
-                  accept={handleAddGroupRequest}
-                  key={note.groupName + '$' + note.friendName}
-                />
-              ))}
-            </List>
-          </Box>
-        </DialogContent>
+        <Box style={{ minWidth: '20rem' }}>
+          <DialogTitle> Notifications </DialogTitle>
+          {friendToAddList.length === 0 && groupToAddList.length === 0 ? (
+            <DialogContent>
+              <Typography color="textsecondary" align="center">
+                No notification for now 😀
+              </Typography>
+            </DialogContent>
+          ) : (
+            <></>
+          )}
+          <DialogContent>
+            {friendToAddList.length !== 0 ? (
+              <>
+                <DialogContentText>New Friend Requests</DialogContentText>
+                <Box minWidth="20rem">
+                  <List>
+                    {friendToAddList.map((name) => (
+                      <NotificationListItem
+                        name={name}
+                        isGroup={false}
+                        friendName={''}
+                        refuse={refuseAddFriendRequest}
+                        accept={handleAddFriendRequest}
+                        key={name}
+                      />
+                    ))}
+                  </List>
+                </Box>
+              </>
+            ) : (
+              <></>
+            )}
+            {groupToAddList.length !== 0 ? (
+              <>
+                <DialogContentText>New Group Requests</DialogContentText>
+                <Box minWidth="20rem">
+                  <List>
+                    {groupToAddList.map((note) => (
+                      <NotificationListItem
+                        name={note.groupName}
+                        isGroup={true}
+                        friendName={note.friendName}
+                        refuse={refuseAddGroupRequest}
+                        accept={handleAddGroupRequest}
+                        key={note.groupName + '$' + note.friendName}
+                      />
+                    ))}
+                  </List>
+                </Box>
+              </>
+            ) : (
+              <></>
+            )}
+          </DialogContent>
+        </Box>
       </Dialog>
     </div>
   )
