@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function SecondaryList(users) {
+export default function SecondaryList() {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -66,7 +66,7 @@ export default function SecondaryList(users) {
     const username = Cookies.get('username')
 
     if (
-      users
+      friendList
         .map((user) => {
           return user.user
         })
@@ -82,7 +82,7 @@ export default function SecondaryList(users) {
     } else {
       postAddFriend(username, friendToAdd).then()
     }
-  }, [friendToAdd, enqueueSnackbar, users])
+  }, [friendToAdd, enqueueSnackbar, friendList])
 
   const onKeyPressAddFriend = useCallback(
     async (e) => {
