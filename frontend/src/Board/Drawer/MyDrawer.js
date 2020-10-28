@@ -9,7 +9,8 @@ import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import { userList, useSecondaryListItems } from './Drawerlist'
+import SecondaryList from './Secondarylist'
+import UserListItem from './UserListItem'
 const drawerWidth = 240
 
 const useStyles = makeStyles((theme) => ({
@@ -92,13 +93,15 @@ export default function MyDrawer() {
       {friendList.length !== 0 ? (
         <>
           <Divider />
-          <List className={classes.listStyles}>{userList(friendList)}</List>
+          <List className={classes.listStyles}>
+            {friendList.map((user) => UserListItem(user))}
+          </List>
         </>
       ) : (
         <></>
       )}
       <Divider />
-      <List>{useSecondaryListItems(friendList)}</List>
+      <SecondaryList user={friendList} />
     </Drawer>
   )
 }

@@ -2,8 +2,8 @@ import React, { useCallback, useState } from 'react'
 import SettingsIcon from '@material-ui/icons/Settings'
 import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import GroupAddIcon from '@material-ui/icons/GroupAdd'
-import UserListItem from './UserListItem'
 import {
+  List,
   Avatar,
   ListItem,
   ListItemAvatar,
@@ -46,11 +46,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export function userList(users) {
-  return <>{users.map((user) => UserListItem(user))}</>
-}
-
-export function useSecondaryListItems(users) {
+export default function SecondaryList(users) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
@@ -129,104 +125,106 @@ export function useSecondaryListItems(users) {
       {/* <ListSubheader inset component="li">
         Tools
       </ListSubheader> */}
-      <ListItem
-        button
-        onClick={() => {
-          setAddFriendDialogOpen(true)
-        }}
-      >
-        <ListItemAvatar>
-          <Avatar className={classes.green}>
-            <PersonAddIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Add Friends" />
-      </ListItem>
-      <ListItem
-        button
-        onClick={() => {
-          setCreateGroupDialogOpen(true)
-        }}
-      >
-        <ListItemAvatar>
-          <Avatar className={classes.green}>
-            <GroupAddIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Add Groups" />
-      </ListItem>
-      <ListItem button>
-        <ListItemAvatar>
-          <Avatar className={classes.pink}>
-            <SettingsIcon />
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary="Settings" />
-      </ListItem>
-      <Dialog
-        open={addFriendDialogOpen}
-        onClose={() => {
-          setAddFriendDialogOpen(false)
-        }}
-      >
-        <DialogTitle> Add new friend</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Enter username of new friend</DialogContentText>
-          <TextField
-            label="username"
-            autoFocus
-            fullWidth
-            onKeyPress={onKeyPressAddFriend}
-            onChange={(e) => {
-              setFriendToAdd(e.target.value)
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={handleAddFriend}>
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={createGroupDialogOpen}
-        onClose={() => {
-          setCreateGroupDialogOpen(false)
-        }}
-      >
-        <DialogTitle> Creat new group</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Group Name"
-            autoFocus
-            fullWidth
-            onChange={(e) => {
-              setGroupName(e.target.value)
-            }}
-          />
-          <FormControl component="fieldset" className={classes.formControl}>
-            <FormLabel component="legend">Select friends</FormLabel>
-            <FormGroup>
-              {friendList.map((user) =>
-                user.isGroup === 0 ? (
-                  <FormControlLabel
-                    control={
-                      <Checkbox onChange={handleChange} name={user.user} />
-                    }
-                    label={user.user}
-                    key={user.user}
-                  />
-                ) : null
-              )}
-            </FormGroup>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={handleCreateGroup}>
-            Creat
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <List>
+        <ListItem
+          button
+          onClick={() => {
+            setAddFriendDialogOpen(true)
+          }}
+        >
+          <ListItemAvatar>
+            <Avatar className={classes.green}>
+              <PersonAddIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Add Friends" />
+        </ListItem>
+        <ListItem
+          button
+          onClick={() => {
+            setCreateGroupDialogOpen(true)
+          }}
+        >
+          <ListItemAvatar>
+            <Avatar className={classes.green}>
+              <GroupAddIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Add Groups" />
+        </ListItem>
+        <ListItem button>
+          <ListItemAvatar>
+            <Avatar className={classes.pink}>
+              <SettingsIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Settings" />
+        </ListItem>
+        <Dialog
+          open={addFriendDialogOpen}
+          onClose={() => {
+            setAddFriendDialogOpen(false)
+          }}
+        >
+          <DialogTitle> Add new friend</DialogTitle>
+          <DialogContent>
+            <DialogContentText>Enter username of new friend</DialogContentText>
+            <TextField
+              label="username"
+              autoFocus
+              fullWidth
+              onKeyPress={onKeyPressAddFriend}
+              onChange={(e) => {
+                setFriendToAdd(e.target.value)
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={handleAddFriend}>
+              Add
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={createGroupDialogOpen}
+          onClose={() => {
+            setCreateGroupDialogOpen(false)
+          }}
+        >
+          <DialogTitle> Creat new group</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Group Name"
+              autoFocus
+              fullWidth
+              onChange={(e) => {
+                setGroupName(e.target.value)
+              }}
+            />
+            <FormControl component="fieldset" className={classes.formControl}>
+              <FormLabel component="legend">Select friends</FormLabel>
+              <FormGroup>
+                {friendList.map((user) =>
+                  user.isGroup === 0 ? (
+                    <FormControlLabel
+                      control={
+                        <Checkbox onChange={handleChange} name={user.user} />
+                      }
+                      label={user.user}
+                      key={user.user}
+                    />
+                  ) : null
+                )}
+              </FormGroup>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={handleCreateGroup}>
+              Creat
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </List>
     </>
   )
 }
