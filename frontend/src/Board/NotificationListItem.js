@@ -19,16 +19,28 @@ export default class NotificationListItem extends React.Component {
   render() {
     return (
       <>
-        <ListItem className={'root'} disableGutters>
-          <Box className={'listBox'}>
+        <ListItem className="root" disableGutters>
+          <Box className="listBox">
             <Box marginRight={2}>
               <Avatar>
                 {this.props.name ? this.props.name[0] : undefined}
               </Avatar>
             </Box>
             <Box flexGrow={1}>
-              <Typography variant="h6">{(this.state.isGroup ? this.state.friendName +
-                  ' invites you to ' : '') + this.state.name}</Typography>
+              {this.state.isGroup ? (
+                <>
+                  <Typography variant="h6">{this.state.name}</Typography>
+                  <Typography
+                    color="textsecondary"
+                    variant="body2"
+                    display="inline"
+                  >
+                    {'from ' + this.state.friendName}
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="h6">{this.state.name}</Typography>
+              )}
             </Box>
             <IconButton
               onClick={() => {
@@ -36,14 +48,14 @@ export default class NotificationListItem extends React.Component {
                 this.props.refuse(this.props.name)
               }}
             >
-              <CheckIcon/>
+              <CheckIcon />
             </IconButton>
             <IconButton
               onClick={() => {
                 this.props.refuse(this.props.name)
               }}
             >
-              <CloseIcon/>
+              <CloseIcon />
             </IconButton>
           </Box>
         </ListItem>
