@@ -113,7 +113,7 @@ export function useSecondaryListItems(users) {
     const params = {
       type: 0,
       username: myName,
-      groupName_name: groupName,
+      group_name: groupName,
       friend_list: friendList
     }
     fetch('/?action=add_group', {
