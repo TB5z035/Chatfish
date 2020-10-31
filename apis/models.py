@@ -59,31 +59,33 @@ class OfflineMessage(models.Model):
     ruid = models.IntegerField(blank = False, default = 0)
     mid = models.IntegerField(blank = False, default = 0)
 
-def Test():
-    pass
+def test_func():
+    '''
+    Wait to complete for testing
+    '''
 
-def JudgeFriend(uid1, uid2):
+def judge_friend(uid1, uid2):
     try:
-        friend = UserMeta.objects.get(meta_name = 'friend', uid = uid1, meta_value = str(uid2))
+        UserMeta.objects.get(meta_name = 'friend', uid = uid1, meta_value = str(uid2))
         return True
-    except:
+    except Exception:
         return False
 
-def JudgeMember(uid, cid):
+def judge_member(uid, cid):
     try:
-        member = ChatMeta.objects.get(meta_name = 'member', cid = cid, meta_value = str(uid))
+        ChatMeta.objects.get(meta_name = 'member', cid = cid, meta_value = str(uid))
         return True
-    except:
+    except Exception:
         return False
 
-def FetchFriends(uid, number = -1): #depreciated api
+def fetch_friends(uid, number = -1): #depreciated api
     try:
         chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat['cid'] for chat in chats ]
         # user can be multiple if delete [0]
         message_list = [ {
-            'user': [ User.objects.get(uid = member).name for member in FetchChatMember(cid) if member != uid ][0],
-            'message_list': FetchChatMessage(cid)
+            'user': [ User.objects.get(uid = member).name for member in fetch_chat_member(cid) if member != uid ][0],
+            'message_list': fetch_chat_message(cid)
         } for cid in cid_list ]
 
         ret = {
@@ -91,7 +93,7 @@ def FetchFriends(uid, number = -1): #depreciated api
             'message': 'All message required successfully.',
             'message_list': message_list
         }
-    except:
+    except Exception:
         ret = {
             'state': 400,
             'message': 'Failed in fetching friend.'
@@ -100,25 +102,27 @@ def FetchFriends(uid, number = -1): #depreciated api
     print(ret)
     return ret
 
-def FetchOfflineMessage(ruid):
-    OfflineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
-    ret = [ Offline_Msg['mid'] for Offline_Msg in Offline_Msgs ]
+def fetch_offline_message(ruid):
+    off_lineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
+    ret = [ offline_Msg['mid'] for offline_Msg in offline_Msgs ]
     return ret
 
-def FetchChatType(cid):
-    pass
+def fetch_chat_type(cid):
+    '''
+    Wait to complete for fetching chat type
+    '''
 
-def FetchChatMember(cid):
-    ChatMembers = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
-    ret = [ int(ChatMember['meta_value']) for ChatMember in  ChatMembers ] # invert to integer id.
+def fetch_chat_member(cid):
+    chatMembers = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
+    ret = [ int(chatMember['meta_value']) for chatMember in  chatMembers ] # invert to integer id.
     return ret
 
-def FetchChatMessage(cid, number = 20):
+def fetch_chat_message(cid, number = 20):
     msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
-    ret = [ { 'type': msg['mtype'], 'time': msg['time'], 'from': FindNameByUid(msg['uid']).get('name'), 'content': msg['content'] } for msg in msgs ]
+    ret = [ { 'type': msg['mtype'], 'time': msg['time'], 'from': find_name_by_uid(msg['uid']).get('name'), 'content': msg['content'] } for msg in msgs ]
     return ret
 
-def FetchAllMessage(uid, number = -1):
+def fetch_all_message(uid, number = -1):
     try:
         chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat_info['cid'] for chat_info in chats_info ]
@@ -127,15 +131,15 @@ def FetchAllMessage(uid, number = -1):
         # user can be multiple if delete [0]
         message_list = [{
             'isGroup': int(chat.ctype),
-            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in FetchChatMember(chat.cid) if member != uid ][0],
-            'message_list': FetchChatMessage(chat.cid)
+            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'message_list': fetch_chat_message(chat.cid)
         } for chat in chats ]
         ret = {
             'state': 200,
             'message': 'All message required successfully.',
             'message_list': message_list
         }
-    except:
+    except Exception:
         ret = {
             'state': 400,
             'message': 'Failed in fetching all message.'
@@ -144,53 +148,53 @@ def FetchAllMessage(uid, number = -1):
     print(ret)
     return ret
 
-def FindUidByName(name):
+def find_uid_by_name(name):
     try:
         user = User.objects.get(name = name)
         ret = {
             'find': 1,
             'uid': user.uid
         }
-    except:
+    except Exception:
         ret = {
             'find': 0
         }
     return ret
 
-def FindNameByUid(uid):
+def find_name_by_uid(uid):
     try:
         user = User.objects.get(uid = uid)
         ret = {
             'find': 1,
             'name': user.name
         }
-    except:
+    except Exception:
         ret = {
             'find': 0
         }
     return ret
 
-def FindCidByName(name):
+def find_cid_by_name(name):
     try:
         chat = Chat.objects.get(name = name)
         ret = {
             'find': 1,
             'cid': chat.cid
         }
-    except:
+    except Exception:
         ret = {
             'find': 0
         }
     return ret
 
-def FindNameByCid(cid):
+def find_name_by_cid(cid):
     try:
         chat = Chat.objects.get(cid = cid)
         ret = {
             'find': 1,
             'name': chat.name
         }
-    except:
+    except Exception:
         ret = {
             'find': 0
         }
