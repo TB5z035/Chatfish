@@ -101,7 +101,7 @@ def FetchFriends(uid, number = -1): #depreciated api
     return ret
 
 def FetchOfflineMessage(ruid):
-    OfflineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
+    Off_lineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
     ret = [ Offline_Msg['mid'] for Offline_Msg in Offline_Msgs ]
     return ret
 
