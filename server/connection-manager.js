@@ -79,8 +79,8 @@ class ConnectionManager {
     close_ws(id) {
         var index = this.find_index(id)
         if (index !== -1) delete this.users[index].ws
-        if (index !== -1) this.users[index].timer = setTimeout(function(ts, index) {
-            ts.users.splice(index, 1)
+        if (index !== -1) this.users[index].timer = setTimeout(function(ts, id) {
+            ts.users.splice(id, 1)
             console.log('token expirated!')
         }, 3 * 60 * 60 * 1000, this, index)
     }
