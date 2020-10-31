@@ -15,7 +15,7 @@ var get_token = function(cookie, url) {
     return token
 }
 
-var get_username = function(cookie) {
+var get_username = function(cookie, url) {
     var params = URL.parse(url, true).query
     if (cookie === undefined || cookie === null) {
         return params.username
@@ -25,12 +25,12 @@ var get_username = function(cookie) {
     return username
 }
 
-var ClientVerify =function(info) {
+var ClientVerify = function(info) {
     var token = get_token(info.req.headers.cookie, info.req.url)
 
     var user = manager.find_by_token(token)
 
-    return user !== undefined && user.username === get_username(info.req.headers.cookie)
+    return user !== undefined && user.username === get_username(info.req.headers.cookie, info.req.url)
 }
 
 exports.get_token = get_token

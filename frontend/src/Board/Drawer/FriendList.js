@@ -12,43 +12,44 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFocusUser } from '../../actions'
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    '& > *': {
+      margin: theme.spacing(1)
+    }
+  },
+  listStyles: {
+    width: '100%',
+    maxWidth: '36ch',
+    maxHeight: '60vh',
+    overflow: 'hidden',
+    overflowX: 'hidden',
+    '&:hover': {
+      overflow: 'auto',
+      overflowX: 'hidden'
+    },
+    '&::-webkit-scrollbar-track': {
+      padding: '2px',
+      backgroundColor: '#e8e8e8'
+    },
+    '&::-webkit-scrollbar': {
+      width: '3px'
+    },
+    '&::-webkit-scrollbar-thumb': {
+      borderRadius: '10px',
+      // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      backgroundColor: '#203152'
+    }
+  },
+  inline: {
+    display: 'inline-block'
+  }
+}))
+
 export default function FriendList() {
   const dispatch = useDispatch()
-  const classes = makeStyles((theme) => ({
-    root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1)
-      }
-    },
-    listStyles: {
-      width: '100%',
-      maxWidth: '36ch',
-      maxHeight: '60vh',
-      overflow: 'hidden',
-      overflowX: 'hidden',
-      '&:hover': {
-        overflow: 'auto',
-        overflowX: 'hidden'
-      },
-      '&::-webkit-scrollbar-track': {
-        padding: '2px',
-        backgroundColor: '#e8e8e8'
-      },
-      '&::-webkit-scrollbar': {
-        width: '3px'
-      },
-      '&::-webkit-scrollbar-thumb': {
-        borderRadius: '10px',
-        // box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-        backgroundColor: '#203152'
-      }
-    },
-    inline: {
-      display: 'inline-block'
-    }
-  }))
-
+  const classes = useStyles()
   const friendList = useSelector((state) => state.messages)
 
   return friendList.length === 0 ? null : (
