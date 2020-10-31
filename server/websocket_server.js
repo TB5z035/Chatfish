@@ -6,34 +6,22 @@ const cookie_parse = require('cookie').parse
 var manager = require('./connection-manager.js').instance()
 
 var get_token = function(cookie, url) {
-    if (cookie == undefined || cookie == null) {
-        var params = URL.parse(url, true).query
-        token = params.token
-        return token
+    var params = URL.parse(url, true).query
+    if (cookie === undefined || cookie === null) {
+        return params.token
     }
     var cookies = cookie_parse(cookie)
-    if ('token' in cookies)
-        token = cookies.token
-    else {
-        var params = URL.parse(url, true).query
-        token = params.token
-    }
+    var token = 'token' in cookies ? cookies.token : params.token
     return token
 }
 
 var get_username = function(cookie) {
-    if (cookie == undefined || cookie == null) {
-        var params = URL.parse(url, true).query
-        username = params.username
-        return username
+    var params = URL.parse(url, true).query
+    if (cookie === undefined || cookie === null) {
+        return params.username
     }
     var cookies = cookie_parse(cookie)
-    if ('username' in cookies)
-        username = cookies.username
-    else {
-        var params = URL.parse(url, true).query
-        username = params.username
-    }
+    var username = 'username' in cookies ? cookies.username : params.username
     return username
 }
 
