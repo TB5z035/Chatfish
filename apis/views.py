@@ -17,14 +17,14 @@ def get_data(request):
     print('Receive get request from nodejs.')
     return JsonResponse(data, safe = False)
 
-def login_varify(data):
+def login_verify(data):
     try:
         user = User.objects.get(name = data['username'])
         if user.pwd == data['password']:
             ret = {
                 'id': user.uid,
                 'state': 200,
-                'meesage': 'Successfully verified!'
+                'message': 'Successfully verified!'
             }
         else:
             ret = {
@@ -189,6 +189,8 @@ def insert_offline_message(data):
 
 def insert_user_meta(uid, meta_name, meta_val):
     try:
+        if uid <= 0:
+            raise Exception
         new_meta = UserMeta(uid = uid, meta_name = meta_name, meta_value = meta_val)
         new_meta.full_clean()
         new_meta.save()
@@ -199,7 +201,7 @@ def insert_user_meta(uid, meta_name, meta_val):
             'meta_value': meta_val
         }
     except:
-        ret ={
+        ret = {
             'status': 0
         }
     return ret
@@ -395,7 +397,7 @@ def accept_friend_request(data):
                 'friend_name': FindNameByUid(data.get('uid')).get('name')
             })
         else :
-            ret ={
+            ret = {
                 'state': 405,
                 'message': 'Invalid token or username or friend name!'
             }
@@ -567,7 +569,7 @@ def post_data(request):
             if 'type' not in data:
                 raise Exception("No type info!")
             if data['type'] == 'LOGIN_VERIFY':
-                ret = login_varify(data.get('user_info'))
+                ret = login_verify(data.get('user_info'))
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))
             elif data['type'] == 'ALL_MESSAGE':
@@ -643,6 +645,12 @@ def post_to_nodejs(data):
         'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key
     }
-    r = requests.post('http://localhost:3000', json = data, headers = headers)
-    ret = r.text
-    return JsonResponse(json.loads(ret))
+    try:
+        r = requests.post('http://localhost:3000', json = data, headers = headers)
+        ret = r.text
+        return JsonResponse(json.loads(ret))
+    except Exception as e:
+        return {
+            'state': 404,
+            'message': str(e)
+        }
