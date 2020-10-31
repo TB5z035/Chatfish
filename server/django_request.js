@@ -51,8 +51,8 @@ exports.post = function post(path, data, on_data_callback, on_err_callback) {
     var post_req = http.request(options, function(res) {
         res.setEncoding('utf-8')
         var body = ""
-        res.on('data', function(data) {
-            body += data
+        res.on('data', function(rec_data) {
+            body += rec_data
         })
         res.on("end", function() {
             try {
