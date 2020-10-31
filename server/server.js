@@ -116,7 +116,7 @@ var register_request = function(request, response, body) {
 var require_friend_list_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
         return
@@ -139,9 +139,10 @@ var require_friend_list_request = function(request, response, body) {
 var add_friend_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
     var data = {
         type: 'ADD_NEW_FRIEND',
@@ -162,9 +163,10 @@ var add_friend_request = function(request, response, body) {
 var agree_add_friend_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
     var data = {
         type: 'AGREE_ADD_NEW_FRIEND',
@@ -185,30 +187,22 @@ var agree_add_friend_request = function(request, response, body) {
 var add_group_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
 
     console.log('Receive add group request!')
     console.log(json_data)
     
-    if (json_data.type == 1) {
-        var data = {
-            type: 'ADD_GROUP',
-            uid: user.id,
-            friend_list: json_data.friend_list,
-            group_name: json_data.group_name
-        }
+    var data = {
+        type: 'ADD_GROUP',
+        uid: user.id,
+        friend_list: json_data.friend_list,
+        group_name: json_data.group_name
     }
-    else {
-        var data = {
-            type: 'ADD_GROUP',
-            uid: user.id,
-            friend_list: json_data.friend_list,
-            group_name: json_data.group_name
-        }
-    }
+    
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
             'Content-Type': 'application/json;charset=utf8',
@@ -223,9 +217,10 @@ var add_group_request = function(request, response, body) {
 var agree_add_group_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
     var data = {
         type: 'AGREE_ADD_GROUP',
@@ -246,9 +241,10 @@ var agree_add_group_request = function(request, response, body) {
 var response_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.username) {
         response.writeHead(403)
         response.end()
+        return
     }
     var data = {
         type: 'RESPONSE',
