@@ -3,7 +3,26 @@ Test suite for meeting
 '''
 import datetime, json, hashlib
 from django.test import Client, TestCase
-from apis.models import *
+from apis.models import User, UserMeta, Chat, ChatMeta, Message, OfflineMessage
+
+TEST_USER = 'test'
+TEST_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+TEST_EMAIL = 'test@admin.email'
+
+TEST_FRIEND_USER = 'friend'
+TEST_FRIEND_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+TEST_EMAIL = 'friend@admin.email'
+
+TEST_NEW_FRIEND_USER = 'new_friend'
+TEST_NEW_FRIEND_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+TEST_NEW_EMAIL = 'new_friend@admin.email'
+
+TEST_CONTENT = 'Test content'
+TEST_UPLOAD = 'Test upload!'
+PRIVATE_CHAT = 'private chat'
+GROUP_CHAT = 'test group'
+
+INVALID_USER = 'Invalid token or username or friend name!'
 
 class GetTest(TestCase):
     '''
@@ -26,15 +45,15 @@ class PostTest(TestCase):
     def setUp(self):
         super(PostTest, self).setUp()
         self.client = Client(enforce_csrf_checks = True)
-        User.objects.create(name = 'test', pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = 'test@admin.email')
-        self.uid1 = User.objects.get(name = 'test').uid
+        User.objects.create(name = TEST_USER, pwd = TEST_PWD, email = TEST_EMAIL)
+        self.uid1 = User.objects.get(name = TEST_USER).uid
 
-    def post_test(client, data):
+    def post_test(self, client, data):
         data = json.dumps(data)
         text_bytes = (data + ' post from ChatFish Server').encode('utf-8')
         sha1 = hashlib.sha1(text_bytes)
         key = sha1.hexdigest()
-        return client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, HTTP_CONNECTION = 'close', content_type = 'application/json')
+        return client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, content_type = 'application/json')
 
 class WrongPostTest(PostTest):
     '''
@@ -70,11 +89,11 @@ class LoginTest(PostTest):
         data = {
             'type': 'LOGIN_VERIFY',
             'user_info': {
-                'username': 'test',
+                'username': TEST_USER,
                 'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('id'), self.uid1)
@@ -85,11 +104,11 @@ class LoginTest(PostTest):
         data = {
             'type': 'LOGIN_VERIFY',
             'user_info': {
-                'username': 'test',
+                'username': TEST_USER,
                 'password': 'this is wrong'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 401)
@@ -103,7 +122,7 @@ class LoginTest(PostTest):
                 'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 400)
@@ -125,7 +144,7 @@ class RegisterTest(PostTest):
                 'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
@@ -135,11 +154,11 @@ class RegisterTest(PostTest):
         data = {
             'type': 'REGISTER_IN',
             'user_info': {
-                'username': 'test',
+                'username': TEST_USER,
                 'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 403)
@@ -152,7 +171,7 @@ class RegisterTest(PostTest):
                 'username': 'test_new'
             }
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 403)
@@ -165,51 +184,51 @@ class RequireFriendListTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = 'friend', pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = 'friend@admin.email')
-        self.uid2 = User.objects.get(name = 'friend').uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = 'friend', meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = 'friend', meta_value = str(self.uid1))
-        Chat.objects.create(name = 'private chat', ctype = 0)
-        self.cid1 = Chat.objects.get(name = 'private chat').cid
+        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
+        self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
-        Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = 'Test content')
+        Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT)
 
     def test_require_friend_list(self):
         data = {
             'type': 'REQUIRE_FRIEND_LIST',
             'uid': self.uid1
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
         self.assertEqual(res_json.get('message'), 'All message required successfully.')
         self.assertEqual(len(res_json.get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
-        self.assertEqual(res_json.get('message_list')[0].get('user'), 'friend')
+        self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), 'test')
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), 'Test content')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
     def test_all_message(self):
         data = {
             'type': 'ALL_MESSAGE',
             'uid': self.uid1
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
         self.assertEqual(res_json.get('message'), 'All message required successfully.')
         self.assertEqual(len(res_json.get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
-        self.assertEqual(res_json.get('message_list')[0].get('user'), 'friend')
+        self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), 'test')
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), 'Test content')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
 class MessageUploadTest(PostTest):
     '''
@@ -218,16 +237,16 @@ class MessageUploadTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = 'friend', pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = 'friend@admin.email')
-        self.uid2 = User.objects.get(name = 'friend').uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = 'friend', meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = 'friend', meta_value = str(self.uid1))
-        Chat.objects.create(name = 'private chat', ctype = 0)
-        self.cid1 = Chat.objects.get(name = 'private chat').cid
+        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
+        self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
-        Chat.objects.create(name = 'test group', ctype = 1)
-        self.cid2 = Chat.objects.get(name = 'test group').cid
+        Chat.objects.create(name = GROUP_CHAT, ctype = 1)
+        self.cid2 = Chat.objects.get(name = GROUP_CHAT).cid
         ChatMeta.objects.create(cid = self.cid2, meta_name = 'member', meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid2, meta_name = 'member', meta_value = str(self.uid2))
     
@@ -236,11 +255,11 @@ class MessageUploadTest(PostTest):
             'type': 'MESSAGE_UPLOAD',
             'is_group': 0,
             'uid': self.uid1,
-            'content': 'Test upload!',
-            'userName': 'test',
-            'friend_name': 'friend'
+            'content': TEST_UPLOAD,
+            'userName': TEST_USER,
+            'friend_name': TEST_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
@@ -251,11 +270,11 @@ class MessageUploadTest(PostTest):
             'type': 'MESSAGE_UPLOAD',
             'is_group': 0,
             'uid': self.uid1,
-            'content': 'Test upload!',
-            'userName': 'test',
+            'content': TEST_UPLOAD,
+            'userName': TEST_USER,
             'friend_name': 'NotFriend'
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 400)
@@ -266,11 +285,11 @@ class MessageUploadTest(PostTest):
             'type': 'MESSAGE_UPLOAD',
             'is_group': 1,
             'uid': self.uid1,
-            'content': 'Test upload!',
-            'userName': 'test',
-            'friend_name': 'test group'
+            'content': TEST_UPLOAD,
+            'userName': TEST_USER,
+            'friend_name': GROUP_CHAT
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
@@ -283,23 +302,23 @@ class AddFriendTest(PostTest):
 
     def setUp(self):
         super().setUp()
-        User.objects.create(name = 'friend', pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = 'friend@admin.email')
-        self.uid2 = User.objects.get(name = 'friend').uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = 'friend', meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = 'friend', meta_value = str(self.uid1))
-        Chat.objects.create(name = 'private chat', ctype = 0)
-        self.cid1 = Chat.objects.get(name = 'private chat').cid
+        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
+        self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
-        User.objects.create(name = 'new_friend', pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = 'new_friend@admin.email')
+        User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_NEW_EMAIL)
         
     def test_add_friend_success(self):
         data = {
             'type': 'ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'new_friend'
+            'friend_name': TEST_NEW_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
@@ -311,19 +330,19 @@ class AddFriendTest(PostTest):
             'uid': self.uid1,
             'friend_name': 'NotExist'
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
-        self.assertEqual(res_json.get('message'), 'Invalid token or username or friend name!')
+        self.assertEqual(res_json.get('message'), INVALID_USER)
     
     def test_add_friend_self(self):
         data = {
             'type': 'ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'test'
+            'friend_name': TEST_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 400)
@@ -333,9 +352,9 @@ class AddFriendTest(PostTest):
         data = {
             'type': 'ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'friend'
+            'friend_name': TEST_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 400)
@@ -345,9 +364,9 @@ class AddFriendTest(PostTest):
         data = {
             'type': 'AGREE_ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'new_friend'
+            'friend_name': TEST_NEW_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
@@ -359,19 +378,19 @@ class AddFriendTest(PostTest):
             'uid': self.uid1,
             'friend_name': 'NotExist'
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
-        self.assertEqual(res_json.get('message'), 'Invalid token or username or friend name!')
+        self.assertEqual(res_json.get('message'), INVALID_USER)
 
     def test_agree_new_friend_self(self):
         data = {
             'type': 'AGREE_ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'test'
+            'friend_name': TEST_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
@@ -381,9 +400,9 @@ class AddFriendTest(PostTest):
         data = {
             'type': 'AGREE_ADD_NEW_FRIEND',
             'uid': self.uid1,
-            'friend_name': 'friend'
+            'friend_name': TEST_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
@@ -393,10 +412,10 @@ class AddFriendTest(PostTest):
         data = {
             'type': 'AGREE_ADD_NEW_FRIEND',
             'uid': 0,
-            'friend_name': 'new_friend'
+            'friend_name': TEST_NEW_FRIEND_USER
         }
-        response = PostTest.post_test(self.client, data)
+        response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
-        self.assertEqual(res_json.get('message'), 'Invalid token or username or friend name!')
+        self.assertEqual(res_json.get('message'), INVALID_USER)
