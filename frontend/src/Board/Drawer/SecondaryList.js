@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addGroup } from '../../actions'
 import { useSnackbar } from 'notistack'
 import { postAddFriend } from '../../fetch/friend/addFriend'
+import { postAddGroup } from '../../fetch/friend/addGroup'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -101,40 +102,30 @@ export default function SecondaryList() {
         friendList.push(key)
       }
     })
-
-    const params = {
-      type: 0,
-      username: myName,
-      group_name: groupName,
-      friend_list: friendList
-    }
-    fetch('/?action=add_group', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) =>
-      res
-        .json()
-        .catch((error) => console.error('Error:', error))
-        .then((data) => {
-          if (
-            data != null &&
+    setSelectState({})
+    postAddGroup(0, myName, friendList, groupName)
+      .then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
                   Object.prototype.hasOwnProperty.call(data, 'state') &&
                   data['state'] === 200
-          ) {
-            dispatch(addGroup(groupName))
-            enqueueSnackbar('Successful create group: ' + groupName, {
-              variant: 'success'
-            })
-          } else {
-            enqueueSnackbar('The name of group already exists: ' + groupName, {
-              variant: 'error'
-            })
-          }
-        })
-    )
-    setSelectState({})
-  }, [selectState, groupName, myName, dispatch])
+            ) {
+              dispatch(addGroup(groupName))
+              enqueueSnackbar('Successful create group: ' + groupName, {
+                variant: 'success'
+              })
+            } else {
+              enqueueSnackbar('The name of group already exists: ' + groupName, {
+                variant: 'error'
+              })
+            }
+          })
+      )
+  }, [selectState, groupName, myName, dispatch, enqueueSnackbar])
 
   const handleChange = (event) => {
     setSelectState({

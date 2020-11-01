@@ -43,10 +43,12 @@ import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
-// import socket from '../reducers/socket'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 import MyDrawer from './Drawer/MyDrawer'
+import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
+import {requireFriendList} from "../fetch/message/requireFriendList";
+// import socket from '../reducers/socket'
 
 // function Copyright() {
 //   return (
@@ -234,31 +236,12 @@ export default function Dashboard() {
 
   const handleAddGroupRequest = useCallback(
     async (groupName) => {
-      const params = {
-        username: myName,
-        group_name: groupName
+      if (await postAgreeAddGroup(myName, groupName)) {
+        dispatch(addGroup(groupName))
+        enqueueSnackbar('Successful add group: ' + groupName, {
+          variant: 'success'
+        })
       }
-      fetch('/?action=agree_add_group', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res) =>
-        res
-          .json()
-          .catch((error) => console.error('Error:', error))
-          .then((data) => {
-            if (
-              data != null &&
-              Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200
-            ) {
-              dispatch(addGroup(groupName))
-              enqueueSnackbar('Successful add group: ' + groupName, {
-                variant: 'success'
-              })
-            }
-          })
-      )
     },
     [myName, dispatch, enqueueSnackbar]
   )
@@ -339,20 +322,14 @@ export default function Dashboard() {
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
-        const params = {
-          username: nameCookie
-        }
+
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
           setOnline(true)
           setInitWebSocket(true)
 
-          fetch('/?action=require_friend_list', {
-            method: 'POST',
-            body: JSON.stringify(params),
-            headers: { 'Content-Type': 'application/json' }
-          }).then((res) =>
+          requireFriendList(nameCookie).then((res) =>
             res
               .json()
               .catch((error) => console.error('Error:', error))
@@ -590,7 +567,7 @@ export default function Dashboard() {
           {friendToAddList.length === 0 && groupToAddList.length === 0 ? (
             <DialogContent>
               <Typography color="textsecondary" align="center">
-                No notification for now 😀
+                No notification for now <span role="img" aria-label="smile">😀</span>
               </Typography>
             </DialogContent>
           ) : (
