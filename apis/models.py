@@ -103,8 +103,8 @@ def fetch_friends(uid, number = -1): #depreciated api
     return ret
 
 def fetch_offline_message(ruid):
-    off_lineMsgs = OfflineMessage.objects.filter(ruid = ruid).values('mid')
-    ret = [ offline_Msg['mid'] for offline_Msg in offline_Msgs ]
+    offline_messages = OfflineMessage.objects.filter(ruid = ruid).values('mid')
+    ret = [ offline_message['mid'] for offline_message in offline_messages ]
     return ret
 
 def fetch_chat_type(cid):
@@ -113,8 +113,8 @@ def fetch_chat_type(cid):
     '''
 
 def fetch_chat_member(cid):
-    chatMembers = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
-    ret = [ int(chatMember['meta_value']) for chatMember in  chatMembers ] # invert to integer id.
+    chat_members = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
+    ret = [ int(chat_member['meta_value']) for chat_member in  chat_members ] # invert to integer id.
     return ret
 
 def fetch_chat_message(cid, number = 20):

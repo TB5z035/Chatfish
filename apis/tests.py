@@ -9,18 +9,20 @@ TEST_USER = 'test'
 TEST_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
 TEST_EMAIL = 'test@admin.email'
 
+FRIEND = 'friend'
+MEMBER = 'member'
+
 TEST_FRIEND_USER = 'friend'
-TEST_FRIEND_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
 TEST_EMAIL = 'friend@admin.email'
 
 TEST_NEW_FRIEND_USER = 'new_friend'
-TEST_NEW_FRIEND_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
 TEST_NEW_EMAIL = 'new_friend@admin.email'
 
 TEST_CONTENT = 'Test content'
 TEST_UPLOAD = 'Test upload!'
 PRIVATE_CHAT = 'private chat'
 GROUP_CHAT = 'test group'
+GROUP_NEW_CHAT = 'test new group'
 
 INVALID_USER = 'Invalid token or username or friend name!'
 
@@ -90,7 +92,7 @@ class LoginTest(PostTest):
             'type': 'LOGIN_VERIFY',
             'user_info': {
                 'username': TEST_USER,
-                'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+                'password': TEST_PWD
             }
         }
         response = self.post_test(self.client, data)
@@ -119,7 +121,7 @@ class LoginTest(PostTest):
             'type': 'LOGIN_VERIFY',
             'user_info': {
                 'username': 'test_wrong',
-                'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+                'password': TEST_PWD
             }
         }
         response = self.post_test(self.client, data)
@@ -141,7 +143,7 @@ class RegisterTest(PostTest):
             'type': 'REGISTER_IN',
             'user_info': {
                 'username': 'test_new',
-                'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+                'password': TEST_PWD
             }
         }
         response = self.post_test(self.client, data)
@@ -155,7 +157,7 @@ class RegisterTest(PostTest):
             'type': 'REGISTER_IN',
             'user_info': {
                 'username': TEST_USER,
-                'password': '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
+                'password': TEST_PWD
             }
         }
         response = self.post_test(self.client, data)
@@ -184,14 +186,14 @@ class RequireFriendListTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
         self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
         Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
         self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
         Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT)
 
     def test_require_friend_list(self):
@@ -237,18 +239,18 @@ class MessageUploadTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
         self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
         Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
         self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
         Chat.objects.create(name = GROUP_CHAT, ctype = 1)
         self.cid2 = Chat.objects.get(name = GROUP_CHAT).cid
-        ChatMeta.objects.create(cid = self.cid2, meta_name = 'member', meta_value = str(self.uid1))
-        ChatMeta.objects.create(cid = self.cid2, meta_name = 'member', meta_value = str(self.uid2))
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
     
     def test_private_message_upload_success(self):
         data = {
@@ -302,15 +304,15 @@ class AddFriendTest(PostTest):
 
     def setUp(self):
         super().setUp()
-        User.objects.create(name = TEST_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_EMAIL)
+        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
         self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
-        UserMeta.objects.create(uid = self.uid1, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid2))
-        UserMeta.objects.create(uid = self.uid2, meta_name = TEST_FRIEND_USER, meta_value = str(self.uid1))
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
         Chat.objects.create(name = PRIVATE_CHAT, ctype = 0)
         self.cid1 = Chat.objects.get(name = PRIVATE_CHAT).cid
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid1))
-        ChatMeta.objects.create(cid = self.cid1, meta_name = 'member', meta_value = str(self.uid2))
-        User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c', email = TEST_NEW_EMAIL)
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
+        User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = TEST_PWD, email = TEST_NEW_EMAIL)
         
     def test_add_friend_success(self):
         data = {
@@ -419,3 +421,131 @@ class AddFriendTest(PostTest):
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
         self.assertEqual(res_json.get('message'), INVALID_USER)
+
+class AddGroupTest(PostTest):
+    '''
+    TestCase for Add Group post request
+    '''
+
+    def setUp(self):
+        super().setUp()
+        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
+        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
+        self.cid1 = Chat.objects.create(name = PRIVATE_CHAT, ctype = 0).cid
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
+        User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = TEST_PWD, email = TEST_NEW_EMAIL)
+        self.uid3 = User.objects.get(name = TEST_NEW_FRIEND_USER).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid3))
+        UserMeta.objects.create(uid = self.uid3, meta_name = FRIEND, meta_value = str(self.uid1))
+        self.cid2 = Chat.objects.create(name = PRIVATE_CHAT, ctype = 0).cid
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid3))
+        self.cid3 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
+        ChatMeta.objects.create(cid = self.cid3, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid3, meta_name = MEMBER, meta_value = str(self.uid2))
+
+    def test_add_group_success(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'group_name': GROUP_NEW_CHAT,
+            'uid': self.uid1,
+            'friend_list': [
+                TEST_FRIEND_USER,
+                TEST_NEW_FRIEND_USER
+            ]
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully init group chat.')
+
+    def test_add_group_not_friend(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'group_name': GROUP_NEW_CHAT,
+            'uid': self.uid1,
+            'friend_list': [
+                TEST_FRIEND_USER,
+                'NotExist'
+            ]
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 403)
+        self.assertEqual(res_json.get('message'), 'Someone not friend.')
+
+    def test_add_group_invalid(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'group_name': PRIVATE_CHAT,
+            'uid': self.uid1,
+            'friend_list': [
+                TEST_FRIEND_USER,
+                TEST_NEW_FRIEND_USER
+            ]
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 403)
+        self.assertEqual(res_json.get('message'), 'Group name invalid.')
+
+    def test_add_group_without_friendlist(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'group_name': GROUP_CHAT,
+            'uid': self.uid1
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'No friend list available!')
+
+    def test_add_group_after_init(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'group_name': GROUP_CHAT,
+            'uid': self.uid1,
+            'friend_list': [
+                TEST_FRIEND_USER,
+                TEST_NEW_FRIEND_USER
+            ]
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully requested!')
+
+    def test_agree_add_group_success(self):
+        data = {
+            'type': 'AGREE_ADD_GROUP',
+            'group_name': GROUP_CHAT,
+            'uid': self.uid3,
+            'username': TEST_NEW_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully requested!')
+
+    def test_agree_add_group_fail(self):
+        data = {
+            'type': 'AGREE_ADD_GROUP',
+            'group_name': 'NotExist',
+            'uid': self.uid3,
+            'username': TEST_NEW_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'No group with this name!')
+        
