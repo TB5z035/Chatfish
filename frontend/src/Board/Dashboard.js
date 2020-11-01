@@ -47,7 +47,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 import MyDrawer from './Drawer/MyDrawer'
 import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
-import {requireFriendList} from "../fetch/message/requireFriendList";
+import { requireFriendList } from '../fetch/message/requireFriendList'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
