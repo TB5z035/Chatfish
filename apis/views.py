@@ -265,21 +265,13 @@ def init_group_chat(data): # one man group
                     'message': 'Someone not friend.'
                 }
 
-        if find_cid_by_name(data.get('name')).get('find') == 1:
-            print('Same group name.')
-            return {
-                'state': 403,
-                'message': 'Same group name.'
-            }
         new_chat = Chat(ctype = 1, name = data.get('name'))
         new_chat.full_clean()
         new_chat.save()
         insert_user_to_chat(data.get('user'), new_chat.cid)
         ret = {
             'state': 200,
-            'message': 'Successfully init group chat.',
-            'cid': new_chat.cid,
-            'uid': data.get('user')
+            'message': 'Successfully init group chat.'
         }
 
         for friend in data.get('friend_list'):
@@ -572,17 +564,23 @@ def post_data(request):
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
                 ret = accept_friend_request(data)
             elif data['type'] == 'ADD_GROUP':
-                cid_ret = find_cid_by_name(data.get('group_name'))
-                if cid_ret.get('find') == 0:
-                    # init a chat
-                    ret = init_group_chat({
-                        'name': data.get('group_name'),
-                        'user': data.get('uid'),
-                        'friend_list': data.get('friend_list')
-                    })
-                else :
-                    # add user to chat
-                    ret = add_users_to_chat(data, cid_ret.get('cid'))
+                if data.get('group_name') == 'private chat':
+                    ret = {
+                        'state': 403,
+                        'message': 'Group name invalid.'
+                    }
+                else:
+                    cid_ret = find_cid_by_name(data.get('group_name'))
+                    if cid_ret.get('find') == 0:
+                        # init a chat
+                        ret = init_group_chat({
+                            'name': data.get('group_name'),
+                            'user': data.get('uid'),
+                            'friend_list': data.get('friend_list')
+                        })
+                    else :
+                        # add user to chat
+                        ret = add_users_to_chat(data, cid_ret.get('cid'))
             elif data['type'] == 'AGREE_ADD_GROUP':
                 ret = accept_add_to_chat_request(data)
             elif data['type'] == 'RESPONSE':
