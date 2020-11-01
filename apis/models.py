@@ -24,6 +24,10 @@ class Message(models.Model):
     '''
     mtype:
         normal: normal msg.
+        enter: enter group msg.
+        picture: picture msg.
+        video: video msg.
+        file: other file msg.
         ...
     '''
     mid = models.BigAutoField(primary_key = True)

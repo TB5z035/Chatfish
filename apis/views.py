@@ -114,6 +114,7 @@ def init_private_message(data):
             'state': 200,
             'type': 'MESSAGE_NOTIFY',
             'content': data.get('content'),
+            'mtype': data.get('mtype'),
             'username': data.get('friend_name'),
             'friend_name': data.get('username'),
             'uid': find_uid_by_name(data.get('friend_name')).get('uid')
@@ -147,6 +148,7 @@ def init_group_message(data):
                     'type': 'MESSAGE_NOTIFY',
                     'is_group': 1,
                     'content': data.get('content'),
+                    'mtype': data.get('mtype'),
                     'username': data.get('group_name'),
                     'friend_name': data.get('username'),
                     'uid': member
@@ -484,7 +486,7 @@ def message_upload(data):
             init_group_message({
                 'cid': this_cid,
                 'uid': data.get('uid'),
-                'mtype': 'normal',
+                'mtype': data.get('mtype') if 'mtype' in data else 'normal',
                 'content': data.get('content'),
                 'username': data.get('userName'),
                 'group_name': data.get('friend_name')
@@ -500,7 +502,7 @@ def message_upload(data):
             init_private_message({
                 'cid': this_cid,
                 'uid': data.get('uid'),
-                'mtype': 'normal',
+                'mtype': data.get('mtype') if 'mtype' in data else 'normal',
                 'content': data.get('content'),
                 'username': data.get('userName'),
                 'friend_name': data.get('friend_name')
