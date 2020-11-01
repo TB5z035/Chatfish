@@ -522,4 +522,30 @@ class AddGroupTest(PostTest):
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
         self.assertEqual(res_json.get('message'), 'Successfully requested!')
+
+    def test_agree_add_group_success(self):
+        data = {
+            'type': 'AGREE_ADD_GROUP',
+            'group_name': GROUP_CHAT,
+            'uid': self.uid3,
+            'username': TEST_NEW_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully requested!')
+
+    def test_agree_add_group_fail(self):
+        data = {
+            'type': 'AGREE_ADD_GROUP',
+            'group_name': 'NotExist',
+            'uid': self.uid3,
+            'username': TEST_NEW_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'No group with this name!')
         
