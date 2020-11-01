@@ -65,7 +65,7 @@ def register_in(data):
     return ret
 
 def insert_user_to_chat(uid, cid):
-    ret = insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
+    insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
 
 def init_message(data): # depreciated API
     try:
@@ -566,7 +566,6 @@ def post_data(request):
             elif data['type'] == 'MESSAGE_UPLOAD':
                 ret = message_upload(data)
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
-                # ret = fetch_friends(data.get('uid'))
                 ret = fetch_all_message(data.get('uid'))
             elif data['type'] == 'ADD_NEW_FRIEND':
                 ret = add_friend(data)
