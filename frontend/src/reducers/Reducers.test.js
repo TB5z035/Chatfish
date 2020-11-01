@@ -207,6 +207,29 @@ describe('chat reducer', () => {
       theme: null,
       drawerOpen: false
     })
+    expect(
+      reducer(
+        {
+          socket: null,
+          focusUser: 'focusUser',
+          messages: [],
+          myName: 'name',
+          theme: null,
+          drawerOpen: false
+        },
+        {
+          type: types.SET_DRAWER_OPEN,
+          open: true
+        }
+      )
+    ).toEqual({
+      socket: null,
+      focusUser: 'focusUser',
+      messages: [],
+      myName: 'name',
+      theme: null,
+      drawerOpen: true
+    })
   })
 
   it('should handle setMessageList', () => {
