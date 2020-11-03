@@ -269,7 +269,7 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-<<<<<<< HEAD
+
   const refuseAddFriendRequest = useCallback(async (refusedUsername, friendName) => {
     if (await postDisagreeAddFriend(myName, refusedUsername)) {
       dispatch(deleteRequest(0, refusedUsername))
@@ -281,25 +281,7 @@ export default function Dashboard() {
       dispatch(deleteRequest(1, refusedGroupName))
     }
   }, [dispatch, myName])
-=======
-  const refuseAddFriendRequest = useCallback(
-    async (refusedUsername) => {
-      if (await postDisagreeAddFriend(myName, refusedUsername)) {
-        dispatch(deleteRequest(0, refusedUsername))
-      }
-    },
-    [myName, dispatch]
-  )
 
-  const refuseAddGroupRequest = useCallback(
-    async (refusedGroupName) => {
-      if (await postDisagreeAddGroup(myName, refusedGroupName)) {
-        dispatch(deleteRequest(1, refusedGroupName))
-      }
-    },
-    [dispatch, myName]
-  )
->>>>>>> bde4894d72fd7821f1ef9a2e5c29a42913cf688e
   const handleReply = async (message) => {
     const params = {
       response: message
