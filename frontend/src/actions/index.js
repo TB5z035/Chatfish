@@ -55,3 +55,21 @@ export const setDrawerOpen = (drawerOpen) => ({
   type: types.SET_DRAWER_OPEN,
   open: drawerOpen
 })
+
+export const setRequestList = (requests) => ({
+  type: types.SET_REQUEST_LIST,
+  requests: requests
+})
+
+export const addRequest = (isGroup, user, friend) => ({
+  type: types.ADD_REQUEST,
+  isGroup: isGroup,
+  user: user,
+  friend_name: friend
+})
+
+export const deleteRequest = (isGroup, user) => ({
+  type: types.DELETE_REQUEST,
+  isGroup: isGroup,
+  user: user
+})

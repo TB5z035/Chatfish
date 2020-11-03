@@ -11,7 +11,7 @@ import {
   setTheme,
   setFocusUser,
   addGroup,
-  setDrawerOpen
+  setDrawerOpen, addRequest, deleteRequest
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -202,9 +202,28 @@ export default function Dashboard() {
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
+  const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
 
   const [online, setOnline] = useState(false)
+
+  useEffect(() => {
+    const friends = []
+    const groups = []
+    for (let i = 0, len = requestList.length; i < len; i++) {
+      const request = requestList[i]
+      if (request.isGroup === 0) {
+        friends.push(request.user)
+      } else {
+        groups.push({
+          groupName: request.user,
+          friendName: request.friendName
+        })
+      }
+    }
+    setFriendToAddList(friends)
+    setGroupToAddList(groups)
+  }, [requestList, setGroupToAddList, setFriendToAddList])
 
   const handleAddFriendRequest = useCallback(
     async (friendName) => {
@@ -246,20 +265,22 @@ export default function Dashboard() {
     [myName, dispatch, enqueueSnackbar]
   )
   const refuseAddFriendRequest = (refusedUsername) => {
-    const index = friendToAddList.indexOf(refusedUsername)
-    const newArray = [...friendToAddList]
-    newArray.splice(index, 1)
-    setFriendToAddList(newArray)
+    // const index = friendToAddList.indexOf(refusedUsername)
+    // const newArray = [...friendToAddList]
+    // newArray.splice(index, 1)
+    // setFriendToAddList(newArray)
+    dispatch(deleteRequest(0, refusedUsername))
   }
   const refuseAddGroupRequest = (refusedGroupName) => {
-    const newArray = [...groupToAddList]
-    for (var i = 0; i < groupToAddList.length; i++) {
-      if (groupToAddList[i]['groupName'] === refusedGroupName) {
-        newArray.splice(i, 1)
-        setGroupToAddList(newArray)
-        break
-      }
-    }
+    // const newArray = [...groupToAddList]
+    // for (var i = 0; i < groupToAddList.length; i++) {
+    //   if (groupToAddList[i]['groupName'] === refusedGroupName) {
+    //     newArray.splice(i, 1)
+    //     setGroupToAddList(newArray)
+    //     break
+    //   }
+    // }
+    dispatch(deleteRequest(1, refusedGroupName))
   }
   const handleReply = async (message) => {
     const params = {
@@ -379,20 +400,11 @@ export default function Dashboard() {
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
-                setFriendToAddList([
-                  ...friendToAddList,
-                  receivedData['friend_name']
-                ])
+                dispatch(addRequest(0, receivedData['friend_name'], receivedData['friend_name']))
                 break
               case 'NEW_ADD_GROUP':
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
-                setGroupToAddList([
-                  ...groupToAddList,
-                  {
-                    groupName: receivedData['group_name'],
-                    friendName: receivedData['friend_name']
-                  }
-                ])
+                dispatch(addRequest(0, receivedData['group_name'], receivedData['friend_name']))
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
@@ -483,10 +495,10 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 || groupToAddList.length !== 0 ? (
+              { requestList.length !== 0 ? (
                 <Badge
                   badgeContent={(
-                    friendToAddList.length + groupToAddList.length
+                    requestList.length
                   ).toString()}
                   color="secondary"
                 >

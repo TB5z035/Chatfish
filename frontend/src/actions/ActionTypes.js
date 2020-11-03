@@ -13,3 +13,7 @@ export const ADD_GROUP = 'ADD_GROUP'
 export const SET_THEME = 'SET_THEME'
 
 export const SET_DRAWER_OPEN = 'SET_DRAWER_OPEN'
+
+export const SET_REQUEST_LIST = 'SET_REQUEST_LIST'
+export const ADD_REQUEST = 'ADD_REQUEST'
+export const DELETE_REQUEST = 'DELETE_REQUEST'
