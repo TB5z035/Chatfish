@@ -400,7 +400,7 @@ export default function Dashboard() {
                 break
               case 'NEW_ADD_GROUP':
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
-                dispatch(addRequest(0, receivedData['group_name'], receivedData['friend_name']))
+                dispatch(addRequest(1, receivedData['group_name'], receivedData['friend_name']))
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()

@@ -22,9 +22,9 @@ const requests = (state = initialState, action) => {
 }
 
 const initialState = [
-  { user: 'test', isGroup: 1, friend_name: 'super' },
-  { user: 'Alice', isGroup: 0, friend_name: '2345' },
-  { user: 'Alice', isGroup: 1, friend_name: '2345' }
+  // { user: 'test', isGroup: 1, friend_name: 'super' },
+  // { user: 'Alice', isGroup: 0, friend_name: '2345' },
+  // { user: 'Alice', isGroup: 1, friend_name: '2345' }
 ]
 
 export default requests
