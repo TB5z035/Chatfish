@@ -11,7 +11,7 @@ import {
   setTheme,
   setFocusUser,
   addGroup,
-  setDrawerOpen, addRequest, deleteRequest
+  setDrawerOpen, addRequest, deleteRequest, setRequestList
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -48,6 +48,8 @@ import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 import MyDrawer from './Drawer/MyDrawer'
 import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
+import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
+import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -264,24 +266,17 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddFriendRequest = (refusedUsername) => {
-    // const index = friendToAddList.indexOf(refusedUsername)
-    // const newArray = [...friendToAddList]
-    // newArray.splice(index, 1)
-    // setFriendToAddList(newArray)
-    dispatch(deleteRequest(0, refusedUsername))
-  }
-  const refuseAddGroupRequest = (refusedGroupName) => {
-    // const newArray = [...groupToAddList]
-    // for (var i = 0; i < groupToAddList.length; i++) {
-    //   if (groupToAddList[i]['groupName'] === refusedGroupName) {
-    //     newArray.splice(i, 1)
-    //     setGroupToAddList(newArray)
-    //     break
-    //   }
-    // }
-    dispatch(deleteRequest(1, refusedGroupName))
-  }
+  const refuseAddFriendRequest = useCallback(async (refusedUsername) => {
+    if (await postDisagreeAddFriend(myName, refusedUsername)) {
+      dispatch(deleteRequest(0, refusedUsername))
+    }
+  }, [myName, dispatch])
+
+  const refuseAddGroupRequest = useCallback(async (refusedGroupName) => {
+    if (await postDisagreeAddGroup(myName, refusedGroupName)) {
+      dispatch(deleteRequest(1, refusedGroupName))
+    }
+  }, [dispatch, myName])
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -361,6 +356,7 @@ export default function Dashboard() {
                   data['state'] === 200
                 ) {
                   dispatch(setMessageList(data['message_list']))
+                  dispatch(setRequestList(data['request_list']))
                 }
               })
           )
