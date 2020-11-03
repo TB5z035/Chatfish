@@ -219,7 +219,7 @@ export default function Dashboard() {
       } else {
         groups.push({
           groupName: request.user,
-          friendName: request.friendName
+          friendName: request.friend_name
         })
       }
     }
