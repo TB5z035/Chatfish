@@ -556,10 +556,10 @@ export default function Dashboard() {
           justifyContent="center"
           margin={2}
         >
+          {/* <Chatroom />
           <Chatroom />
           <Chatroom />
-          <Chatroom />
-          <Chatroom />
+          <Chatroom /> */}
           <Chatroom />
         </Box>
       </main>
