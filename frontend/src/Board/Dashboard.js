@@ -228,7 +228,7 @@ export default function Dashboard() {
   }, [requestList, setGroupToAddList, setFriendToAddList])
 
   const handleAddFriendRequest = useCallback(
-    async (friendName) => {
+    async (friendName, inviter) => {
       if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
@@ -256,8 +256,8 @@ export default function Dashboard() {
   )
 
   const handleAddGroupRequest = useCallback(
-    async (groupName) => {
-      if (await postAgreeAddGroup(myName, groupName)) {
+    async (groupName, friendName) => {
+      if (await postAgreeAddGroup(myName, groupName, friendName)) {
         dispatch(addGroup(groupName))
         enqueueSnackbar('Successful add group: ' + groupName, {
           variant: 'success'
@@ -266,14 +266,14 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddFriendRequest = useCallback(async (refusedUsername) => {
+  const refuseAddFriendRequest = useCallback(async (refusedUsername, friendName) => {
     if (await postDisagreeAddFriend(myName, refusedUsername)) {
       dispatch(deleteRequest(0, refusedUsername))
     }
   }, [myName, dispatch])
 
-  const refuseAddGroupRequest = useCallback(async (refusedGroupName) => {
-    if (await postDisagreeAddGroup(myName, refusedGroupName)) {
+  const refuseAddGroupRequest = useCallback(async (refusedGroupName, friendName) => {
+    if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
       dispatch(deleteRequest(1, refusedGroupName))
     }
   }, [dispatch, myName])

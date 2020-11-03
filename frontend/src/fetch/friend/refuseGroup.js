@@ -1,10 +1,11 @@
 import { post } from '../post'
 
-export async function postDisagreeAddGroup(username, groupName) {
+export async function postDisagreeAddGroup(username, groupName, friendName) {
   let isSend = null
   const params = {
     username: username,
-    group_name: groupName
+    group_name: groupName,
+    friend_name: friendName
   }
 
   await post('/?action=disagree_add_group', params).then((res) =>
