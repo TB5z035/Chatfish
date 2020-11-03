@@ -410,14 +410,14 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          // if (!initWebSocket) { history.push('/sign') }
+          if (!initWebSocket) { history.push('/sign') }
           setOnline(false)
         }
         socket.onclose = (event) => {
           setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()

@@ -76,21 +76,21 @@ const messages = (state = initialState, action) => {
 }
 
 const initialState = [
-  { user: 'testusertestusertestusertestusertestusertestusertestusertestusertestuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'Alice', isGroup: 0, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] },
-  { user: 'testuser', isGroup: 1, message_list: [] }
+  // { user: 'testusertestusertestusertestusertestusertestusertestusertestusertestuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'Alice', isGroup: 0, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser', isGroup: 1, message_list: [] }
 ]
 
 export default messages
