@@ -4,7 +4,7 @@ export async function postAgreeAddGroup(username, groupName, friendName) {
   let isSend = null
   const params = {
     username: username,
-    group_name: groupName, 
+    group_name: groupName,
     friend_name: friendName
   }
 
