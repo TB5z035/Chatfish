@@ -145,8 +145,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(4)
   },
   box: {
-    padding: theme.spacing(4),
-    minWidth: 300 // fixme: not working!
+    // padding: theme.spacing(4),
+    margin: theme.spacing(4),
   },
   paper: {
     padding: theme.spacing(2),
@@ -318,7 +318,8 @@ export default function Dashboard() {
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new ReconnectingWebSocket(
-          'wss://' + window.location.host + '/ws'
+          // 'wss://' + window.location.host + '/ws'
+          'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
@@ -409,14 +410,14 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          if (!initWebSocket) { history.push('/sign') }
+          // if (!initWebSocket) { history.push('/sign') }
           setOnline(false)
         }
         socket.onclose = (event) => {
           setOnline(false)
         }
       } else {
-        history.push('/sign')
+        // history.push('/sign')
       }
     }
     setWebSocket().then()
@@ -549,10 +550,17 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Box display="flex" flexDirection="row" justifyContent="center">
-          <Box className={classes.box}>
-            <Chatroom />
-          </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="center"
+          margin={2}
+        >
+          <Chatroom />
+          <Chatroom />
+          <Chatroom />
+          <Chatroom />
+          <Chatroom />
         </Box>
       </main>
 
