@@ -11,7 +11,10 @@ import {
   setTheme,
   setFocusUser,
   addGroup,
-  setDrawerOpen, addRequest, deleteRequest, setRequestList
+  setDrawerOpen,
+  addRequest,
+  deleteRequest,
+  setRequestList
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -147,8 +150,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(4)
   },
   box: {
-    padding: theme.spacing(4),
-    minWidth: 300 // fixme: not working!
+    // padding: theme.spacing(4),
+    margin: theme.spacing(4)
   },
   paper: {
     padding: theme.spacing(2),
@@ -266,17 +269,23 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddFriendRequest = useCallback(async (refusedUsername) => {
-    if (await postDisagreeAddFriend(myName, refusedUsername)) {
-      dispatch(deleteRequest(0, refusedUsername))
-    }
-  }, [myName, dispatch])
+  const refuseAddFriendRequest = useCallback(
+    async (refusedUsername) => {
+      if (await postDisagreeAddFriend(myName, refusedUsername)) {
+        dispatch(deleteRequest(0, refusedUsername))
+      }
+    },
+    [myName, dispatch]
+  )
 
-  const refuseAddGroupRequest = useCallback(async (refusedGroupName) => {
-    if (await postDisagreeAddGroup(myName, refusedGroupName)) {
-      dispatch(deleteRequest(1, refusedGroupName))
-    }
-  }, [dispatch, myName])
+  const refuseAddGroupRequest = useCallback(
+    async (refusedGroupName) => {
+      if (await postDisagreeAddGroup(myName, refusedGroupName)) {
+        dispatch(deleteRequest(1, refusedGroupName))
+      }
+    },
+    [dispatch, myName]
+  )
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -334,7 +343,8 @@ export default function Dashboard() {
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new ReconnectingWebSocket(
-          'wss://' + window.location.host + '/ws'
+          // 'wss://' + window.location.host + '/ws'
+          'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
@@ -396,11 +406,23 @@ export default function Dashboard() {
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
-                dispatch(addRequest(0, receivedData['friend_name'], receivedData['friend_name']))
+                dispatch(
+                  addRequest(
+                    0,
+                    receivedData['friend_name'],
+                    receivedData['friend_name']
+                  )
+                )
                 break
               case 'NEW_ADD_GROUP':
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
-                dispatch(addRequest(1, receivedData['group_name'], receivedData['friend_name']))
+                dispatch(
+                  addRequest(
+                    1,
+                    receivedData['group_name'],
+                    receivedData['friend_name']
+                  )
+                )
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
@@ -417,7 +439,9 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          if (!initWebSocket) { history.push('/sign') }
+          if (!initWebSocket) {
+            history.push('/sign')
+          }
           setOnline(false)
         }
         socket.onclose = (event) => {
@@ -491,11 +515,9 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              { requestList.length !== 0 ? (
+              {requestList.length !== 0 ? (
                 <Badge
-                  badgeContent={(
-                    requestList.length
-                  ).toString()}
+                  badgeContent={requestList.length.toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -557,10 +579,17 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Box display="flex" flexDirection="row" justifyContent="center">
-          <Box className={classes.box}>
-            <Chatroom />
-          </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="center"
+          margin={2}
+        >
+          {/* <Chatroom />
+          <Chatroom />
+          <Chatroom />
+          <Chatroom /> */}
+          <Chatroom />
         </Box>
       </main>
 
@@ -575,7 +604,10 @@ export default function Dashboard() {
           {friendToAddList.length === 0 && groupToAddList.length === 0 ? (
             <DialogContent>
               <Typography color="textsecondary" align="center">
-                No notification for now <span role="img" aria-label="smile">😀</span>
+                No notification for now{' '}
+                <span role="img" aria-label="smile">
+                  😀
+                </span>
               </Typography>
             </DialogContent>
           ) : (
