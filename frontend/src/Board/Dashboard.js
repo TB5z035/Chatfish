@@ -222,10 +222,11 @@ export default function Dashboard() {
         groupName: request.user,
         friendName: request.friend_name
       }
-      if (request.isGroup === 0 && !friends.includes(request.user))
+      if (request.isGroup === 0 && !friends.includes(request.user)) {
         friends.push(request.user)
-      else if (request.isGroup === 1 && !groups.includes(tempItem))
+      } else if (request.isGroup === 1 && !groups.includes(tempItem)) {
         groups.push(tempItem)
+      }
     })
     setFriendToAddList(friends)
     setGroupToAddList(groups)
