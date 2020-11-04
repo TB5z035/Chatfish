@@ -239,7 +239,7 @@ export default function Dashboard() {
       } else if (
         friendList
           .map((user) => {
-            return user.user
+            return user.isGroup === 0 ? user.user : null
           })
           .includes(friendName)
       ) {
@@ -249,6 +249,7 @@ export default function Dashboard() {
       } else {
         if (await postAgreeAddFriend(myName, friendName)) {
           dispatch(addFriend(friendName))
+          dispatch(deleteRequest(0, friendName))
           enqueueSnackbar('Successful add friend: ' + friendName, {
             variant: 'success'
           })
@@ -262,6 +263,7 @@ export default function Dashboard() {
     async (groupName, friendName) => {
       if (await postAgreeAddGroup(myName, groupName, friendName)) {
         dispatch(addGroup(groupName))
+        dispatch(deleteRequest(1, groupName))
         enqueueSnackbar('Successful add group: ' + groupName, {
           variant: 'success'
         })
