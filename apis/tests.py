@@ -205,7 +205,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
-        self.assertEqual(res_json.get('message'), 'All message required successfully.')
+        self.assertEqual(res_json.get('message'), 'Successfully fetched.')
         self.assertEqual(len(res_json.get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
