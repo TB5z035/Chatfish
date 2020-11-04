@@ -58,10 +58,18 @@ class ChatMeta(models.Model):
     meta_name = models.CharField(max_length = 15)
     meta_value = models.TextField()
 
+class OfflineRequest(models.Model):
+    id = models.BigAutoField(primary_key = True)
+    ruid = models.IntegerField(blank = False, default = 0)
+    suid = models.IntegerField(blank = False, default = 0)
+    name = models.CharField(max_length = 20)
+    req_type = models.IntegerField(blank = False, default = 0)
+
 class OfflineMessage(models.Model):
     id = models.BigAutoField(primary_key = True)
     ruid = models.IntegerField(blank = False, default = 0)
     mid = models.IntegerField(blank = False, default = 0)
+    cid = models.IntegerField(blank = False, default = 0)
 
 def test_func():
     '''
@@ -123,7 +131,12 @@ def fetch_chat_member(cid):
 
 def fetch_chat_message(cid, number = 20):
     msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
-    ret = [ { 'type': msg['mtype'], 'time': msg['time'], 'from': find_name_by_uid(msg['uid']).get('name'), 'content': msg['content'] } for msg in msgs ]
+    ret = [ { 
+        'type': msg['mtype'],
+        'time': msg['time'],
+        'from': find_name_by_uid(msg['uid']).get('name'),
+        'content': msg['content'],
+    } for msg in msgs ]
     return ret
 
 def fetch_all_message(uid, number = -1):
@@ -149,6 +162,28 @@ def fetch_all_message(uid, number = -1):
             'message': 'Failed in fetching all message.'
         }
     print('fetch all message.')
+    print(ret)
+    return ret
+
+def fetch_all_offline_request(uid, number = -1):
+    try:
+        requests = OfflineRequest.objects.filter(ruid = uid)
+        request_list = [{
+            'isGroup': request.req_type,
+            'user': request.name,
+            'friend_name': find_name_by_uid(request.suid).get('name') 
+        } for request in requests ]
+        ret = {
+            'state': 200,
+            'message': 'All requests required successfully.',
+            'request_list': request_list
+        }
+    except Exception:
+        ret = {
+            'state': 400,
+            'message': 'Failed in fetching all requests.'
+        }
+    print('fetch all requests.')
     print(ret)
     return ret
 
