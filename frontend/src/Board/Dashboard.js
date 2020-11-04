@@ -215,17 +215,18 @@ export default function Dashboard() {
   useEffect(() => {
     const friends = []
     const groups = []
-    for (let i = 0, len = requestList.length; i < len; i++) {
-      const request = requestList[i]
-      if (request.isGroup === 0) {
-        friends.push(request.user)
-      } else {
-        groups.push({
-          groupName: request.user,
-          friendName: request.friend_name
-        })
+
+    requestList.map((item) => {
+      const request = item
+      const tempItem = {
+        groupName: request.user,
+        friendName: request.friend_name
       }
-    }
+      if (request.isGroup === 0 && !friends.includes(request.user))
+        friends.push(request.user)
+      else if (request.isGroup === 1 && !groups.includes(tempItem))
+        groups.push(tempItem)
+    })
     setFriendToAddList(friends)
     setGroupToAddList(groups)
   }, [requestList, setGroupToAddList, setFriendToAddList])
@@ -272,17 +273,23 @@ export default function Dashboard() {
     [myName, dispatch, enqueueSnackbar]
   )
 
-  const refuseAddFriendRequest = useCallback(async (refusedUsername, friendName) => {
-    if (await postDisagreeAddFriend(myName, refusedUsername)) {
-      dispatch(deleteRequest(0, refusedUsername))
-    }
-  }, [myName, dispatch])
+  const refuseAddFriendRequest = useCallback(
+    async (refusedUsername, friendName) => {
+      if (await postDisagreeAddFriend(myName, refusedUsername)) {
+        dispatch(deleteRequest(0, refusedUsername))
+      }
+    },
+    [myName, dispatch]
+  )
 
-  const refuseAddGroupRequest = useCallback(async (refusedGroupName, friendName) => {
-    if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
-      dispatch(deleteRequest(1, refusedGroupName))
-    }
-  }, [dispatch, myName])
+  const refuseAddGroupRequest = useCallback(
+    async (refusedGroupName, friendName) => {
+      if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
+        dispatch(deleteRequest(1, refusedGroupName))
+      }
+    },
+    [dispatch, myName]
+  )
 
   const handleReply = async (message) => {
     const params = {
