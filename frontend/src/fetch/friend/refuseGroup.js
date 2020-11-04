@@ -1,6 +1,6 @@
 import { post } from '../post'
 
-export async function postAgreeAddGroup(username, groupName, friendName) {
+export async function postDisagreeAddGroup(username, groupName, friendName) {
   let isSend = null
   const params = {
     username: username,
@@ -8,7 +8,7 @@ export async function postAgreeAddGroup(username, groupName, friendName) {
     friend_name: friendName
   }
 
-  await post('/?action=agree_add_group', params).then((res) =>
+  await post('/?action=disagree_add_group', params).then((res) =>
     res
       .json()
       .catch((error) => console.error('Error:', error))

@@ -5,6 +5,7 @@ import focusUser from './focusUser'
 import myName from './myName'
 import theme from './theme'
 import drawerOpen from './drawerOpen'
+import requests from './requests'
 
 const chat = combineReducers({
   socket,
@@ -12,7 +13,8 @@ const chat = combineReducers({
   messages,
   myName,
   theme,
-  drawerOpen
+  drawerOpen,
+  requests
 })
 
 export default chat

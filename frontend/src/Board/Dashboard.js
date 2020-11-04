@@ -11,7 +11,10 @@ import {
   setTheme,
   setFocusUser,
   addGroup,
-  setDrawerOpen
+  setDrawerOpen,
+  addRequest,
+  deleteRequest,
+  setRequestList
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -48,6 +51,8 @@ import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 import MyDrawer from './Drawer/MyDrawer'
 import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
+import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
+import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -145,8 +150,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(4)
   },
   box: {
-    padding: theme.spacing(4),
-    minWidth: 300 // fixme: not working!
+    // padding: theme.spacing(4),
+    margin: theme.spacing(4)
   },
   paper: {
     padding: theme.spacing(2),
@@ -202,12 +207,31 @@ export default function Dashboard() {
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
+  const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
 
   const [online, setOnline] = useState(false)
 
+  useEffect(() => {
+    const friends = []
+    const groups = []
+    for (let i = 0, len = requestList.length; i < len; i++) {
+      const request = requestList[i]
+      if (request.isGroup === 0) {
+        friends.push(request.user)
+      } else {
+        groups.push({
+          groupName: request.user,
+          friendName: request.friend_name
+        })
+      }
+    }
+    setFriendToAddList(friends)
+    setGroupToAddList(groups)
+  }, [requestList, setGroupToAddList, setFriendToAddList])
+
   const handleAddFriendRequest = useCallback(
-    async (friendName) => {
+    async (friendName, inviter) => {
       if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
@@ -235,8 +259,8 @@ export default function Dashboard() {
   )
 
   const handleAddGroupRequest = useCallback(
-    async (groupName) => {
-      if (await postAgreeAddGroup(myName, groupName)) {
+    async (groupName, friendName) => {
+      if (await postAgreeAddGroup(myName, groupName, friendName)) {
         dispatch(addGroup(groupName))
         enqueueSnackbar('Successful add group: ' + groupName, {
           variant: 'success'
@@ -245,22 +269,19 @@ export default function Dashboard() {
     },
     [myName, dispatch, enqueueSnackbar]
   )
-  const refuseAddFriendRequest = (refusedUsername) => {
-    const index = friendToAddList.indexOf(refusedUsername)
-    const newArray = [...friendToAddList]
-    newArray.splice(index, 1)
-    setFriendToAddList(newArray)
-  }
-  const refuseAddGroupRequest = (refusedGroupName) => {
-    const newArray = [...groupToAddList]
-    for (var i = 0; i < groupToAddList.length; i++) {
-      if (groupToAddList[i]['groupName'] === refusedGroupName) {
-        newArray.splice(i, 1)
-        setGroupToAddList(newArray)
-        break
-      }
+
+  const refuseAddFriendRequest = useCallback(async (refusedUsername, friendName) => {
+    if (await postDisagreeAddFriend(myName, refusedUsername)) {
+      dispatch(deleteRequest(0, refusedUsername))
     }
-  }
+  }, [myName, dispatch])
+
+  const refuseAddGroupRequest = useCallback(async (refusedGroupName, friendName) => {
+    if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
+      dispatch(deleteRequest(1, refusedGroupName))
+    }
+  }, [dispatch, myName])
+
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -319,6 +340,7 @@ export default function Dashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new ReconnectingWebSocket(
           'wss://' + window.location.host + '/ws'
+          // 'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
@@ -340,6 +362,7 @@ export default function Dashboard() {
                   data['state'] === 200
                 ) {
                   dispatch(setMessageList(data['message_list']))
+                  dispatch(setRequestList(data['request_list']))
                 }
               })
           )
@@ -379,20 +402,23 @@ export default function Dashboard() {
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
-                setFriendToAddList([
-                  ...friendToAddList,
-                  receivedData['friend_name']
-                ])
+                dispatch(
+                  addRequest(
+                    0,
+                    receivedData['friend_name'],
+                    receivedData['friend_name']
+                  )
+                )
                 break
               case 'NEW_ADD_GROUP':
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
-                setGroupToAddList([
-                  ...groupToAddList,
-                  {
-                    groupName: receivedData['group_name'],
-                    friendName: receivedData['friend_name']
-                  }
-                ])
+                dispatch(
+                  addRequest(
+                    1,
+                    receivedData['group_name'],
+                    receivedData['friend_name']
+                  )
+                )
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
@@ -409,7 +435,9 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          if (!initWebSocket) { history.push('/sign') }
+          if (!initWebSocket) {
+            history.push('/sign')
+          }
           setOnline(false)
         }
         socket.onclose = (event) => {
@@ -483,11 +511,9 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 || groupToAddList.length !== 0 ? (
+              {requestList.length !== 0 ? (
                 <Badge
-                  badgeContent={(
-                    friendToAddList.length + groupToAddList.length
-                  ).toString()}
+                  badgeContent={requestList.length.toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -549,10 +575,17 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Box display="flex" flexDirection="row" justifyContent="center">
-          <Box className={classes.box}>
-            <Chatroom />
-          </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="center"
+          margin={2}
+        >
+          {/* <Chatroom />
+          <Chatroom />
+          <Chatroom />
+          <Chatroom /> */}
+          <Chatroom />
         </Box>
       </main>
 
@@ -567,7 +600,10 @@ export default function Dashboard() {
           {friendToAddList.length === 0 && groupToAddList.length === 0 ? (
             <DialogContent>
               <Typography color="textsecondary" align="center">
-                No notification for now <span role="img" aria-label="smile">😀</span>
+                No notification for now{' '}
+                <span role="img" aria-label="smile">
+                  😀
+                </span>
               </Typography>
             </DialogContent>
           ) : (
