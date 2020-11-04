@@ -741,7 +741,20 @@ def post_data(request):
             elif data['type'] == 'MESSAGE_UPLOAD':
                 ret = message_upload(data)
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
-                ret = fetch_all_message(data.get('uid'))
+                message_list_ret = fetch_all_message(data.get('uid'))
+                request_list_ret = fetch_all_offline_request(data.get('uid'))
+                if message_list_ret.get('state') == 200 and request_list_ret.get('state') == 200 :
+                    ret = {
+                        'state': 200,
+                        'message': 'Successfully fetched.',
+                        'message_list': message_list_ret.get('message_list'),
+                        'request_list': request_list_ret.get('request_list')
+                    }
+                else :
+                    ret = {
+                        'state': 400,
+                        'message': 'fetch failed.'
+                    }
             elif data['type'] == 'ADD_NEW_FRIEND':
                 ret = add_friend(data)
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
