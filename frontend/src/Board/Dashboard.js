@@ -263,15 +263,27 @@ export default function Dashboard() {
 
   const handleAddGroupRequest = useCallback(
     async (groupName, friendName) => {
-      if (await postAgreeAddGroup(myName, groupName, friendName)) {
-        dispatch(addGroup(groupName))
-        dispatch(deleteRequest(1, groupName))
-        enqueueSnackbar('Successful add group: ' + groupName, {
-          variant: 'success'
+      if (
+        friendList
+          .map((user) => {
+            return user.isGroup === 1 ? user.user : null
+          })
+          .includes(groupName)
+      ) {
+        enqueueSnackbar('You are already in the group ' + groupName, {
+          variant: 'warning'
         })
+      } else {
+        if (await postAgreeAddGroup(myName, groupName, friendName)) {
+          dispatch(addGroup(groupName))
+          dispatch(deleteRequest(1, groupName))
+          enqueueSnackbar('Successful add group: ' + groupName, {
+            variant: 'success'
+          })
+        }
       }
     },
-    [myName, dispatch, enqueueSnackbar]
+    [myName, dispatch, enqueueSnackbar, friendList]
   )
 
   const refuseAddFriendRequest = useCallback(
