@@ -6,6 +6,7 @@ import myName from './myName'
 import theme from './theme'
 import drawerOpen from './drawerOpen'
 import requests from './requests'
+import ossClient from './ossClient'
 
 const chat = combineReducers({
   socket,
@@ -14,7 +15,8 @@ const chat = combineReducers({
   myName,
   theme,
   drawerOpen,
-  requests
+  requests,
+  ossClient
 })
 
 export default chat

@@ -31,6 +31,11 @@ export const setSocket = (socket) => ({
   socket
 })
 
+export const setOSSClient = (client) => ({
+  type: types.SET_OSS_CLIENT,
+  client: client
+})
+
 export const setMyName = (myName) => ({
   type: types.SET_MY_NAME,
   myName

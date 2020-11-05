@@ -356,6 +356,15 @@ export default function Dashboard() {
 
     // * Set up WebSocket
     async function setWebSocket() {
+      // const OSS = require('ali-oss')
+      // const client = new OSS({
+      //   region: 'oss-cn-hangzhou',
+      //   accessKeyId: 'LTAIBMLqLQSqvsin',
+      //   accessKeySecret: '2nbRh2PdprS5Lvn1AMjeVuBgvkN0zi',
+      //   bucket: 'wzf2000-1'
+      // })
+      // dispatch(setOSSClient(client))
+
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
