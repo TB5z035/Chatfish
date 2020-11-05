@@ -14,7 +14,7 @@ import {
   setDrawerOpen,
   addRequest,
   deleteRequest,
-  setRequestList
+  setRequestList, deleteFriend
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -441,6 +441,9 @@ export default function Dashboard() {
                     receivedData['friend_name']
                   )
                 )
+                break
+              case 'FRIEND_DELETED':
+                dispatch(deleteFriend(receivedData['friend_name']))
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
