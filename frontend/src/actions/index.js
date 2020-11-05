@@ -46,6 +46,16 @@ export const addGroup = (groupName) => ({
   groupName
 })
 
+export const deleteFriend = (friendName) => ({
+  type: types.DELETE_FRIEND,
+  friendName
+})
+
+export const deleteGroup = (groupName) => ({
+  type: types.DELETE_GROUP,
+  groupName
+})
+
 export const setTheme = (theme) => ({
   type: types.SET_THEME,
   theme: theme

@@ -9,6 +9,8 @@ export const SET_MY_NAME = 'SET_MY_NAME'
 
 export const ADD_FRIEND = 'ADD_FRIEND'
 export const ADD_GROUP = 'ADD_GROUP'
+export const DELETE_FRIEND = 'DELETE_FRIEND'
+export const DELETE_GROUP = 'DELETE_GROUP'
 
 export const SET_THEME = 'SET_THEME'
 
