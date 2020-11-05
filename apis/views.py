@@ -769,16 +769,21 @@ def post_data(request):
                     }
                 else:
                     cid_ret = find_cid_by_name(data.get('group_name'))
-                    if cid_ret.get('find') == 0:
+                    if data.get('type') == 0 and cid_ret.get('find') == 0:
                         # init a chat
                         ret = init_group_chat({
                             'name': data.get('group_name'),
                             'user': data.get('uid'),
                             'friend_list': data.get('friend_list')
                         })
-                    else :
+                    elif data.get('type') == 1 and cid_ret.get('find') == 1:
                         # add user to chat
                         ret = add_users_to_chat(data, cid_ret.get('cid'))
+                    else :
+                        ret = {
+                            'state': 403,
+                            'message': 'Invalid request for add group.'
+                        }
             elif data['type'] == 'AGREE_ADD_GROUP':
                 ret = accept_add_to_chat_request(data)
             elif data['type'] == 'DISAGREE_ADD_GROUP':
