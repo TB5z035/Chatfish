@@ -258,6 +258,7 @@ var add_group_request = function(request, response, body) {
     var data = {
         type: 'ADD_GROUP',
         uid: user.id,
+        is_init: json_data.type,
         friend_list: json_data.friend_list,
         group_name: json_data.group_name
     }
