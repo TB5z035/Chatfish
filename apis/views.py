@@ -769,14 +769,14 @@ def post_data(request):
                     }
                 else:
                     cid_ret = find_cid_by_name(data.get('group_name'))
-                    if data.get('is_group') == 0 and cid_ret.get('find') == 0:
+                    if data.get('is_init') == 0 and cid_ret.get('find') == 0:
                         # init a chat
                         ret = init_group_chat({
                             'name': data.get('group_name'),
                             'user': data.get('uid'),
                             'friend_list': data.get('friend_list')
                         })
-                    elif data.get('is_group') == 1 and cid_ret.get('find') == 1:
+                    elif data.get('is_init') == 1 and cid_ret.get('find') == 1:
                         # add user to chat
                         ret = add_users_to_chat(data, cid_ret.get('cid'))
                     else :
