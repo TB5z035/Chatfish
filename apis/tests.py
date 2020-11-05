@@ -504,7 +504,7 @@ class AddGroupTest(PostTest):
         response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
-        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('state'), 403)
         self.assertEqual(res_json.get('message'), 'No friend list available!')
 
     def test_add_group_after_init(self):
