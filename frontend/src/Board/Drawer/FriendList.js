@@ -11,6 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFocusUser } from '../../actions'
+import md5 from 'crypto-js/md5'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -66,7 +67,13 @@ export default function FriendList() {
             }}
           >
             <ListItemAvatar>
-              <Avatar> {user.user.toString()[0]} </Avatar>
+              <Avatar src={user.isGroup === 1
+                ? null
+                : 'https://www.gravatar.com/avatar/' +
+                  md5(user.user).toString() +
+                  '?d=robohash'}>{user.isGroup === 1
+                  ? user.user[0]
+                  : null}</Avatar>
             </ListItemAvatar>
             <ListItemText
               primary={user.user}

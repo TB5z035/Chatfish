@@ -355,9 +355,6 @@ export default function Dashboard() {
     // * Set default theme
     dispatch(setTheme(darkState ? themeDarkDefault : themeLightDefault))
 
-    // const hashDigest = md5('625125754@qq.com').toString()
-    // console.log(hashDigest)
-
     // * Set up WebSocket
     async function setWebSocket() {
       // const OSS = require('ali-oss')
@@ -593,7 +590,12 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar src={'https://www.gravatar.com/avatar/' + 'dce3adc8812d921a8af8963d3cc41fb7?d=retro'}/>
+            <Avatar src=
+              {myName === null ? 'https://www.gravatar.com/avatar/' +
+                  'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                : 'https://www.gravatar.com/avatar/' +
+                        md5(myName).toString() +
+                        '?d=robohash'}/>
           </IconButton>
           <Menu
             id="simple-menu"
