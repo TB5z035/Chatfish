@@ -53,6 +53,7 @@ import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
+import md5 from 'crypto-js/md5'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -354,6 +355,9 @@ export default function Dashboard() {
     // * Set default theme
     dispatch(setTheme(darkState ? themeDarkDefault : themeLightDefault))
 
+    // const hashDigest = md5('625125754@qq.com').toString()
+    // console.log(hashDigest)
+
     // * Set up WebSocket
     async function setWebSocket() {
       // const OSS = require('ali-oss')
@@ -589,7 +593,7 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
+            <Avatar src={'https://www.gravatar.com/avatar/' + 'dce3adc8812d921a8af8963d3cc41fb7?d=retro'}/>
           </IconButton>
           <Menu
             id="simple-menu"
