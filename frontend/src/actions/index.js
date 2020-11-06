@@ -31,6 +31,11 @@ export const setSocket = (socket) => ({
   socket
 })
 
+export const setOSSClient = (client) => ({
+  type: types.SET_OSS_CLIENT,
+  client: client
+})
+
 export const setMyName = (myName) => ({
   type: types.SET_MY_NAME,
   myName
@@ -43,6 +48,16 @@ export const addFriend = (friendName) => ({
 
 export const addGroup = (groupName) => ({
   type: types.ADD_GROUP,
+  groupName
+})
+
+export const deleteFriend = (friendName) => ({
+  type: types.DELETE_FRIEND,
+  friendName
+})
+
+export const deleteGroup = (groupName) => ({
+  type: types.DELETE_GROUP,
   groupName
 })
 

@@ -14,7 +14,7 @@ import {
   setDrawerOpen,
   addRequest,
   deleteRequest,
-  setRequestList
+  setRequestList, deleteFriend
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -53,6 +53,7 @@ import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
+import md5 from 'crypto-js/md5'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -356,6 +357,15 @@ export default function Dashboard() {
 
     // * Set up WebSocket
     async function setWebSocket() {
+      // const OSS = require('ali-oss')
+      // const client = new OSS({
+      //   region: 'oss-cn-hangzhou',
+      //   accessKeyId: 'LTAIBMLqLQSqvsin',
+      //   accessKeySecret: '2nbRh2PdprS5Lvn1AMjeVuBgvkN0zi',
+      //   bucket: 'wzf2000-1'
+      // })
+      // dispatch(setOSSClient(client))
+
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
@@ -441,6 +451,9 @@ export default function Dashboard() {
                     receivedData['friend_name']
                   )
                 )
+                break
+              case 'FRIEND_DELETED':
+                dispatch(deleteFriend(receivedData['friend_name']))
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
@@ -577,7 +590,12 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
+            <Avatar src=
+              {myName === null ? 'https://www.gravatar.com/avatar/' +
+                  'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                : 'https://www.gravatar.com/avatar/' +
+                        md5(myName).toString() +
+                        '?d=robohash'}/>
           </IconButton>
           <Menu
             id="simple-menu"

@@ -3,6 +3,22 @@ const messages = (state = initialState, action) => {
   let j = 0
   const len = newList.length
   switch (action.type) {
+    case 'DELETE_FRIEND':
+      for (; j < len; j++) {
+        if (newList[j].isGroup === 0 && newList[j].user === action.friendName) {
+          newList.splice(j, 1)
+          break
+        }
+      }
+      return newList
+    case 'DELETE_GROUP':
+      for (; j < len; j++) {
+        if (newList[j].isGroup === 1 && newList[j].user === action.groupName) {
+          newList.splice(j, 1)
+          break
+        }
+      }
+      return newList
     case 'ADD_FRIEND':
       return [
         ...state,
@@ -83,7 +99,7 @@ const initialState = [
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
-  // { user: 'testuser', isGroup: 1, message_list: [] },
+  // { user: 'testuser1', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'Alice', isGroup: 0, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
