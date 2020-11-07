@@ -56,3 +56,8 @@
   font-size: small;
   max-height: inherit;
 }
+
+.test{
+  min-width: 100px;
+  min-height: 100px;
+}
