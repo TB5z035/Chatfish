@@ -94,7 +94,7 @@ const messages = (state = initialState, action) => {
 const initialState = [
   // { user: 'testusertestusertest
   // usertestusertestusertestusert
-  // estusertestusertestuser', isGroup: 1, message_list: [] },
+  // // estusertestusertestuser', isGroup: 1, message_list: [] },
   // {
   //   user: 'testuser',
   //   isGroup: 1,
