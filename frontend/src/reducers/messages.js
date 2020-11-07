@@ -95,7 +95,19 @@ const initialState = [
   // { user: 'testusertestusertest
   // usertestusertestusertestusert
   // estusertestusertestuser', isGroup: 1, message_list: [] },
-  // { user: 'testuser', isGroup: 1, message_list: [] },
+  {
+    user: 'testuser',
+    isGroup: 1,
+    message_list: [
+      {
+        from: 'Bob', // sender of this message
+        time: 1603430942584, // number of milliseconds from 1970.1.1
+        content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/ChatFish/image/1604743229135LiSA%20-%20crossing%20field.flac',
+        mtype: 'abnormal',
+        id: 'i am the id of a message'
+      }
+    ]
+  }
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
