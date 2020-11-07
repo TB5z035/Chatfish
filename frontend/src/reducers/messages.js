@@ -80,7 +80,7 @@ const messages = (state = initialState, action) => {
             from: action.author,
             content: action.message,
             time: new Date().getTime(),
-            type: 'normal'
+            mtype: action.mtype
           })
           newList.unshift(temp)
         }
@@ -102,7 +102,8 @@ const initialState = [
   //     {
   //       from: 'Bob', // sender of this message
   //       time: 1603430942584, // number of milliseconds from 1970.1.1
-  //       content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/ChatFish/image/1604743644455Groundhog.Day.1993.2160p.BluRay.x265.HDR.mUHD-FRDS%20%5BAVC%20480p%5D.mp4',
+  //       content:
+  //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/ChatFish/image/1604743644455Groundhog.Day.1993.2160p.BluRay.x265.HDR.mUHD-FRDS%20%5BAVC%20480p%5D.mp4',
   //       mtype: 'abnormal',
   //       id: 'i am the id of a message'
   //     }
