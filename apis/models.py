@@ -132,7 +132,7 @@ def fetch_chat_member(cid):
 def fetch_chat_message(cid, number = 20):
     msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
     ret = [ { 
-        'type': msg['mtype'],
+        'mtype': msg['mtype'],
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
         'content': msg['content'],
