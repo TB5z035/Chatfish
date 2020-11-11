@@ -8,10 +8,12 @@ it('renders without crashing', () => {
     time: '2019-10-21T06:38:03.063Z',
     from: 'alice',
     content: 'hello' }
+  const userInfo = { email: 'b', nickname: 'a' }
   ReactDOM.render(
     <div>
       <Message
         message={message}
+        userInfo={userInfo}
         key={message.content + message.time}
       /></div>, div)
 })
