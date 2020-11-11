@@ -222,6 +222,30 @@ def insert_offline_message(data):
         }
     return ret
 
+def del_offline_message(data, by = 'cid'):
+    try:
+        if by == 'cid':
+            OfflineMessage.objects.filter(ruid = data.get('ruid'), cid = data.get('cid')).delete()
+        elif by == 'uid':
+            cid_list1 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')
+            cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
+            cid = [ cid for cid in cid_list1 if not cid in cid_list2 and Chat.objects.get(cid = cid).ctype == 0 ][0]
+            OfflineMessage.objects.filter(ruid = data.get('ruid'), cid = cid).delete()
+        elif by == 'mid':
+            OfflineMessage.objects.filter(ruid = data.get('ruid'), mid = data.get('mid')).delete()
+        elif by == 'id':
+            OfflineMessage.objects.filter(ruid = data.get('ruid'), id = data.get('id')).delete()
+        ret = {
+            'state': 200,
+            'message': 'Successfully delete offline messages.'
+        }
+    except Exception:
+        ret = {
+            'state': 403,
+            'message': 'Something wrong in offline message deletion.'
+        }
+    return ret
+
 def insert_user_meta(uid, meta_name, meta_val):
     try:
         if uid <= 0:
@@ -353,6 +377,24 @@ def init_group_chat(data): # one man group
         ret = {
             'state': 403,
             'message': 'Something wrong in chat initialization.'
+        }
+    return ret
+
+def delete_friend(data):
+    try:
+        fuid = find_uid_by_name(data.get('friend_name')).get('uid')
+        cid = find_cid_by_user(fuid, data.get('uid')).get('cid')
+        UserMeta.objects.filter(uid = uid, meta_name = 'friend', meta_value = str(fuid)).delete()
+        UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(uid)).delete()
+        Chat.objects.filter(cid = cid).delete()
+        ret = {
+            'state': 200,
+            'message': 'Successful requested'
+        }
+    except:
+        ret = {
+            'state': 405,
+            'message': 'Invalid token or username or friend name'
         }
     return ret
 
@@ -507,6 +549,21 @@ def deny_friend_request(data):
             }
     print('deny friend request.')
     print(ret)
+    return ret
+
+def leave_group(data):
+    try:
+        cid = find_cid_by_name(data.get('group_name')).get('cid')
+        ChatMeta.objects.filter(cid = cid, meta_name = 'member', meta_value = str(data.get('uid'))).delete()
+        ret = {
+            'state': 200,
+            'message': 'Successful requested'
+        }
+    except:
+        ret = {
+            'state': 200,
+            'message': 'Failed'
+        }
     return ret
 
 def add_user_to_chat(data, cid): # depreciated API
@@ -756,12 +813,19 @@ def post_data(request):
                         'state': 400,
                         'message': 'fetch failed.'
                     }
+            elif data['type'] == 'FETCH_GROUP_MEMBER':
+                ret = fetch_group_member_info(data)
+                print(ret)
+            elif data['type'] == 'DELETE_FRIEND':
+                ret = delete_friend(data)
             elif data['type'] == 'ADD_NEW_FRIEND':
                 ret = add_friend(data)
             elif data['type'] == 'AGREE_ADD_NEW_FRIEND':
                 ret = accept_friend_request(data)
             elif data['type'] == 'DISAGREE_ADD_NEW_FRIEND':
                 ret = deny_friend_request(data)
+            elif data['type'] == 'LEAVE_GROUP':
+                ret = leave_group(data)
             elif data['type'] == 'ADD_GROUP':
                 if data.get('group_name') == 'private chat':
                     ret = {
@@ -789,18 +853,27 @@ def post_data(request):
                 ret = accept_add_to_chat_request(data)
             elif data['type'] == 'DISAGREE_ADD_GROUP':
                 ret = deny_add_to_chat_request(data)
+            elif data['type'] == 'CHAT_ENTER':
+                if 'is_group' in data and data.get('is_group') == 1:
+                    ret = del_offline_message({
+                        'uid': data.get('uid'),
+                        'cid': find_cid_by_name(data.get('group_name')).get('cid')
+                    })
+                else :
+                    ret = del_offline_message(
+                        data = {
+                            'uid': data.get('uid'),
+                            'fuid': find_uid_by_name(data.get('friend_name')).get('uid')
+                        },
+                        by = 'uid'
+                    )
+            elif data['type'] == 'CHAT_FETCH':
+                if 'is_group' in data and data.get('is_group') == 1:
+                    ret = fetch_chat_message(cid = find_cid_by_name(data.get('group_name')).get('cid'), page = data.get('page'))
+                else :
+                    ret = fetch_chat_message(cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid'), page = data.get('page'))
             elif data['type'] == 'RESPONSE':
                 ret = response_handle(data)
-            elif data['type'] == 'LEAVE_GROUP':
-                ret = {
-                    'state': 399,
-                    'message': 'Unrealized API.'
-                }
-            elif data['type'] == 'DELETE_FRIEND':
-                ret = {
-                    'state': 399,
-                    'message': 'Unrealized API.'
-                }
             elif data['type'] == 'TEST': # 本地测试接口正确性
                 print('successful testing.')
                 ret = {
