@@ -472,7 +472,7 @@ export default function Dashboard() {
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
           if (!initWebSocket) {
-            // history.push('/sign')
+            history.push('/sign')
           }
           setOnline(false)
         }
@@ -480,7 +480,7 @@ export default function Dashboard() {
           setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()
