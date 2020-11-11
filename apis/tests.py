@@ -211,7 +211,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
@@ -229,7 +229,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
