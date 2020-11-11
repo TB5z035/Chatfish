@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 import SettingsIcon from '@material-ui/icons/Settings'
 import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import GroupAddIcon from '@material-ui/icons/GroupAdd'
+import ForumIcon from '@material-ui/icons/Forum'
 import {
   List,
   Avatar,
@@ -26,10 +27,11 @@ import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import { useDispatch, useSelector } from 'react-redux'
-import { addGroup } from '../../actions'
+import { addGroup, addMessage } from '../../actions'
 import { useSnackbar } from 'notistack'
 import { postAddFriend } from '../../fetch/friend/addFriend'
 import { postAddGroup } from '../../fetch/friend/addGroup'
+import yellow from '@material-ui/core/colors/yellow'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -39,8 +41,12 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   pink: {
-    color: theme.palette.getContrastText(pink[500]),
-    backgroundColor: theme.palette.random
+    color: '#fff',
+    backgroundColor: pink[500]
+  },
+  yellow: {
+    color: '#fff',
+    backgroundColor: yellow[500]
   },
   green: {
     color: '#fff',
@@ -51,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 export default function SecondaryList() {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
-
+  const webSocket = useSelector((state) => state.socket)
   const dispatch = useDispatch()
   const myName = useSelector((state) => state.myName)
   const friendList = useSelector((state) => state.messages)
@@ -61,7 +67,8 @@ export default function SecondaryList() {
   const [groupName, setGroupName] = useState('')
   const [createGroupDialogOpen, setCreateGroupDialogOpen] = useState(false)
   const [selectState, setSelectState] = React.useState({})
-
+  const [message, setMessage] = useState('')
+  const [massSendDialogOpen, setMassSendDialogOpen] = useState(false)
   const handleAddFriend = useCallback(async () => {
     setAddFriendDialogOpen(false)
     const username = Cookies.get('username')
@@ -143,6 +150,35 @@ export default function SecondaryList() {
     }
   }, [selectState, groupName, myName, friendList, dispatch, enqueueSnackbar])
 
+  const handleMassSend = useCallback(async () => {
+    setMassSendDialogOpen(false)
+    let userName = Cookies.get('username')
+    if (userName == null) {
+      userName = 'Unknown'
+    }
+    Object.getOwnPropertyNames(selectState).forEach(function (key) {
+      if (selectState[key]) {
+        if (message !== '') {
+          dispatch(addMessage(message, userName, key, 0, 'normal'))
+
+          if (webSocket !== null) {
+            const params = {
+              type: 'MESSAGE_UPLOAD',
+              content: message,
+              userName: userName,
+              friend_name: key,
+              is_group: 0,
+              mtype: 'normal'
+            }
+            webSocket.send(JSON.stringify(params))
+          }
+        }
+      }
+    })
+    setMessage('')
+    setSelectState({})
+  }, [message, webSocket, dispatch, selectState])
+
   const handleChange = (event) => {
     setSelectState({
       ...selectState,
@@ -182,6 +218,17 @@ export default function SecondaryList() {
             </Avatar>
           </ListItemAvatar>
           <ListItemText primary="Add Groups" />
+        </ListItem>
+        <ListItem button
+          onClick={() => {
+            setMassSendDialogOpen(true)
+          }}>
+          <ListItemAvatar>
+            <Avatar className={classes.yellow}>
+              <ForumIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="MassSend" />
         </ListItem>
         <ListItem button>
           <ListItemAvatar>
@@ -252,6 +299,45 @@ export default function SecondaryList() {
           <DialogActions>
             <Button color="primary" onClick={handleCreateGroup}>
               Creat
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={massSendDialogOpen}
+          onClose={() => {
+            setMassSendDialogOpen(false)
+          }}
+        >
+          <DialogTitle> Mass sending</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Message"
+              autoFocus
+              fullWidth
+              onChange={(e) => {
+                setMessage(e.target.value)
+              }}
+            />
+            <FormControl component="fieldset" className={classes.formControl}>
+              <FormLabel component="legend">Select friends</FormLabel>
+              <FormGroup>
+                {friendList.map((user) =>
+                  user.isGroup === 0 ? (
+                    <FormControlLabel
+                      control={
+                        <Checkbox onChange={handleChange} name={user.user} />
+                      }
+                      label={user.user}
+                      key={user.user}
+                    />
+                  ) : null
+                )}
+              </FormGroup>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button color="primary" onClick={handleMassSend}>
+              Send
             </Button>
           </DialogActions>
         </Dialog>
