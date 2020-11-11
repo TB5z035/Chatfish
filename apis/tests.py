@@ -553,4 +553,9 @@ class AddGroupTest(PostTest):
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
         self.assertEqual(res_json.get('message'), 'No group with this name!')
-        
+
+class FetchGroupMemberTest(PostTest):
+    '''
+    TestCase for Fetch Group Member post request
+    '''
+    pass
