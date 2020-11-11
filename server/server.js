@@ -27,7 +27,7 @@ const login_register_options = {
     //changeOrigin: true
 }
 
-const ws_filter = function(pathname, req) {
+const ws_filter = function(pathname) {
     return pathname.match('^/ws')
 }
 

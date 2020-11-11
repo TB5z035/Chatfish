@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 import requests
 import hashlib
 import json
+from config.local_settings import SALT
 # Create your views here.
 
 @require_http_methods(["GET"])
@@ -715,7 +716,7 @@ def response_handle(data):
 @csrf_exempt
 def post_data(request):
     body = request.body.decode('utf-8')
-    sha256 = hashlib.sha256((body + ' post from ChatFish Server').encode('utf-8'))
+    sha256 = hashlib.sha256((body + SALT).encode('utf-8'))
     ret = {}
     print('Receive post request from nodejs: ')
     print(body)
@@ -829,7 +830,7 @@ def post_data(request):
     return JsonResponse(ret, safe = False)
 
 def post_to_nodejs(data):
-    text_bytes = (json.dumps(data) + ' post from ChatFish Server').encode('utf-8')
+    text_bytes = (json.dumps(data) + SALT).encode('utf-8')
     sha256 = hashlib.sha256(text_bytes)
     key = sha256.hexdigest()
     headers = {

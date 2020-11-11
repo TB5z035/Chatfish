@@ -4,9 +4,10 @@ Test suite for meeting
 import datetime, json, hashlib
 from django.test import Client, TestCase
 from apis.models import User, UserMeta, Chat, ChatMeta, Message, OfflineMessage
+from config.local_settings import TEST_PWD
+from config.local_settings import WRONG_PWD
 
 TEST_USER = 'test'
-TEST_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
 TEST_EMAIL = 'test@admin.email'
 
 FRIEND = 'friend'
@@ -107,7 +108,7 @@ class LoginTest(PostTest):
             'type': 'LOGIN_VERIFY',
             'user_info': {
                 'username': TEST_USER,
-                'password': 'this is wrong'
+                'password': WRONG_PWD
             }
         }
         response = self.post_test(self.client, data)
