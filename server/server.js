@@ -27,7 +27,7 @@ const login_register_options = {
     //changeOrigin: true
 }
 
-const ws_filter = function(pathname, req) {
+const ws_filter = function(pathname) {
     return pathname.match('^/ws')
 }
 
@@ -136,6 +136,31 @@ var require_friend_list_request = function(request, response, body) {
     })
 }
 
+var fetch_group_member_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    var data = {
+        type: 'FETCH_GROUP_MEMBER',
+        uid: user.id,
+        username: json_data.username,
+        group_name: json_data.group_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
 var chat_enter_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
@@ -160,6 +185,31 @@ var chat_enter_request = function(request, response, body) {
         }
     }
 
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var delete_friend_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    var data = {
+        type: 'DELETE_FRIEND',
+        uid: user.id,
+        username: json_data.username,
+        friend_name: json_data.friend_name
+    }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
             'Content-Type': 'application/json;charset=utf8',
@@ -232,6 +282,36 @@ var disagree_add_friend_request = function(request, response, body) {
         uid: user.id,
         friend_name: json_data.friend_name
     }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var leave_group_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+
+    console.log('Receive add group request!')
+    console.log(json_data)
+    
+    var data = {
+        type: 'LEAVE_GROUP',
+        uid: user.id,
+        username: json_data.username,
+        group_name: json_data.group_name
+    }
+    
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
             'Content-Type': 'application/json;charset=utf8',
@@ -350,9 +430,9 @@ var response_request = function(request, response, body) {
 }
 
 var django_request = function(request, response, body) {
-    var sha1 = crypto.createHash('sha1')
+    var sha256 = crypto.createHash('sha256')
     var text = encoder.encode(body + ' post from ChatFish Server')
-    var key = sha1.update(text).digest('hex')
+    var key = sha256.update(text).digest('hex')
     response.writeHead(200, {
         'Content-Type': 'application/json;charset=utf8'
     })
@@ -407,14 +487,20 @@ request_server.on('request', function(request, response) {
                     register_request(request, response, body)
                 else if (params.action === 'require_friend_list')
                     require_friend_list_request(request, response, body)
+                else if (params.action === 'fetch_group_member')
+                    fetch_group_member_request(request, response, body)
                 else if (params.action === 'chat_enter')
                     chat_enter_request(request, response, body)
+                else if (params.action === 'delete_friend')
+                    delete_friend_request(request, response, body)
                 else if (params.action === 'add_friend')
                     add_friend_request(request, response, body)
                 else if (params.action === 'agree_add_friend')
                     agree_add_friend_request(request, response, body)
                 else if (params.action === 'disagree_add_friend')
                     disagree_add_friend_request(request, response, body)
+                else if (params.action === 'leave_group')
+                    leave_group_request(request, response, body)
                 else if (params.action === 'add_group')
                     add_group_request(request, response, body)
                 else if (params.action === 'agree_add_group')

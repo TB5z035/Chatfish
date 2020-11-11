@@ -4,9 +4,10 @@ Test suite for meeting
 import datetime, json, hashlib
 from django.test import Client, TestCase
 from apis.models import User, UserMeta, Chat, ChatMeta, Message, OfflineMessage
+from config.local_settings import TEST_PWD
+from config.local_settings import WRONG_PWD
 
 TEST_USER = 'test'
-TEST_PWD = '0c7c4f7e4b9f49ba6d09bf00d5b62a3950f13b3c'
 TEST_EMAIL = 'test@admin.email'
 
 FRIEND = 'friend'
@@ -53,8 +54,8 @@ class PostTest(TestCase):
     def post_test(self, client, data):
         data = json.dumps(data)
         text_bytes = (data + ' post from ChatFish Server').encode('utf-8')
-        sha1 = hashlib.sha1(text_bytes)
-        key = sha1.hexdigest()
+        sha256 = hashlib.sha256(text_bytes)
+        key = sha256.hexdigest()
         return client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, content_type = 'application/json')
 
 class WrongPostTest(PostTest):
@@ -71,8 +72,8 @@ class WrongPostTest(PostTest):
         }
         data = json.dumps(data)
         text_bytes = (data + ' this is wrong').encode('utf-8')
-        sha1 = hashlib.sha1(text_bytes)
-        key = sha1.hexdigest()
+        sha256 = hashlib.sha256(text_bytes)
+        key = sha256.hexdigest()
         response = self.client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, content_type = 'application/json')
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
@@ -107,7 +108,7 @@ class LoginTest(PostTest):
             'type': 'LOGIN_VERIFY',
             'user_info': {
                 'username': TEST_USER,
-                'password': 'this is wrong'
+                'password': WRONG_PWD
             }
         }
         response = self.post_test(self.client, data)
@@ -210,7 +211,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
@@ -228,7 +229,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
