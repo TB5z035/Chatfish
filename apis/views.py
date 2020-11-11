@@ -532,11 +532,11 @@ def response_handle(data):
 @csrf_exempt
 def post_data(request):
     body = request.body.decode('utf-8')
-    sha1 = hashlib.sha1((body + ' post from ChatFish Server').encode('utf-8'))
+    sha256 = hashlib.sha256((body + ' post from ChatFish Server').encode('utf-8'))
     ret = {}
     print('Receive post request from nodejs: ')
     print(body)
-    if (sha1.hexdigest() == request.META.get('HTTP_DATA_KEY')):
+    if (sha256.hexdigest() == request.META.get('HTTP_DATA_KEY')):
         ret = {
             'state': 200,
             'message': 'Successfuly post!'
@@ -625,8 +625,8 @@ def post_data(request):
 
 def post_to_nodejs(data):
     text_bytes = (json.dumps(data) + ' post from ChatFish Server').encode('utf-8')
-    sha1 = hashlib.sha1(text_bytes)
-    key = sha1.hexdigest()
+    sha256 = hashlib.sha256(text_bytes)
+    key = sha256.hexdigest()
     headers = {
         'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key
