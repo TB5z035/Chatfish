@@ -205,12 +205,12 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
-        self.assertEqual(res_json.get('message'), 'All message required successfully.')
+        self.assertEqual(res_json.get('message'), 'Successfully fetched.')
         self.assertEqual(len(res_json.get('message_list')), 1)
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
@@ -228,7 +228,7 @@ class RequireFriendListTest(PostTest):
         self.assertEqual(res_json.get('message_list')[0].get('isGroup'), 0)
         self.assertEqual(res_json.get('message_list')[0].get('user'), TEST_FRIEND_USER)
         self.assertEqual(len(res_json.get('message_list')[0].get('message_list')), 1)
-        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('type'), 'normal')
+        self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('mtype'), 'normal')
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('from'), TEST_USER)
         self.assertEqual(res_json.get('message_list')[0].get('message_list')[0].get('content'), TEST_CONTENT)
 
@@ -450,6 +450,7 @@ class AddGroupTest(PostTest):
     def test_add_group_success(self):
         data = {
             'type': 'ADD_GROUP',
+            'is_init': 0,
             'group_name': GROUP_NEW_CHAT,
             'uid': self.uid1,
             'friend_list': [
@@ -466,6 +467,7 @@ class AddGroupTest(PostTest):
     def test_add_group_not_friend(self):
         data = {
             'type': 'ADD_GROUP',
+            'is_init': 0,
             'group_name': GROUP_NEW_CHAT,
             'uid': self.uid1,
             'friend_list': [
@@ -498,6 +500,7 @@ class AddGroupTest(PostTest):
     def test_add_group_without_friendlist(self):
         data = {
             'type': 'ADD_GROUP',
+            'is_init': 1,
             'group_name': GROUP_CHAT,
             'uid': self.uid1
         }
@@ -510,6 +513,7 @@ class AddGroupTest(PostTest):
     def test_add_group_after_init(self):
         data = {
             'type': 'ADD_GROUP',
+            'is_init': 1,
             'group_name': GROUP_CHAT,
             'uid': self.uid1,
             'friend_list': [

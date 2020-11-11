@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addGroup } from '../../actions'
 import { useSnackbar } from 'notistack'
 import { postAddFriend } from '../../fetch/friend/addFriend'
+import { postAddGroup } from '../../fetch/friend/addGroup'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,7 +69,9 @@ export default function SecondaryList() {
     if (
       friendList
         .map((user) => {
-          if (user.isGroup === 0) { return user.user } else return ''
+          if (user.isGroup === 0) {
+            return user.user
+          } else return ''
         })
         .includes(friendToAdd)
     ) {
@@ -95,46 +98,50 @@ export default function SecondaryList() {
 
   const handleCreateGroup = useCallback(async () => {
     setCreateGroupDialogOpen(false)
-    const friendList = []
+    const friends = []
     Object.getOwnPropertyNames(selectState).forEach(function (key) {
       if (selectState[key]) {
-        friendList.push(key)
+        friends.push(key)
       }
     })
-
-    const params = {
-      type: 0,
-      username: myName,
-      group_name: groupName,
-      friend_list: friendList
-    }
-    fetch('/?action=add_group', {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: { 'Content-Type': 'application/json' }
-    }).then((res) =>
-      res
-        .json()
-        .catch((error) => console.error('Error:', error))
-        .then((data) => {
-          if (
-            data != null &&
-                  Object.prototype.hasOwnProperty.call(data, 'state') &&
-                  data['state'] === 200
-          ) {
-            dispatch(addGroup(groupName))
-            enqueueSnackbar('Successful create group: ' + groupName, {
-              variant: 'success'
-            })
-          } else {
-            enqueueSnackbar('The name of group already exists: ' + groupName, {
-              variant: 'error'
-            })
-          }
-        })
-    )
     setSelectState({})
-  }, [selectState, groupName, myName, dispatch])
+    if (
+      friendList
+        .map((user) => {
+          return user.isGroup === 1 ? user.user : null
+        })
+        .includes(groupName)
+    ) {
+      enqueueSnackbar('You are already in group :' + groupName, {
+        variant: 'warning'
+      })
+    } else {
+      postAddGroup(0, myName, friends, groupName).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
+              Object.prototype.hasOwnProperty.call(data, 'state') &&
+              data['state'] === 200
+            ) {
+              dispatch(addGroup(groupName))
+              enqueueSnackbar('Successful create group: ' + groupName, {
+                variant: 'success'
+              })
+            } else {
+              enqueueSnackbar(
+                'The name of group already exists: ' + groupName,
+                {
+                  variant: 'error'
+                }
+              )
+            }
+          })
+      )
+    }
+  }, [selectState, groupName, myName, friendList, dispatch, enqueueSnackbar])
 
   const handleChange = (event) => {
     setSelectState({

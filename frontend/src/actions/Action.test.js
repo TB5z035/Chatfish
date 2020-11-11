@@ -2,6 +2,14 @@ import * as actions from './index'
 import * as types from './ActionTypes'
 
 describe('actions', () => {
+  it('should drawerOpen', () => {
+    const drawerOpen = true
+    const expectedAction = {
+      type: types.SET_DRAWER_OPEN,
+      open: drawerOpen
+    }
+    expect(actions.setDrawerOpen(drawerOpen)).toEqual(expectedAction)
+  })
   it('should create actions setTheme', () => {
     const theme = 'Light'
     const expectedAction = {

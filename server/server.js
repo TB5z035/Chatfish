@@ -136,6 +136,41 @@ var require_friend_list_request = function(request, response, body) {
     })
 }
 
+var chat_enter_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    if ( json_data.has_key('is_group') && json_data.is_group == 1 ) {
+        var data = {
+            type: 'CHAT_ENTER',
+            uid: user.id,
+            is_group: 1,
+            group_name: json_data.group_name
+        }
+    }
+    else {
+        var data = {
+            type: 'CHAT_ENTER',
+            uid: user.id,
+            friend_name: json_data.friend_name
+        }
+    }
+
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
 var add_friend_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
@@ -184,6 +219,30 @@ var agree_add_friend_request = function(request, response, body) {
     })
 }
 
+var disagree_add_friend_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    var data = {
+        type: 'DISAGREE_ADD_NEW_FRIEND',
+        uid: user.id,
+        friend_name: json_data.friend_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
 var add_group_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
@@ -199,6 +258,7 @@ var add_group_request = function(request, response, body) {
     var data = {
         type: 'ADD_GROUP',
         uid: user.id,
+        is_init: json_data.type,
         friend_list: json_data.friend_list,
         group_name: json_data.group_name
     }
@@ -225,7 +285,33 @@ var agree_add_group_request = function(request, response, body) {
     var data = {
         type: 'AGREE_ADD_GROUP',
         uid: user.id,
-        group_name: json_data.group_name
+        group_name: json_data.group_name,
+        friend_name: json_data.friend_name
+    }
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
+var disagree_add_group_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    var data = {
+        type: 'DISAGREE_ADD_GROUP',
+        uid: user.id,
+        group_name: json_data.group_name,
+        friend_name: json_data.friend_name
     }
     request_to_django.post('/api/post_data/', data, function(res) {
         response.writeHead(200, {
@@ -321,14 +407,20 @@ request_server.on('request', function(request, response) {
                     register_request(request, response, body)
                 else if (params.action === 'require_friend_list')
                     require_friend_list_request(request, response, body)
+                else if (params.action === 'chat_enter')
+                    chat_enter_request(request, response, body)
                 else if (params.action === 'add_friend')
                     add_friend_request(request, response, body)
                 else if (params.action === 'agree_add_friend')
                     agree_add_friend_request(request, response, body)
+                else if (params.action === 'disagree_add_friend')
+                    disagree_add_friend_request(request, response, body)
                 else if (params.action === 'add_group')
                     add_group_request(request, response, body)
                 else if (params.action === 'agree_add_group')
                     agree_add_group_request(request, response, body)
+                else if (params.action === 'disagree_add_group')
+                    disagree_add_group_request(request, response, body)
                 else if (params.action === 'response')
                     response_request(request, response, body)
             }
