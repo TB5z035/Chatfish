@@ -24,10 +24,6 @@ class Message(models.Model):
     '''
     mtype:
         normal: normal msg.
-        enter: enter group msg.
-        picture: picture msg.
-        video: video msg.
-        file: other file msg.
         ...
     '''
     mid = models.BigAutoField(primary_key = True)
@@ -90,54 +86,83 @@ def judge_member(uid, cid):
     except Exception:
         return False
 
-def fetch_friends(uid, number = -1): #depreciated api
-    try:
-        chats = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
-        cid_list = [ chat['cid'] for chat in chats ]
-        # user can be multiple if delete [0]
-        message_list = [ {
-            'user': [ User.objects.get(uid = member).name for member in fetch_chat_member(cid) if member != uid ][0],
-            'message_list': fetch_chat_message(cid)
-        } for cid in cid_list ]
-
-        ret = {
-            'state': 200,
-            'message': 'All message required successfully.',
-            'message_list': message_list
-        }
-    except Exception:
-        ret = {
-            'state': 400,
-            'message': 'Failed in fetching friend.'
-        }
-    print('fetching friend.')
-    print(ret)
-    return ret
-
-def fetch_offline_message(ruid):
-    offline_messages = OfflineMessage.objects.filter(ruid = ruid).values('mid')
-    ret = [ offline_message['mid'] for offline_message in offline_messages ]
+def fetch_offline_message(data, by = 'cid'):
+    if by == 'cid':
+        offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
+        mids = [ msg['mid'] for msg in offline_messages ]
+        msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
+        ret = [ {
+            'type': msg['mtype'],
+            'time': msg['content'],
+            'from' : find_name_by_uid(msg['uid']).get('name'),
+            'content': msg['content']
+        } for msg in msgs ]
+    else :
+        ret = []
     return ret
 
 def fetch_chat_type(cid):
     '''
     Wait to complete for fetching chat type
     '''
+    pass
+
+def fetch_group_member_info(data):
+    try:
+        cid = find_cid_by_name(data.get('group_name')).get('cid')
+        uid_list = fetch_chat_member(cid)
+        users = [ User.objects.get(uid = uid) for uid in uid_list ]
+        group_member = [{
+            'user': user.name,
+            # 'email': user.email,
+            'email': 'default_email',
+            'nickname': 'default_nickname'
+        } for user in users ]
+        print(group_member)
+        ret = {
+            'state': 200,
+            'message': 'Successfully requested.',
+            'group_name': data.get('group_name'),
+            'group_member': group_member
+        }
+    except:
+        ret = {
+            'state': 400,
+            'message': 'Fetch failed.'
+        }
+    return ret
 
 def fetch_chat_member(cid):
     chat_members = ChatMeta.objects.filter(meta_name = 'member', cid = cid).values('meta_value')
     ret = [ int(chat_member['meta_value']) for chat_member in  chat_members ] # invert to integer id.
     return ret
 
-def fetch_chat_message(cid, number = 20):
+def fetch_chat_message(cid, number = 20, page = -1):
     msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
-    ret = [ { 
-        'mtype': msg['mtype'],
+    message_list = [ { 
+        'type': msg['mtype'],
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
         'content': msg['content'],
     } for msg in msgs ]
-    return ret
+    if number == -1 or page == -1 :
+        return {
+            'state': 200,
+            'message_list': message_list,
+            'bottom': 1
+        }
+    elif len(ret) > number * page :
+        return {
+            'state': 200,
+            'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ],
+            'bottom': 0
+        }
+    else :
+        return {
+            'state': 200,
+            'message_list': message_list[: -1 * number * (page - 1) ],
+            'bottom': 1
+        }
 
 def fetch_all_message(uid, number = -1):
     try:
@@ -149,7 +174,11 @@ def fetch_all_message(uid, number = -1):
         message_list = [{
             'isGroup': int(chat.ctype),
             'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
-            'message_list': fetch_chat_message(chat.cid)
+            'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
+            'offline_message_list': fetch_offline_message({
+                'uid': uid,
+                'cid': chat.cid
+            })
         } for chat in chats ]
         ret = {
             'state': 200,
@@ -165,7 +194,7 @@ def fetch_all_message(uid, number = -1):
     print(ret)
     return ret
 
-def fetch_all_offline_request(uid, number = -1):
+def fetch_all_offline_request(uid):
     try:
         requests = OfflineRequest.objects.filter(ruid = uid)
         request_list = [{
@@ -206,6 +235,32 @@ def find_name_by_uid(uid):
         ret = {
             'find': 1,
             'name': user.name
+        }
+    except Exception:
+        ret = {
+            'find': 0
+        }
+    return ret
+
+def find_cid_by_user(ruid, username = None, uid = None):
+    try:
+        if username is None and uid is None :
+            ret = {
+                'find': 0
+            }
+            return ret
+        elif not uid is None:
+            pass
+        else :
+            uid = find_uid_by_name(username).get('uid')
+        cid_list1 = [ chatmeta.cid for chatmeta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid)) \
+                        if Chat.objects.get(cid = chatmeta.cid).ctype == 0 ]
+        cid_list2 = [ chatmeta.cid for chatmeta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)) \
+                        if Chat.objects.get(cid = chatmeta.cid).ctype == 0 ]
+        cid = [ cid for cid in cid_list1 if cid in cid_list2 ][0]
+        ret = {
+            'find': 1,
+            'cid': cid
         }
     except Exception:
         ret = {
