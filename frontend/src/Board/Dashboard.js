@@ -11,7 +11,10 @@ import {
   setTheme,
   setFocusUser,
   addGroup,
-  setDrawerOpen
+  setDrawerOpen,
+  addRequest,
+  deleteRequest,
+  setRequestList, deleteFriend
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -43,10 +46,15 @@ import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
 import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
-// import socket from '../reducers/socket'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
 import MyDrawer from './Drawer/MyDrawer'
+import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
+import { requireFriendList } from '../fetch/message/requireFriendList'
+import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
+import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
+import md5 from 'crypto-js/md5'
+// import socket from '../reducers/socket'
 
 // function Copyright() {
 //   return (
@@ -143,8 +151,8 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(4)
   },
   box: {
-    padding: theme.spacing(4),
-    minWidth: 300 // fixme: not working!
+    // padding: theme.spacing(4),
+    margin: theme.spacing(4)
   },
   paper: {
     padding: theme.spacing(2),
@@ -200,12 +208,33 @@ export default function Dashboard() {
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
+  const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
 
   const [online, setOnline] = useState(false)
 
+  useEffect(() => {
+    const friends = []
+    const groups = []
+
+    requestList.map((item) => {
+      const request = item
+      const tempItem = {
+        groupName: request.user,
+        friendName: request.friend_name
+      }
+      if (request.isGroup === 0 && !friends.includes(request.user)) {
+        friends.push(request.user)
+      } else if (request.isGroup === 1 && !groups.includes(tempItem)) {
+        groups.push(tempItem)
+      }
+    })
+    setFriendToAddList(friends)
+    setGroupToAddList(groups)
+  }, [requestList, setGroupToAddList, setFriendToAddList])
+
   const handleAddFriendRequest = useCallback(
-    async (friendName) => {
+    async (friendName, inviter) => {
       if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
@@ -213,7 +242,7 @@ export default function Dashboard() {
       } else if (
         friendList
           .map((user) => {
-            return user.user
+            return user.isGroup === 0 ? user.user : null
           })
           .includes(friendName)
       ) {
@@ -223,6 +252,7 @@ export default function Dashboard() {
       } else {
         if (await postAgreeAddFriend(myName, friendName)) {
           dispatch(addFriend(friendName))
+          dispatch(deleteRequest(0, friendName))
           enqueueSnackbar('Successful add friend: ' + friendName, {
             variant: 'success'
           })
@@ -233,51 +263,48 @@ export default function Dashboard() {
   )
 
   const handleAddGroupRequest = useCallback(
-    async (groupName) => {
-      const params = {
-        username: myName,
-        group_name: groupName
-      }
-      fetch('/?action=agree_add_group', {
-        method: 'POST',
-        body: JSON.stringify(params),
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res) =>
-        res
-          .json()
-          .catch((error) => console.error('Error:', error))
-          .then((data) => {
-            if (
-              data != null &&
-              Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200
-            ) {
-              dispatch(addGroup(groupName))
-              enqueueSnackbar('Successful add group: ' + groupName, {
-                variant: 'success'
-              })
-            }
+    async (groupName, friendName) => {
+      if (
+        friendList
+          .map((user) => {
+            return user.isGroup === 1 ? user.user : null
           })
-      )
-    },
-    [myName, dispatch, enqueueSnackbar]
-  )
-  const refuseAddFriendRequest = (refusedUsername) => {
-    const index = friendToAddList.indexOf(refusedUsername)
-    const newArray = [...friendToAddList]
-    newArray.splice(index, 1)
-    setFriendToAddList(newArray)
-  }
-  const refuseAddGroupRequest = (refusedGroupName) => {
-    const newArray = [...groupToAddList]
-    for (var i = 0; i < groupToAddList.length; i++) {
-      if (groupToAddList[i]['groupName'] === refusedGroupName) {
-        newArray.splice(i, 1)
-        setGroupToAddList(newArray)
-        break
+          .includes(groupName)
+      ) {
+        enqueueSnackbar('You are already in the group ' + groupName, {
+          variant: 'warning'
+        })
+      } else {
+        if (await postAgreeAddGroup(myName, groupName, friendName)) {
+          dispatch(addGroup(groupName))
+          dispatch(deleteRequest(1, groupName))
+          enqueueSnackbar('Successful add group: ' + groupName, {
+            variant: 'success'
+          })
+        }
       }
-    }
-  }
+    },
+    [myName, dispatch, enqueueSnackbar, friendList]
+  )
+
+  const refuseAddFriendRequest = useCallback(
+    async (refusedUsername, friendName) => {
+      if (await postDisagreeAddFriend(myName, refusedUsername)) {
+        dispatch(deleteRequest(0, refusedUsername))
+      }
+    },
+    [myName, dispatch]
+  )
+
+  const refuseAddGroupRequest = useCallback(
+    async (refusedGroupName, friendName) => {
+      if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
+        dispatch(deleteRequest(1, refusedGroupName))
+      }
+    },
+    [dispatch, myName]
+  )
+
   const handleReply = async (message) => {
     const params = {
       response: message
@@ -330,29 +357,33 @@ export default function Dashboard() {
 
     // * Set up WebSocket
     async function setWebSocket() {
+      // const OSS = require('ali-oss')
+      // const client = new OSS({
+      //   region: 'oss-cn-hangzhou',
+      //   accessKeyId: 'LTAIBMLqLQSqvsin',
+      //   accessKeySecret: '2nbRh2PdprS5Lvn1AMjeVuBgvkN0zi',
+      //   bucket: 'wzf2000-1'
+      // })
+      // dispatch(setOSSClient(client))
+
       const localCookie = Cookies.get('token')
       const nameCookie = Cookies.get('username')
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new ReconnectingWebSocket(
           'wss://' + window.location.host + '/ws'
+          // 'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
         await dispatch(setMyName(nameCookie))
-        const params = {
-          username: nameCookie
-        }
+
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
           setOnline(true)
           setInitWebSocket(true)
 
-          fetch('/?action=require_friend_list', {
-            method: 'POST',
-            body: JSON.stringify(params),
-            headers: { 'Content-Type': 'application/json' }
-          }).then((res) =>
+          requireFriendList(nameCookie).then((res) =>
             res
               .json()
               .catch((error) => console.error('Error:', error))
@@ -363,6 +394,7 @@ export default function Dashboard() {
                   data['state'] === 200
                 ) {
                   dispatch(setMessageList(data['message_list']))
+                  dispatch(setRequestList(data['request_list']))
                 }
               })
           )
@@ -386,7 +418,8 @@ export default function Dashboard() {
                       receivedData['content'],
                       receivedData['friend_name'],
                       receivedData['username'],
-                      1
+                      1,
+                      receivedData['mtype']
                     )
                   )
                 } else {
@@ -395,27 +428,34 @@ export default function Dashboard() {
                       receivedData['content'],
                       receivedData['friend_name'],
                       null,
-                      0
+                      0,
+                      receivedData['mtype']
                     )
                   )
                 }
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
-                setFriendToAddList([
-                  ...friendToAddList,
-                  receivedData['friend_name']
-                ])
+                dispatch(
+                  addRequest(
+                    0,
+                    receivedData['friend_name'],
+                    receivedData['friend_name']
+                  )
+                )
                 break
               case 'NEW_ADD_GROUP':
                 handleReply('NOTIFY_NEW_ADD_GROUP').then()
-                setGroupToAddList([
-                  ...groupToAddList,
-                  {
-                    groupName: receivedData['group_name'],
-                    friendName: receivedData['friend_name']
-                  }
-                ])
+                dispatch(
+                  addRequest(
+                    1,
+                    receivedData['group_name'],
+                    receivedData['friend_name']
+                  )
+                )
+                break
+              case 'FRIEND_DELETED':
+                dispatch(deleteFriend(receivedData['friend_name']))
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
@@ -432,7 +472,9 @@ export default function Dashboard() {
         })
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
-          if (!initWebSocket) { history.push('/sign') }
+          if (!initWebSocket) {
+            history.push('/sign')
+          }
           setOnline(false)
         }
         socket.onclose = (event) => {
@@ -506,11 +548,9 @@ export default function Dashboard() {
             }}
           >
             <IconButton>
-              {friendToAddList.length !== 0 || groupToAddList.length !== 0 ? (
+              {requestList.length !== 0 ? (
                 <Badge
-                  badgeContent={(
-                    friendToAddList.length + groupToAddList.length
-                  ).toString()}
+                  badgeContent={requestList.length.toString()}
                   color="secondary"
                 >
                   <NotificationsIcon />
@@ -552,7 +592,12 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar>{myName == null ? 'S' : myName[0]}</Avatar>
+            <Avatar src=
+              {myName === null ? 'https://www.gravatar.com/avatar/' +
+                  'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                : 'https://www.gravatar.com/avatar/' +
+                        md5(myName).toString() +
+                        '?d=robohash'}/>
           </IconButton>
           <Menu
             id="simple-menu"
@@ -572,10 +617,17 @@ export default function Dashboard() {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Box display="flex" flexDirection="row" justifyContent="center">
-          <Box className={classes.box}>
-            <Chatroom />
-          </Box>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="center"
+          margin={2}
+        >
+          {/* <Chatroom />
+          <Chatroom />
+          <Chatroom />
+          <Chatroom /> */}
+          <Chatroom />
         </Box>
       </main>
 
@@ -590,7 +642,10 @@ export default function Dashboard() {
           {friendToAddList.length === 0 && groupToAddList.length === 0 ? (
             <DialogContent>
               <Typography color="textsecondary" align="center">
-                No notification for now 😀
+                No notification for now{' '}
+                <span role="img" aria-label="smile">
+                  😀
+                </span>
               </Typography>
             </DialogContent>
           ) : (

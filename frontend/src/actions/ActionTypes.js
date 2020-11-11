@@ -6,10 +6,16 @@ export const NEW_MESSAGE_SEND = 'NEW_MESSAGE_SEND'
 export const NEW_MESSAGE_RECEIVE = 'NEW_MESSAGE_RECEIVE'
 
 export const SET_MY_NAME = 'SET_MY_NAME'
-
+export const SET_OSS_CLIENT = 'SET_OSS_CLIENT'
 export const ADD_FRIEND = 'ADD_FRIEND'
 export const ADD_GROUP = 'ADD_GROUP'
+export const DELETE_FRIEND = 'DELETE_FRIEND'
+export const DELETE_GROUP = 'DELETE_GROUP'
 
 export const SET_THEME = 'SET_THEME'
 
 export const SET_DRAWER_OPEN = 'SET_DRAWER_OPEN'
+
+export const SET_REQUEST_LIST = 'SET_REQUEST_LIST'
+export const ADD_REQUEST = 'ADD_REQUEST'
+export const DELETE_REQUEST = 'DELETE_REQUEST'

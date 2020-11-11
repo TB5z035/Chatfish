@@ -1,19 +1,21 @@
 import * as types from './ActionTypes'
 
-export const addMessage = (message, author, receiver, isGroup) => ({
+export const addMessage = (message, author, receiver, isGroup, mtype) => ({
   type: types.NEW_MESSAGE_SEND,
   message,
   author,
   receiver,
-  isGroup
+  isGroup,
+  mtype
 })
 
-export const messageReceived = (message, author, group, isGroup) => ({
+export const messageReceived = (message, author, group, isGroup, mtype) => ({
   type: types.NEW_MESSAGE_RECEIVE,
   message,
   author,
   group,
-  isGroup
+  isGroup,
+  mtype
 })
 
 export const setFocusUser = (username) => ({
@@ -31,6 +33,11 @@ export const setSocket = (socket) => ({
   socket
 })
 
+export const setOSSClient = (client) => ({
+  type: types.SET_OSS_CLIENT,
+  client: client
+})
+
 export const setMyName = (myName) => ({
   type: types.SET_MY_NAME,
   myName
@@ -46,6 +53,16 @@ export const addGroup = (groupName) => ({
   groupName
 })
 
+export const deleteFriend = (friendName) => ({
+  type: types.DELETE_FRIEND,
+  friendName
+})
+
+export const deleteGroup = (groupName) => ({
+  type: types.DELETE_GROUP,
+  groupName
+})
+
 export const setTheme = (theme) => ({
   type: types.SET_THEME,
   theme: theme
@@ -54,4 +71,22 @@ export const setTheme = (theme) => ({
 export const setDrawerOpen = (drawerOpen) => ({
   type: types.SET_DRAWER_OPEN,
   open: drawerOpen
+})
+
+export const setRequestList = (requests) => ({
+  type: types.SET_REQUEST_LIST,
+  requests: requests
+})
+
+export const addRequest = (isGroup, user, friend) => ({
+  type: types.ADD_REQUEST,
+  isGroup: isGroup,
+  user: user,
+  friend_name: friend
+})
+
+export const deleteRequest = (isGroup, user) => ({
+  type: types.DELETE_REQUEST,
+  isGroup: isGroup,
+  user: user
 })

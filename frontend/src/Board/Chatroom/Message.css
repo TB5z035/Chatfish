@@ -27,12 +27,37 @@
 }
 
 .textTime {
+  display: flex;
   font-size: 60%;
   text-align: right;
+  align-items: center;
+  color: grey;
 }
-
 
 .textSender {
   font-size: 60%;
   text-align: left;
+}
+
+.stateBox {
+  align-items: center;
+  justify-content: flex-end;
+  max-height: 1.5em;
+}
+
+.stateIconBox {
+  max-height: inherit;
+  margin-left: 5px;
+  color: gray;
+}
+
+.stateIcon {
+  color: inherit;
+  font-size: small;
+  max-height: inherit;
+}
+
+.test{
+  min-width: 100px;
+  min-height: 100px;
 }
