@@ -12,12 +12,13 @@
 
 .paperBox {
   display: flex;
-  max-width: 300px;
+  max-width: 60%;
   align-items: center;
 }
 
 .textBox {
   margin: 1em;
+  width: 100%;
 }
 
 .text {
@@ -35,7 +36,8 @@
 }
 
 .textSender {
-  font-size: 60%;
+  font-style: italic;
+  font-weight: lighter;
   text-align: left;
 }
 
@@ -57,7 +59,22 @@
   max-height: inherit;
 }
 
-.test{
+/* .test {
   min-width: 100px;
   min-height: 100px;
+} */
+
+.pictureBox {
+  max-width: 100%;
+  margin-top: 1%;
+}
+
+.videoBox {
+  max-width: 100%;
+  margin-top: 1%;
+}
+
+.musicBox {
+  max-width: 100%;
+  margin-top: 3%;
 }
