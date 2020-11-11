@@ -383,9 +383,10 @@ def init_group_chat(data): # one man group
 def delete_friend(data):
     try:
         fuid = find_uid_by_name(data.get('friend_name')).get('uid')
-        cid = find_cid_by_user(fuid, data.get('uid')).get('cid')
-        UserMeta.objects.filter(uid = uid, meta_name = 'friend', meta_value = str(fuid)).delete()
-        UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(uid)).delete()
+        cid = find_cid_by_user(ruid = fuid, uid = data.get('uid')).get('cid')
+        UserMeta.objects.filter(uid = data.get('uid'), meta_name = 'friend', meta_value = str(fuid)).delete()
+        UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(data.get('uid'))).delete()
+        ChatMeta.objects.filter(cid = cid).delete()
         Chat.objects.filter(cid = cid).delete()
         ret = {
             'state': 200,
