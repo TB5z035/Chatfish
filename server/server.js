@@ -264,9 +264,9 @@ var response_request = function(request, response, body) {
 }
 
 var django_request = function(request, response, body) {
-    var sha1 = crypto.createHash('sha1')
+    var sha256 = crypto.createHash('sha256')
     var text = encoder.encode(body + ' post from ChatFish Server')
-    var key = sha1.update(text).digest('hex')
+    var key = sha256.update(text).digest('hex')
     response.writeHead(200, {
         'Content-Type': 'application/json;charset=utf8'
     })
