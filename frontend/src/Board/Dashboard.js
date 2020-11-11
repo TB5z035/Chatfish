@@ -374,8 +374,6 @@ export default function Dashboard() {
           'wss://' + window.location.host + '/ws'
           // 'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        await dispatch(setMyName(nameCookie))
 
         // Connection opened
         socket.addEventListener('open', function (event) {
@@ -393,6 +391,7 @@ export default function Dashboard() {
                   Object.prototype.hasOwnProperty.call(data, 'state') &&
                   data['state'] === 200
                 ) {
+                  dispatch(setMyName(data['userInfo']))
                   dispatch(setMessageList(data['message_list']))
                   dispatch(setRequestList(data['request_list']))
                 }
@@ -473,7 +472,7 @@ export default function Dashboard() {
         socket.onerror = function (event) {
           console.error('WebSocket error observed:', event)
           if (!initWebSocket) {
-            history.push('/sign')
+            // history.push('/sign')
           }
           setOnline(false)
         }
@@ -481,7 +480,7 @@ export default function Dashboard() {
           setOnline(false)
         }
       } else {
-        history.push('/sign')
+        // history.push('/sign')
       }
     }
     setWebSocket().then()
@@ -596,7 +595,7 @@ export default function Dashboard() {
               {myName === null ? 'https://www.gravatar.com/avatar/' +
                   'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
                 : 'https://www.gravatar.com/avatar/' +
-                        md5(myName).toString() +
+                        md5(myName.email).toString() +
                         '?d=robohash'}/>
           </IconButton>
           <Menu

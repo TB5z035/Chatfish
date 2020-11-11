@@ -70,13 +70,13 @@ export default function FriendList() {
               <Avatar src={user.isGroup === 1
                 ? null
                 : 'https://www.gravatar.com/avatar/' +
-                  md5(user.user).toString() +
+                  md5(user.userInfo.email).toString() +
                   '?d=robohash'}>{user.isGroup === 1
                   ? user.user[0]
                   : null}</Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={user.user}
+              primary={user.userInfo.nickname}
               secondary={
                 <React.Fragment>
                   <Typography
