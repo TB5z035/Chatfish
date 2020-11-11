@@ -92,7 +92,7 @@ def fetch_offline_message(data, by = 'cid'):
         mids = [ msg['mid'] for msg in offline_messages ]
         msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
         ret = [ {
-            'type': msg['mtype'],
+            'mtype': msg['mtype'],
             'time': msg['content'],
             'from' : find_name_by_uid(msg['uid']).get('name'),
             'content': msg['content']
@@ -140,7 +140,7 @@ def fetch_chat_member(cid):
 def fetch_chat_message(cid, number = 20, page = -1):
     msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
     message_list = [ { 
-        'type': msg['mtype'],
+        'mtype': msg['mtype'],
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
         'content': msg['content'],
