@@ -151,7 +151,7 @@ def fetch_chat_message(cid, number = 20, page = -1):
             'message_list': message_list,
             'bottom': 1
         }
-    elif len(ret) > number * page :
+    elif len(msgs) > number * page :
         return {
             'state': 200,
             'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ],
