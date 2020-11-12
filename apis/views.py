@@ -43,7 +43,7 @@ def register_in(data):
     {username: user_name, password: user_password}
     '''
     try:
-        new_user = User(name = data['username'], pwd = data['password'])
+        new_user = User(name = data['username'], pwd = data['password'], email = data['email'], nickname = data['nickname'])
     except Exception:
         ret = {
             'state': 403,
@@ -152,6 +152,7 @@ def init_group_message(data):
                     'mtype': data.get('mtype'),
                     'username': data.get('group_name'),
                     'friend_name': data.get('username'),
+                    'userInfo': fetch_user_info_by_uid(data.get('uid')).get('userInfo'),
                     'uid': member
                 })
     except Exception:
@@ -806,6 +807,7 @@ def post_data(request):
                     ret = {
                         'state': 200,
                         'message': 'Successfully fetched.',
+                        'userInfo': fetch_user_info_by_uid(data.get('uid')).get('userInfo'),
                         'message_list': message_list_ret.get('message_list'),
                         'request_list': request_list_ret.get('request_list')
                     }
