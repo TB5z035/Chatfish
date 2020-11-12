@@ -45,14 +45,16 @@ export const setMyName = (myName) => ({
   myName
 })
 
-export const addFriend = (friendName) => ({
+export const addFriend = (friendName, userInfo) => ({
   type: types.ADD_FRIEND,
-  friendName
+  friendName,
+  userInfo
 })
 
-export const addGroup = (groupName) => ({
+export const addGroup = (groupName, userInfo) => ({
   type: types.ADD_GROUP,
-  groupName
+  groupName,
+  userInfo
 })
 
 export const deleteFriend = (friendName) => ({

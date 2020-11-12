@@ -133,7 +133,7 @@ export default function SecondaryList() {
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
             ) {
-              dispatch(addGroup(groupName))
+              dispatch(addGroup(groupName, data['userInfo']))
               enqueueSnackbar('Successful create group: ' + groupName, {
                 variant: 'success'
               })

@@ -250,13 +250,24 @@ export default function Dashboard() {
           variant: 'warning'
         })
       } else {
-        if (await postAgreeAddFriend(myName.username, friendName)) {
-          dispatch(addFriend(friendName))
-          dispatch(deleteRequest(0, friendName))
-          enqueueSnackbar('Successful add friend: ' + friendName, {
-            variant: 'success'
-          })
-        }
+        await postAgreeAddFriend(myName.username, friendName).then((res) =>
+          res
+            .json()
+            .catch((error) => console.error('Error:', error))
+            .then((data) => {
+              if (
+                data != null &&
+                      Object.prototype.hasOwnProperty.call(data, 'state') &&
+                      data['state'] === 200
+              ) {
+                dispatch(addFriend(friendName, data['userInfo']))
+                dispatch(deleteRequest(0, friendName))
+                enqueueSnackbar('Successful add friend: ' + friendName, {
+                  variant: 'success'
+                })
+              }
+            })
+        )
       }
     },
     [myName, dispatch, enqueueSnackbar, friendList]
@@ -275,13 +286,24 @@ export default function Dashboard() {
           variant: 'warning'
         })
       } else {
-        if (await postAgreeAddGroup(myName.username, groupName, friendName)) {
-          dispatch(addGroup(groupName))
-          dispatch(deleteRequest(1, groupName))
-          enqueueSnackbar('Successful add group: ' + groupName, {
-            variant: 'success'
-          })
-        }
+        postAgreeAddGroup(myName.username, groupName, friendName).then((res) =>
+          res
+            .json()
+            .catch((error) => console.error('Error:', error))
+            .then((data) => {
+              if (
+                data != null &&
+                      Object.prototype.hasOwnProperty.call(data, 'state') &&
+                      data['state'] === 200
+              ) {
+                dispatch(addGroup(groupName, data['userInfo']))
+                dispatch(deleteRequest(1, groupName))
+                enqueueSnackbar('Successful add group: ' + groupName, {
+                  variant: 'success'
+                })
+              }
+            })
+        )
       }
     },
     [myName, dispatch, enqueueSnackbar, friendList]
@@ -459,7 +481,7 @@ export default function Dashboard() {
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-                dispatch(addFriend(receivedData['friend_name']))
+                dispatch(addFriend(receivedData['friend_name'], receivedData['userInfo']))
                 enqueueSnackbar(
                   'Successful add friend: ' + receivedData['friend_name'],
                   { variant: 'success' }
