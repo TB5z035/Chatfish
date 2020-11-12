@@ -1,7 +1,7 @@
 {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "Init_test",
+        "NAME": "chatfish",
         "USER": "root",
         "PASSWORD": "eeRiethei1EikohgaiheizoLoom1el0a",
         "HOST": "mariaDB.GoJellyfish.secoder.local",
