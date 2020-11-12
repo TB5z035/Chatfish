@@ -123,7 +123,7 @@ export default function SecondaryList() {
         variant: 'warning'
       })
     } else {
-      postAddGroup(0, myName, friends, groupName).then((res) =>
+      postAddGroup(0, myName.username, friends, groupName).then((res) =>
         res
           .json()
           .catch((error) => console.error('Error:', error))
