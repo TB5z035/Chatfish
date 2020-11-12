@@ -487,27 +487,11 @@ class AddGroupTest(PostTest):
         self.assertEqual(res_json.get('state'), 403)
         self.assertEqual(res_json.get('message'), 'Someone not friend.')
 
-    def test_add_group_invalid(self):
-        data = {
-            'type': 'ADD_GROUP',
-            'group_name': PRIVATE_CHAT,
-            'uid': self.uid1,
-            'friend_list': [
-                TEST_FRIEND_USER,
-                TEST_NEW_FRIEND_USER
-            ]
-        }
-        response = self.post_test(self.client, data)
-        self.assertEqual(response.status_code, 200)
-        res_json = json.loads(response.content)
-        self.assertEqual(res_json.get('state'), 403)
-        self.assertEqual(res_json.get('message'), 'Group name invalid.')
-
     def test_add_group_without_friendlist(self):
         data = {
             'type': 'ADD_GROUP',
             'is_init': 1,
-            'group_name': GROUP_CHAT,
+            'group_name': self.cid3,
             'uid': self.uid1
         }
         response = self.post_test(self.client, data)
@@ -520,7 +504,7 @@ class AddGroupTest(PostTest):
         data = {
             'type': 'ADD_GROUP',
             'is_init': 1,
-            'group_name': GROUP_CHAT,
+            'group_name': self.cid3,
             'uid': self.uid1,
             'friend_list': [
                 TEST_FRIEND_USER,
@@ -536,7 +520,7 @@ class AddGroupTest(PostTest):
     def test_agree_add_group_success(self):
         data = {
             'type': 'AGREE_ADD_GROUP',
-            'group_name': GROUP_CHAT,
+            'group_name': self.cid3,
             'uid': self.uid3,
             'username': TEST_NEW_FRIEND_USER
         }
