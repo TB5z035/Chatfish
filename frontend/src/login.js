@@ -74,11 +74,16 @@ export default function SignInSide () {
   const [repeatNewPassword, setRepeatNewPassword] = useState('')
   const [newPasswordValid, setNewPasswordValid] = useState(false)
   const [newUserNameValid, setNewUserNameValid] = useState(false)
+  const [emailValid, setEmailValid] = useState(false)
+  const [nicknameValid, setNicknameValid] = useState(false)
+  const [emailInit, setEmailInit] = useState(false)
+  const [nicknameInit, setNicknameInit] = useState(false)
   const [repeatNewPasswordValid, setRepeatNewPasswordValid] = useState(false)
   const [newUserNameInit, setNewUserNameInit] = useState(false)
   const [newPasswordInit, setNewPasswordInit] = useState(false)
   const [repeatNewUserNameInit, setRepeatNewPasswordInit] = useState(false)
   const [email, setEmail] = useState('')
+  const [nickname, setNickname] = useState('')
   const handleLogin = useCallback(async (e) => {
     e.preventDefault()
 
@@ -112,7 +117,8 @@ export default function SignInSide () {
     const params = {
       username: newUserName,
       password: newPasswordSHA,
-      email: email
+      email: email,
+      nickname: nickname
     }
 
     fetch('/?action=register', {
@@ -128,7 +134,7 @@ export default function SignInSide () {
           setIsSignIn(true)
         } else alert('Fail to register!')
       }))
-  }, [newUserName, newPassword, email])
+  }, [newUserName, newPassword, email, nickname])
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -235,12 +241,42 @@ export default function SignInSide () {
               <TextField
                 variant="outlined"
                 margin="normal"
+                error={!nicknameValid && nicknameInit}
+                helperText="1-10 chars"
+                onChange={(e) => {
+                  setNickname(e.target.value)
+                  setNicknameInit(true)
+                  if (/^[\u4e00-\u9fa5_a-zA-Z0-9]{1,10}$/.test(e.target.value)) {
+                    setNicknameValid(true)
+                  } else {
+                    setNicknameValid(false)
+                  }
+                }}
+                required
+                fullWidth
+                value={nickname}
+                name="Nickname"
+                label="Nickname"
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
                 required
                 fullWidth
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 name="Email"
                 label="Email"
+                error={!emailValid && emailInit}
+                helperText="your email"
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setEmailInit(true)
+                  if (/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+/.test(e.target.value)) {
+                    setEmailValid(true)
+                  } else {
+                    setEmailValid(false)
+                  }
+                }}
               />
               <TextField
                 variant="outlined"
@@ -292,7 +328,8 @@ export default function SignInSide () {
                 fullWidth
                 variant="contained"
                 color="primary"
-                disabled={!(newPasswordValid && newUserNameValid && repeatNewPasswordValid)}
+                disabled={!(newPasswordValid &&
+                    newUserNameValid && repeatNewPasswordValid && emailValid && nicknameValid)}
                 className={classes.submit}
                 onClick={handleSignUp}
               >
