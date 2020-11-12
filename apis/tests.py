@@ -9,6 +9,7 @@ from config.local_settings import WRONG_PWD
 
 TEST_USER = 'test'
 TEST_EMAIL = 'test@admin.email'
+TEST_NICKNAME = 'test_nick'
 
 FRIEND = 'friend'
 MEMBER = 'member'
@@ -144,7 +145,9 @@ class RegisterTest(PostTest):
             'type': 'REGISTER_IN',
             'user_info': {
                 'username': 'test_new',
-                'password': TEST_PWD
+                'password': TEST_PWD,
+                'email': TEST_EMAIL,
+                'nickname': TEST_NICKNAME
             }
         }
         response = self.post_test(self.client, data)
@@ -158,7 +161,9 @@ class RegisterTest(PostTest):
             'type': 'REGISTER_IN',
             'user_info': {
                 'username': TEST_USER,
-                'password': TEST_PWD
+                'password': TEST_PWD,
+                'email': TEST_EMAIL,
+                'nickname': TEST_NICKNAME
             }
         }
         response = self.post_test(self.client, data)

@@ -7,6 +7,7 @@ class User(models.Model):
     name = models.CharField(max_length = 12, unique = True)
     pwd = models.CharField(max_length = 50)
     email = models.EmailField(blank = True)
+    nickname = models.CharField(max_length = 12, blank = True)
 
 class UserMeta(models.Model):
     '''
@@ -111,13 +112,7 @@ def fetch_group_member_info(data):
     try:
         cid = find_cid_by_name(data.get('group_name')).get('cid')
         uid_list = fetch_chat_member(cid)
-        users = [ User.objects.get(uid = uid) for uid in uid_list ]
-        group_member = [{
-            'user': user.name,
-            # 'email': user.email,
-            'email': 'default_email',
-            'nickname': 'default_nickname'
-        } for user in users ]
+        group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
         ret = {
             'state': 200,
@@ -144,6 +139,7 @@ def fetch_chat_message(cid, number = 20, page = -1):
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
         'content': msg['content'],
+        'userInfo': fetch_user_info_by_uid(msg['uid']).get('userInfo')
     } for msg in msgs ]
     if number == -1 or page == -1 :
         return {
@@ -173,7 +169,12 @@ def fetch_all_message(uid, number = -1):
         # user can be multiple if delete [0]
         message_list = [{
             'isGroup': int(chat.ctype),
+            'userInfo': {
+                'username': chat.cid,
+                'nickname': chat.name
+            } if chat.ctype else [ fetch_user_info_by_uid(member).get('userInfo') for member in fetch_chat_member(chat.cid) if member != uid ][0],
             'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'userMap': fetch_user_map_by_cid(chat.cid) if chat.ctype else None,
             'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
             'offline_message_list': fetch_offline_message({
                 'uid': uid,
@@ -214,6 +215,35 @@ def fetch_all_offline_request(uid):
         }
     print('fetch all requests.')
     print(ret)
+    return ret
+
+def fetch_user_info_by_uid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+        ret = {
+            'find': 1,
+            'userInfo': {
+                'username': user.name,
+                'nickname': user.nickname if user.nickname != "" else user.name,
+                'email': user.email
+            }
+        }
+    except Exception:
+        ret = {
+            'find': 0
+        }
+    return ret
+
+def fetch_user_map_by_cid(cid):
+    users = ChatMeta.objects.filter(cid = cid, meta_name = 'member').values('meta_value')
+    ret = {}
+    for user in users:
+        uid = int(user['meta_value'])
+        user_info = fetch_user_info_by_uid(uid).get('userInfo')
+        ret[user_info.get('username')] = {
+            'nickname': user_info.get('nickname'),
+            'email': user_info.get('email')
+        }
     return ret
 
 def find_uid_by_name(name):
