@@ -7,13 +7,12 @@ it('renders without crashing', () => {
   const message = { type: 'normal',
     time: '2019-10-21T06:38:03.063Z',
     from: 'alice',
-    content: 'hello' }
-  const userInfo = { email: 'b', nickname: 'a' }
+    content: 'hello',
+    userInfo: { email: 'b', nickname: 'a' }}
   ReactDOM.render(
     <div>
       <Message
         message={message}
-        userInfo={userInfo}
         key={message.content + message.time}
       /></div>, div)
 })
