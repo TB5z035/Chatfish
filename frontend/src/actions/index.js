@@ -1,21 +1,23 @@
 import * as types from './ActionTypes'
 
-export const addMessage = (message, author, receiver, isGroup, mtype) => ({
+export const addMessage = (message, author, receiver, isGroup, mtype, userInfo) => ({
   type: types.NEW_MESSAGE_SEND,
   message,
   author,
   receiver,
   isGroup,
-  mtype
+  mtype,
+  userInfo
 })
 
-export const messageReceived = (message, author, group, isGroup, mtype) => ({
+export const messageReceived = (message, author, group, isGroup, mtype, userInfo) => ({
   type: types.NEW_MESSAGE_RECEIVE,
   message,
   author,
   group,
   isGroup,
-  mtype
+  mtype,
+  userInfo
 })
 
 export const setFocusUser = (username) => ({

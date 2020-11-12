@@ -58,7 +58,8 @@ const messages = (state = initialState, action) => {
             from: action.author,
             content: action.message,
             time: new Date().getTime(),
-            mtype: action.mtype
+            mtype: action.mtype,
+            userInfo: action.userInfo
           })
           newList.unshift(temp)
         }
@@ -80,7 +81,8 @@ const messages = (state = initialState, action) => {
             from: action.author,
             content: action.message,
             time: new Date().getTime(),
-            mtype: action.mtype
+            mtype: action.mtype,
+            userInfo: action.userInfo
           })
           newList.unshift(temp)
         }
@@ -136,8 +138,8 @@ const initialState = [
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser1', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
-  // { user: 'Alice', isGroup: 0, message_list: [{ mtype: 'normal', time: '2020-10-28T06:20:52.148Z', from: 'Alice', content: 'hello' }], userInfo: { username: 'Alice', nickname: 'nic2k', email: '' } },
-  // { isGroup: 1, userInfo: { username: 'sdked', nickname: 'nickegout', email: '' }, userMap: { 2345: { nickname: '2345nick', email: '' }, 1234: { nickname: '1234nick', email: '' }, tianbeiwen: { nickname: 'tianbeiwennick', email: '' } }, user: 'sdked', message_list: [{ mtype: 'normal', time: '2020-10-28T06:20:52.149Z', from: '2345', content: 'hello' }, { mtype: 'normal', time: '2020-10-28T06:41:50.812Z', from: '1234', content: 'hello' }, { mtype: 'normal', time: '2020-10-28T06:45:36.608Z', from: '1234', content: 'asdgas' }, { mtype: 'normal', time: '2020-10-28T07:05:52.492Z', from: '2345', content: 'tiana' }] }
+  // { user: 'Alice', isGroup: 0, message_list: [{ mtype: 'normal', time: '2020-10-28T06:20:52.148Z', from: 'Alice', content: 'hello', userInfo: { username: 'Alice', nickname: 'nic2k', email: '' } }], userInfo: { username: 'Alice', nickname: 'nic2k', email: '' } },
+  // { isGroup: 1, userInfo: { username: 'sdked', nickname: 'nickegout', email: '' }, user: 'sdked', message_list: [{ mtype: 'normal', time: '2020-10-28T06:20:52.149Z', from: '2345', content: 'hello', userInfo: { username: 'sdked', nickname: '2345nick', email: '' } }, { mtype: 'normal', time: '2020-10-28T06:41:50.812Z', from: '1234', content: 'hello' , userInfo: { username: 'sdked', nickname: '1234nick', email: '' }}] }
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },
   // { user: 'testuser', isGroup: 1, message_list: [] },

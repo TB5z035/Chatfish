@@ -418,7 +418,8 @@ export default function Dashboard() {
                       receivedData['friend_name'],
                       receivedData['username'],
                       1,
-                      receivedData['mtype']
+                      receivedData['mtype'],
+                      receivedData['userInfo']
                     )
                   )
                 } else {
