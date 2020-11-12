@@ -250,7 +250,7 @@ export default function Dashboard() {
           variant: 'warning'
         })
       } else {
-        if (await postAgreeAddFriend(myName, friendName)) {
+        if (await postAgreeAddFriend(myName.username, friendName)) {
           dispatch(addFriend(friendName))
           dispatch(deleteRequest(0, friendName))
           enqueueSnackbar('Successful add friend: ' + friendName, {
@@ -275,7 +275,7 @@ export default function Dashboard() {
           variant: 'warning'
         })
       } else {
-        if (await postAgreeAddGroup(myName, groupName, friendName)) {
+        if (await postAgreeAddGroup(myName.username, groupName, friendName)) {
           dispatch(addGroup(groupName))
           dispatch(deleteRequest(1, groupName))
           enqueueSnackbar('Successful add group: ' + groupName, {
@@ -289,7 +289,7 @@ export default function Dashboard() {
 
   const refuseAddFriendRequest = useCallback(
     async (refusedUsername, friendName) => {
-      if (await postDisagreeAddFriend(myName, refusedUsername)) {
+      if (await postDisagreeAddFriend(myName.username, refusedUsername)) {
         dispatch(deleteRequest(0, refusedUsername))
       }
     },
@@ -298,7 +298,7 @@ export default function Dashboard() {
 
   const refuseAddGroupRequest = useCallback(
     async (refusedGroupName, friendName) => {
-      if (await postDisagreeAddGroup(myName, refusedGroupName, friendName)) {
+      if (await postDisagreeAddGroup(myName.username, refusedGroupName, friendName)) {
         dispatch(deleteRequest(1, refusedGroupName))
       }
     },
