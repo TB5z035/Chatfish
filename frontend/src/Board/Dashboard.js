@@ -217,7 +217,7 @@ export default function Dashboard() {
     const friends = []
     const groups = []
 
-    requestList.map((item) => {
+    requestList.forEach((item) => {
       const request = item
       const tempItem = {
         groupName: request.user,
