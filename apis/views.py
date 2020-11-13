@@ -68,35 +68,6 @@ def register_in(data):
 def insert_user_to_chat(uid, cid):
     insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
 
-def init_message(data): # depreciated API
-    try:
-        new_msg = Message(cid = data.get('cid'), \
-                        uid = data.get('uid'), \
-                        mtype = data.get('mtype'), \
-                        content = data.get('content'))
-        new_msg.full_clean()
-        new_msg.save()
-        ret = {
-            'state': 200,
-            'uid': data.get('uid'),
-            'cid': data.get('cid'),
-            'mid': new_msg.mid
-        }
-        post_to_nodejs({
-            'state': 200,
-            'type': 'MESSAGE_NOTIFY',
-            'content': data.get('content'),
-            'username': data.get('friend_name'),
-            'friend_name': data.get('username'),
-            'uid': find_uid_by_name(data.get('friend_name')).get('uid')
-        })
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in message initialization.'
-        }
-    return ret
-
 def init_private_message(data):
     try:
         new_msg = Message(cid = data.get('cid'), \
@@ -276,31 +247,6 @@ def insert_chat_meta(cid, meta_name, meta_val):
         'meta_name': meta_name,
         'meta_value': meta_val
     }
-    return ret
-
-def init_chat(data): # depreciated API
-    '''
-    key:
-        ctype
-        name
-        users
-    '''
-    try:
-        new_chat = Chat(ctype = data.get('ctype'), name = data.get('name'))
-        new_chat.full_clean()
-        new_chat.save()
-        for uid in data.get('users'):
-            insert_user_to_chat(uid, new_chat.cid)
-        ret = {
-            'state': 200,
-            'cid': data.get('uid'),
-            'users': data.get('users')
-        }
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in chat initialization.'
-        }
     return ret
 
 def init_private_chat(data):
@@ -566,39 +512,6 @@ def leave_group(data):
             'state': 200,
             'message': 'Failed'
         }
-    return ret
-
-def add_user_to_chat(data, cid): # depreciated API
-    uid_ret = find_uid_by_name(data.get('friend_name'))
-    if uid_ret.get('find') == 0 :
-        ret = {
-            'state': 405,
-            'message': 'Invalid token or username or friend name!'
-        }
-    elif not judge_friend(data.get('uid'), uid_ret.get('uid')): # check friends' relation.
-        ret = {
-            'state': 405,
-            'message': 'Not friend of the user.'
-        }
-    elif judge_member(uid_ret.get('uid'), cid) :
-        ret = {
-            'state': 405,
-            'message': 'Already member of the group.'
-        }
-    else :
-        ret = {
-            'state': 200,
-            'message': 'Successfully requested!'
-        }
-        post_to_nodejs({
-            'state': 200,
-            'type': 'NEW_ADD_GROUP',
-            'content': 'Add friend to group request sent.',
-            'uid': uid_ret.get('uid'),
-            'username': data.get('friend_name'),
-            'group_name': data.get('group_name'),
-            'friend_name': find_name_by_uid(data.get('uid')).get('name')
-        })
     return ret
 
 def add_users_to_chat(data, cid):
