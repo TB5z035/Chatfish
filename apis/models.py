@@ -201,7 +201,7 @@ def fetch_all_offline_request(uid):
         request_list = [{
             'isGroup': request.req_type,
             'user': request.name,
-            'friend_name': find_name_by_uid(request.suid).get('name') 
+            'friend_name': User.objects.get(uid = request.suid).nickname 
         } for request in requests ]
         ret = {
             'state': 200,
