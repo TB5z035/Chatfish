@@ -110,7 +110,7 @@ def fetch_chat_type(cid):
 
 def fetch_group_member_info(data):
     try:
-        cid = find_cid_by_name(data.get('group_name')).get('cid')
+        cid = data.get('group_name')
         uid_list = fetch_chat_member(cid)
         group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
