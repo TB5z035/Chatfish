@@ -89,6 +89,7 @@ def init_private_message(data):
             'mtype': data.get('mtype'),
             'username': data.get('friend_name'),
             'friend_name': data.get('username'),
+            'userInfo': fetch_user_info_by_uid(data.get('uid')).get('userInfo'),
             'uid': find_uid_by_name(data.get('friend_name')).get('uid')
         })
     except Exception:
