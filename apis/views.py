@@ -337,6 +337,7 @@ def delete_friend(data):
     try:
         fuid = find_uid_by_name(data.get('friend_name')).get('uid')
         cid = find_cid_by_user(ruid = fuid, uid = data.get('uid')).get('cid')
+        chat = Chat.objects.get(cid = cid)
         UserMeta.objects.filter(uid = data.get('uid'), meta_name = 'friend', meta_value = str(fuid)).delete()
         UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(data.get('uid'))).delete()
         ChatMeta.objects.filter(cid = cid).delete()
@@ -345,7 +346,7 @@ def delete_friend(data):
             'state': 200,
             'message': 'Successful requested'
         }
-    except:
+    except Exception:
         ret = {
             'state': 405,
             'message': 'Invalid token or username or friend name'
