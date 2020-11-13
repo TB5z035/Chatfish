@@ -111,13 +111,14 @@ def fetch_chat_type(cid):
 def fetch_group_member_info(data):
     try:
         cid = data.get('group_name')
+        chat = Chat.objects.get(cid = cid)
         uid_list = fetch_chat_member(cid)
         group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
         ret = {
             'state': 200,
             'message': 'Successfully requested.',
-            'group_name': data.get('group_name'),
+            'group_name': cid,
             'group_member': group_member
         }
     except:
