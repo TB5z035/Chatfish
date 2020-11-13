@@ -162,6 +162,7 @@ def fetch_chat_message(cid, number = 20, page = -1):
 
 def fetch_all_message(uid, number = -1):
     try:
+        user = User.objects.get(uid = uid)
         chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat_info['cid'] for chat_info in chats_info ]
         chats = [ Chat.objects.get(cid = cid) for cid in cid_list ]
@@ -197,6 +198,7 @@ def fetch_all_message(uid, number = -1):
 
 def fetch_all_offline_request(uid):
     try:
+        user = User.objects.get(uid = uid)
         requests = OfflineRequest.objects.filter(ruid = uid)
         request_list = [{
             'isGroup': request.req_type,
