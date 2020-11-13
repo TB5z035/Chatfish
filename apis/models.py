@@ -173,7 +173,7 @@ def fetch_all_message(uid, number = -1):
                 'username': chat.cid,
                 'nickname': chat.name
             } if chat.ctype else [ fetch_user_info_by_uid(member).get('userInfo') for member in fetch_chat_member(chat.cid) if member != uid ][0],
-            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'user': chat.cid if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
             'userMap': fetch_user_map_by_cid(chat.cid) if chat.ctype else None,
             'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
             'offline_message_list': fetch_offline_message({
