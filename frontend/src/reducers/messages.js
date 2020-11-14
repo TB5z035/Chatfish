@@ -22,12 +22,12 @@ const messages = (state = initialState, action) => {
     case 'ADD_FRIEND':
       return [
         ...state,
-        { user: action.friendName, message_list: [], isGroup: 0 }
+        { user: action.friendName, message_list: [], isGroup: 0, userInfo: action.userInfo }
       ]
     case 'ADD_GROUP':
       return [
         ...state,
-        { user: action.groupName, message_list: [], isGroup: 1 }
+        { user: action.groupName, message_list: [], isGroup: 1, userInfo: action.userInfo }
       ]
     case 'SET_MESSAGE_LIST':
       newList = action.messageList
@@ -94,6 +94,15 @@ const messages = (state = initialState, action) => {
 }
 
 const initialState = [
+  // { user: 'asg',
+  //   isGroup: 0,
+  //   userInfo: { nickname: 'a', email: 'g12sagsad@qq.com' },
+  //   message_list: [{ from: 'a',
+  //     type: 'abnormal',
+  //     content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+  //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+  //     time: 46546516,
+  //     userInfo: { nickname: 'a', email: '6dsa@qq.com' } }] }
 ]
 
 export default messages

@@ -133,7 +133,7 @@ export default function SecondaryList() {
               Object.prototype.hasOwnProperty.call(data, 'state') &&
               data['state'] === 200
             ) {
-              dispatch(addGroup(groupName))
+              dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
               enqueueSnackbar('Successful create group: ' + groupName, {
                 variant: 'success'
               })
@@ -168,7 +168,8 @@ export default function SecondaryList() {
               userName: userName,
               friend_name: key,
               is_group: 0,
-              mtype: 'normal'
+              mtype: 'normal',
+              userInfo: myName
             }
             webSocket.send(JSON.stringify(params))
           }
@@ -177,7 +178,7 @@ export default function SecondaryList() {
     })
     setMessage('')
     setSelectState({})
-  }, [message, webSocket, dispatch, selectState])
+  }, [message, webSocket, dispatch, selectState, myName])
 
   const handleChange = (event) => {
     setSelectState({
