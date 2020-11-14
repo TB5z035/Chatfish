@@ -59,7 +59,7 @@ class OfflineRequest(models.Model):
     id = models.BigAutoField(primary_key = True)
     ruid = models.IntegerField(blank = False, default = 0)
     suid = models.IntegerField(blank = False, default = 0)
-    name = models.CharField(max_length = 20)
+    name = models.CharField(max_length = 25)
     req_type = models.IntegerField(blank = False, default = 0)
 
 class OfflineMessage(models.Model):
@@ -110,14 +110,15 @@ def fetch_chat_type(cid):
 
 def fetch_group_member_info(data):
     try:
-        cid = find_cid_by_name(data.get('group_name')).get('cid')
+        cid = data.get('group_name')
+        chat = Chat.objects.get(cid = cid)
         uid_list = fetch_chat_member(cid)
         group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
         ret = {
             'state': 200,
             'message': 'Successfully requested.',
-            'group_name': data.get('group_name'),
+            'group_name': cid,
             'group_member': group_member
         }
     except:
@@ -162,6 +163,7 @@ def fetch_chat_message(cid, number = 20, page = -1):
 
 def fetch_all_message(uid, number = -1):
     try:
+        user = User.objects.get(uid = uid)
         chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat_info['cid'] for chat_info in chats_info ]
         chats = [ Chat.objects.get(cid = cid) for cid in cid_list ]
@@ -173,7 +175,7 @@ def fetch_all_message(uid, number = -1):
                 'username': chat.cid,
                 'nickname': chat.name
             } if chat.ctype else [ fetch_user_info_by_uid(member).get('userInfo') for member in fetch_chat_member(chat.cid) if member != uid ][0],
-            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'user': chat.cid if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
             'userMap': fetch_user_map_by_cid(chat.cid) if chat.ctype else None,
             'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
             'offline_message_list': fetch_offline_message({
@@ -197,11 +199,12 @@ def fetch_all_message(uid, number = -1):
 
 def fetch_all_offline_request(uid):
     try:
+        user = User.objects.get(uid = uid)
         requests = OfflineRequest.objects.filter(ruid = uid)
         request_list = [{
             'isGroup': request.req_type,
             'user': request.name,
-            'friend_name': find_name_by_uid(request.suid).get('name') 
+            'friend_name': User.objects.get(uid = request.suid).nickname 
         } for request in requests ]
         ret = {
             'state': 200,
@@ -291,32 +294,6 @@ def find_cid_by_user(ruid, username = None, uid = None):
         ret = {
             'find': 1,
             'cid': cid
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
-
-def find_cid_by_name(name):
-    try:
-        chat = Chat.objects.get(name = name)
-        ret = {
-            'find': 1,
-            'cid': chat.cid
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
-
-def find_name_by_cid(cid):
-    try:
-        chat = Chat.objects.get(cid = cid)
-        ret = {
-            'find': 1,
-            'name': chat.name
         }
     except Exception:
         ret = {
