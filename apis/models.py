@@ -59,7 +59,7 @@ class OfflineRequest(models.Model):
     id = models.BigAutoField(primary_key = True)
     ruid = models.IntegerField(blank = False, default = 0)
     suid = models.IntegerField(blank = False, default = 0)
-    name = models.CharField(max_length = 20)
+    name = models.CharField(max_length = 25)
     req_type = models.IntegerField(blank = False, default = 0)
 
 class OfflineMessage(models.Model):
