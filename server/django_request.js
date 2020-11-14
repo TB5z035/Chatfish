@@ -32,9 +32,9 @@ exports.get = function get(path, on_data_callback, on_err_callback) {
 }
 
 exports.post = function post(path, data, on_data_callback, on_err_callback) {
-    var sha256 = crypto.createHash('sha256')
+    var sha512 = crypto.createHash('sha512')
     var text = encoder.encode(JSON.stringify(data) + ' post from ChatFish Server')
-    var key = sha256.update(text).digest('hex')
+    var key = sha512.update(text).digest('hex')
 
     var content = JSON.stringify(data)
     var options = {

@@ -55,8 +55,8 @@ class PostTest(TestCase):
     def post_test(self, client, data):
         data = json.dumps(data)
         text_bytes = (data + ' post from ChatFish Server').encode('utf-8')
-        sha256 = hashlib.sha256(text_bytes)
-        key = sha256.hexdigest()
+        sha512 = hashlib.sha512(text_bytes)
+        key = sha512.hexdigest()
         return client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, content_type = 'application/json')
 
 class BasePostTest(PostTest):
@@ -73,8 +73,8 @@ class BasePostTest(PostTest):
         }
         data = json.dumps(data)
         text_bytes = (data + ' this is wrong').encode('utf-8')
-        sha256 = hashlib.sha256(text_bytes)
-        key = sha256.hexdigest()
+        sha512 = hashlib.sha512(text_bytes)
+        key = sha512.hexdigest()
         response = self.client.post('/api/post_data/', data = data, HTTP_DATA_KEY = key, content_type = 'application/json')
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)

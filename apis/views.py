@@ -738,11 +738,11 @@ def response_handle(data):
 @csrf_exempt
 def post_data(request):
     body = request.body.decode('utf-8')
-    sha256 = hashlib.sha256((body + SALT).encode('utf-8'))
+    sha512 = hashlib.sha512((body + SALT).encode('utf-8'))
     ret = {}
     print('Receive post request from nodejs: ')
     print(body)
-    if (sha256.hexdigest() == request.META.get('HTTP_DATA_KEY')):
+    if (sha512.hexdigest() == request.META.get('HTTP_DATA_KEY')):
         ret = {
             'state': 200,
             'message': 'Successfuly post!'
@@ -864,8 +864,8 @@ def post_data(request):
 
 def post_to_nodejs(data):
     text_bytes = (json.dumps(data) + SALT).encode('utf-8')
-    sha256 = hashlib.sha256(text_bytes)
-    key = sha256.hexdigest()
+    sha512 = hashlib.sha512(text_bytes)
+    key = sha512.hexdigest()
     headers = {
         'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key
