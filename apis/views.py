@@ -161,9 +161,11 @@ def insert_offline_request(data):
 def del_offline_request(data):
     try:
         if data.get('req_type') == 1 :
-            OfflineRequest.objects.filter(ruid = data.get('ruid'), name = data.get('name'), req_type = data.get('req_type')).delete()
+            pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), name = data.get('name'), req_type = data.get('req_type'))
+            pre_req.delete()
         else :
-            OfflineRequest.objects.filter(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type')).delete()
+            pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type'))
+            pre_req.delete()
         ret = {
             'state': 200,
             'message': 'Successfully delete a request.'
@@ -380,12 +382,18 @@ def add_friend(data):
 
         user = User.objects.get(uid = data.get('uid'))
 
-        insert_offline_request({
+        s = insert_offline_request({
             'ruid': uid_ret.get('uid'),
             'suid': data.get('uid'),
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 400,
+                'message': 'You hava requested before!'
+            }
 
         post_to_nodejs({
             'state': 200,
@@ -427,6 +435,12 @@ def accept_friend_request(data):
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         # set up the chat.
         init_private_chat(
