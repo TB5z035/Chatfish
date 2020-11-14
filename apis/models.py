@@ -300,29 +300,3 @@ def find_cid_by_user(ruid, username = None, uid = None):
             'find': 0
         }
     return ret
-
-def find_cid_by_name(name):
-    try:
-        chat = Chat.objects.get(name = name)
-        ret = {
-            'find': 1,
-            'cid': chat.cid
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
-
-def find_name_by_cid(cid):
-    try:
-        chat = Chat.objects.get(cid = cid)
-        ret = {
-            'find': 1,
-            'name': chat.name
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
