@@ -532,14 +532,14 @@ def deny_friend_request(data):
 def leave_group(data):
     try:
         cid = data.get('group_name')
-        ChatMeta.objects.filter(cid = cid, meta_name = 'member', meta_value = str(data.get('uid'))).delete()
+        ChatMeta.objects.get(cid = cid, meta_name = 'member', meta_value = str(data.get('uid'))).delete()
         ret = {
             'state': 200,
             'message': 'Successful requested'
         }
     except:
         ret = {
-            'state': 200,
+            'state': 405,
             'message': 'Failed'
         }
     return ret
