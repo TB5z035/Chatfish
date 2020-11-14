@@ -68,35 +68,6 @@ def register_in(data):
 def insert_user_to_chat(uid, cid):
     insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
 
-def init_message(data): # depreciated API
-    try:
-        new_msg = Message(cid = data.get('cid'), \
-                        uid = data.get('uid'), \
-                        mtype = data.get('mtype'), \
-                        content = data.get('content'))
-        new_msg.full_clean()
-        new_msg.save()
-        ret = {
-            'state': 200,
-            'uid': data.get('uid'),
-            'cid': data.get('cid'),
-            'mid': new_msg.mid
-        }
-        post_to_nodejs({
-            'state': 200,
-            'type': 'MESSAGE_NOTIFY',
-            'content': data.get('content'),
-            'username': data.get('friend_name'),
-            'friend_name': data.get('username'),
-            'uid': find_uid_by_name(data.get('friend_name')).get('uid')
-        })
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in message initialization.'
-        }
-    return ret
-
 def init_private_message(data):
     try:
         new_msg = Message(cid = data.get('cid'), \
@@ -118,6 +89,7 @@ def init_private_message(data):
             'mtype': data.get('mtype'),
             'username': data.get('friend_name'),
             'friend_name': data.get('username'),
+            'userInfo': fetch_user_info_by_uid(data.get('uid')).get('userInfo'),
             'uid': find_uid_by_name(data.get('friend_name')).get('uid')
         })
     except Exception:
@@ -188,10 +160,8 @@ def insert_offline_request(data):
 
 def del_offline_request(data):
     try:
-        if data.get('req_type') == 1 :
-            OfflineRequest.objects.filter(ruid = data.get('ruid'), name = data.get('name'), req_type = data.get('req_type')).delete()
-        else :
-            OfflineRequest.objects.filter(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type')).delete()
+        pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type'))
+        pre_req.delete()
         ret = {
             'state': 200,
             'message': 'Successfully delete a request.'
@@ -227,7 +197,7 @@ def del_offline_message(data, by = 'cid'):
         elif by == 'uid':
             cid_list1 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')
             cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
-            cid = [ cid for cid in cid_list1 if not cid in cid_list2 and Chat.objects.get(cid = cid).ctype == 0 ][0]
+            cid = [ cid.get('cid') for cid in cid_list1 if cid in cid_list2 and Chat.objects.get(cid = cid.get('cid')).ctype == 0 ][0]
             OfflineMessage.objects.filter(ruid = data.get('ruid'), cid = cid).delete()
         elif by == 'mid':
             OfflineMessage.objects.filter(ruid = data.get('ruid'), mid = data.get('mid')).delete()
@@ -273,31 +243,6 @@ def insert_chat_meta(cid, meta_name, meta_val):
         'meta_name': meta_name,
         'meta_value': meta_val
     }
-    return ret
-
-def init_chat(data): # depreciated API
-    '''
-    key:
-        ctype
-        name
-        users
-    '''
-    try:
-        new_chat = Chat(ctype = data.get('ctype'), name = data.get('name'))
-        new_chat.full_clean()
-        new_chat.save()
-        for uid in data.get('users'):
-            insert_user_to_chat(uid, new_chat.cid)
-        ret = {
-            'state': 200,
-            'cid': data.get('uid'),
-            'users': data.get('users')
-        }
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in chat initialization.'
-        }
     return ret
 
 def init_private_chat(data):
@@ -390,6 +335,7 @@ def delete_friend(data):
     try:
         fuid = find_uid_by_name(data.get('friend_name')).get('uid')
         cid = find_cid_by_user(ruid = fuid, uid = data.get('uid')).get('cid')
+        chat = Chat.objects.get(cid = cid)
         UserMeta.objects.filter(uid = data.get('uid'), meta_name = 'friend', meta_value = str(fuid)).delete()
         UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(data.get('uid'))).delete()
         ChatMeta.objects.filter(cid = cid).delete()
@@ -398,7 +344,7 @@ def delete_friend(data):
             'state': 200,
             'message': 'Successful requested'
         }
-    except:
+    except Exception:
         ret = {
             'state': 405,
             'message': 'Invalid token or username or friend name'
@@ -432,12 +378,18 @@ def add_friend(data):
 
         user = User.objects.get(uid = data.get('uid'))
 
-        insert_offline_request({
+        s = insert_offline_request({
             'ruid': uid_ret.get('uid'),
             'suid': data.get('uid'),
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 400,
+                'message': 'You hava requested before!'
+            }
 
         post_to_nodejs({
             'state': 200,
@@ -479,6 +431,12 @@ def accept_friend_request(data):
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         # set up the chat.
         init_private_chat(
@@ -544,6 +502,7 @@ def deny_friend_request(data):
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
         if s.get('state') == 200 :
             ret = {
                 'state': 200,
@@ -570,49 +529,16 @@ def deny_friend_request(data):
 def leave_group(data):
     try:
         cid = data.get('group_name')
-        ChatMeta.objects.filter(cid = cid, meta_name = 'member', meta_value = str(data.get('uid'))).delete()
+        ChatMeta.objects.get(cid = cid, meta_name = 'member', meta_value = str(data.get('uid'))).delete()
         ret = {
             'state': 200,
             'message': 'Successful requested'
         }
     except:
         ret = {
-            'state': 200,
+            'state': 405,
             'message': 'Failed'
         }
-    return ret
-
-def add_user_to_chat(data, cid): # depreciated API
-    uid_ret = find_uid_by_name(data.get('friend_name'))
-    if uid_ret.get('find') == 0 :
-        ret = {
-            'state': 405,
-            'message': 'Invalid token or username or friend name!'
-        }
-    elif not judge_friend(data.get('uid'), uid_ret.get('uid')): # check friends' relation.
-        ret = {
-            'state': 405,
-            'message': 'Not friend of the user.'
-        }
-    elif judge_member(uid_ret.get('uid'), cid) :
-        ret = {
-            'state': 405,
-            'message': 'Already member of the group.'
-        }
-    else :
-        ret = {
-            'state': 200,
-            'message': 'Successfully requested!'
-        }
-        post_to_nodejs({
-            'state': 200,
-            'type': 'NEW_ADD_GROUP',
-            'content': 'Add friend to group request sent.',
-            'uid': uid_ret.get('uid'),
-            'username': data.get('friend_name'),
-            'group_name': data.get('group_name'),
-            'friend_name': find_name_by_uid(data.get('uid')).get('name')
-        })
     return ret
 
 def add_users_to_chat(data, cid):
@@ -686,12 +612,18 @@ def accept_add_to_chat_request(data):
         }
 
         # delete the offline request.
-        del_offline_request({
+        s = del_offline_request({
             'ruid': data.get('uid'),
             'suid': find_uid_by_name(data.get('friend_name')).get('uid'),
             'name': chat.name + '@' + str(cid),
             'req_type': 1
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         insert_user_to_chat(data.get('uid'), cid)
         
@@ -727,12 +659,18 @@ def deny_add_to_chat_request(data):
         }
 
         # delete the offline request.
-        del_offline_request({
+        s = del_offline_request({
             'ruid': data.get('uid'),
             'suid': find_uid_by_name(data.get('friend_name')).get('uid'),
             'name': chat.name + '@' + str(cid),
             'req_type': 1
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         # post_to_nodejs({
         #     'state': 200,
