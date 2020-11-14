@@ -234,7 +234,8 @@ export default function Dashboard() {
   }, [requestList, setGroupToAddList, setFriendToAddList])
 
   const handleAddFriendRequest = useCallback(
-    async (friendName, inviter) => {
+    async (fName, inviter) => {
+      const friendName = fName.split('@')[1]
       if (myName === friendName) {
         enqueueSnackbar('You cannot accept yourself as a friend', {
           variant: 'warning'
@@ -261,7 +262,7 @@ export default function Dashboard() {
                       data['state'] === 200
               ) {
                 dispatch(addFriend(friendName, data['userInfo']))
-                dispatch(deleteRequest(0, friendName))
+                dispatch(deleteRequest(0, fName))
                 enqueueSnackbar('Successful add friend: ' + friendName, {
                   variant: 'success'
                 })
@@ -274,7 +275,9 @@ export default function Dashboard() {
   )
 
   const handleAddGroupRequest = useCallback(
-    async (groupName, friendName) => {
+    async (gName, fName) => {
+      const groupName = gName.split('@')[1]
+      const friendName = fName.split('@')[1]
       if (
         friendList
           .map((user) => {
@@ -296,8 +299,8 @@ export default function Dashboard() {
                       Object.prototype.hasOwnProperty.call(data, 'state') &&
                       data['state'] === 200
               ) {
-                dispatch(addGroup(groupName, data['userInfo']))
-                dispatch(deleteRequest(1, groupName))
+                dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
+                dispatch(deleteRequest(1, gName))
                 enqueueSnackbar('Successful add group: ' + groupName, {
                   variant: 'success'
                 })
@@ -311,7 +314,7 @@ export default function Dashboard() {
 
   const refuseAddFriendRequest = useCallback(
     async (refusedUsername, friendName) => {
-      if (await postDisagreeAddFriend(myName.username, refusedUsername)) {
+      if (await postDisagreeAddFriend(myName.username, refusedUsername.split('@')[1])) {
         dispatch(deleteRequest(0, refusedUsername))
       }
     },
@@ -320,7 +323,8 @@ export default function Dashboard() {
 
   const refuseAddGroupRequest = useCallback(
     async (refusedGroupName, friendName) => {
-      if (await postDisagreeAddGroup(myName.username, refusedGroupName, friendName)) {
+      if (await postDisagreeAddGroup(myName.username,
+        refusedGroupName.split('@')[1], friendName.split('@')[1])) {
         dispatch(deleteRequest(1, refusedGroupName))
       }
     },
@@ -451,7 +455,8 @@ export default function Dashboard() {
                       receivedData['friend_name'],
                       null,
                       0,
-                      receivedData['mtype']
+                      receivedData['mtype'],
+                      receivedData['userInfo']
                     )
                   )
                 }
