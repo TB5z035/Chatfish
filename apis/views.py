@@ -197,7 +197,7 @@ def del_offline_message(data, by = 'cid'):
         elif by == 'uid':
             cid_list1 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')
             cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
-            cid = [ cid for cid in cid_list1 if not cid in cid_list2 and Chat.objects.get(cid = cid).ctype == 0 ][0]
+            cid = [ cid.get('cid') for cid in cid_list1 if cid in cid_list2 and Chat.objects.get(cid = cid.get('cid')).ctype == 0 ][0]
             OfflineMessage.objects.filter(ruid = data.get('ruid'), cid = cid).delete()
         elif by == 'mid':
             OfflineMessage.objects.filter(ruid = data.get('ruid'), mid = data.get('mid')).delete()
