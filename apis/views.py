@@ -160,12 +160,8 @@ def insert_offline_request(data):
 
 def del_offline_request(data):
     try:
-        if data.get('req_type') == 1 :
-            pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), name = data.get('name'), req_type = data.get('req_type'))
-            pre_req.delete()
-        else :
-            pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type'))
-            pre_req.delete()
+        pre_req = OfflineRequest.objects.get(ruid = data.get('ruid'), suid = data.get('suid'), name = data.get('name'), req_type = data.get('req_type'))
+        pre_req.delete()
         ret = {
             'state': 200,
             'message': 'Successfully delete a request.'
@@ -506,6 +502,7 @@ def deny_friend_request(data):
             'name': user.nickname + '@' + user.name,
             'req_type': 0
         })
+
         if s.get('state') == 200 :
             ret = {
                 'state': 200,
@@ -615,12 +612,18 @@ def accept_add_to_chat_request(data):
         }
 
         # delete the offline request.
-        del_offline_request({
+        s = del_offline_request({
             'ruid': data.get('uid'),
             'suid': find_uid_by_name(data.get('friend_name')).get('uid'),
             'name': chat.name + '@' + str(cid),
             'req_type': 1
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         insert_user_to_chat(data.get('uid'), cid)
         
@@ -656,12 +659,18 @@ def deny_add_to_chat_request(data):
         }
 
         # delete the offline request.
-        del_offline_request({
+        s = del_offline_request({
             'ruid': data.get('uid'),
             'suid': find_uid_by_name(data.get('friend_name')).get('uid'),
             'name': chat.name + '@' + str(cid),
             'req_type': 1
         })
+
+        if s.get('state') != 200:
+            return {
+                'state': 405,
+                'message': 'No such request!'
+            }
 
         # post_to_nodejs({
         #     'state': 200,
