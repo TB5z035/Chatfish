@@ -746,11 +746,11 @@ def response_handle(data):
 @require_http_methods(["POST"])
 def post_data(request):
     body = request.body.decode('utf-8')
-    sha512 = hashlib.sha512((body + SALT).encode('utf-8'))
+    sha3_512 = hashlib.sha3_512((body + SALT).encode('utf-8'))
     ret = {}
     print('Receive post request from nodejs: ')
     print(body)
-    if (sha512.hexdigest() == request.META.get('HTTP_DATA_KEY')):
+    if (sha3_512.hexdigest() == request.META.get('HTTP_DATA_KEY')):
         ret = {
             'state': 200,
             'message': 'Successfuly post!'
@@ -872,8 +872,8 @@ def post_data(request):
 
 def post_to_nodejs(data):
     text_bytes = (json.dumps(data) + SALT).encode('utf-8')
-    sha512 = hashlib.sha512(text_bytes)
-    key = sha512.hexdigest()
+    sha3_512 = hashlib.sha3_512(text_bytes)
+    key = sha3_512.hexdigest()
     headers = {
         'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key

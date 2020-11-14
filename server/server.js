@@ -2,10 +2,8 @@ const http = require('http')
 const URL = require('url')
 const connect = require('connect')
 const { createProxyMiddleware } = require('http-proxy-middleware')
-const crypto = require('crypto')
-const encoder = new TextEncoder('utf8')
+const jsSHA = require('jssha')
 const random = require('string-random')
-const co = require('co');
 
 const ws_server = require('./websocket_server')
 var manager = require('./connection-manager.js').instance()
@@ -431,9 +429,9 @@ var response_request = function(request, response, body) {
 }
 
 var django_request = function(request, response, body) {
-    var sha512 = crypto.createHash('sha512')
-    var text = encoder.encode(body + ' post from ChatFish Server')
-    var key = sha512.update(text).digest('hex')
+    const shaObj = new jsSHA("SHA3-512", "TEXT", { encoding: "UTF8" })
+    shaObj.update(body + ' post from ChatFish Server')
+    var key = shaObj.getHash("HEX")
     response.writeHead(200, {
         'Content-Type': 'application/json;charset=utf8'
     })

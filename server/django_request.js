@@ -1,6 +1,5 @@
 const http = require('http')
-const crypto = require('crypto')
-const encoder = new TextEncoder('utf8')
+const jsSHA = require('jssha')
 
 var default_protocol = "http://"
 var default_host = "localhost"
@@ -33,9 +32,9 @@ exports.get = function get(path) {
 }
 
 exports.post = function post(path, data, on_data_callback, on_err_callback) {
-    var sha512 = crypto.createHash('sha512')
-    var text = encoder.encode(JSON.stringify(data) + ' post from ChatFish Server')
-    var key = sha512.update(text).digest('hex')
+    const shaObj = new jsSHA("SHA3-512", "TEXT", { encoding: "UTF8" })
+    shaObj.update(JSON.stringify(data) + ' post from ChatFish Server')
+    var key = shaObj.getHash("HEX")
 
     var content = JSON.stringify(data)
     var options = {
