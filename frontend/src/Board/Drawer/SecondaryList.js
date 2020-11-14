@@ -159,7 +159,7 @@ export default function SecondaryList() {
     Object.getOwnPropertyNames(selectState).forEach(function (key) {
       if (selectState[key]) {
         if (message !== '') {
-          dispatch(addMessage(message, userName, key, 0, 'normal'))
+          dispatch(addMessage(message, userName, key, 0, 'normal', myName))
 
           if (webSocket !== null) {
             const params = {
