@@ -48,7 +48,7 @@ class PostTest(TestCase):
 
     def setUp(self):
         super(PostTest, self).setUp()
-        self.client = Client(enforce_csrf_checks = True)
+        self.client = Client(enforce_csrf_checks = False)
         User.objects.create(name = TEST_USER, pwd = TEST_PWD, email = TEST_EMAIL, nickname = TEST_NICKNAME)
         self.uid1 = User.objects.get(name = TEST_USER).uid
 
