@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from .models import *
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token as csrf_get_token
 import requests
 import hashlib
 import json
@@ -15,6 +16,14 @@ def get_data(request):
         'data': 'This is a test from django.'
     }
     print('Receive get request from nodejs.')
+    return JsonResponse(data, safe = False)
+
+@require_http_methods(["GET"])
+def get_token(request):
+    data = {
+        'token': csrf_get_token(request)
+    }
+    print('Receive get token request from nodejs.')
     return JsonResponse(data, safe = False)
 
 def login_verify(data):
@@ -735,7 +744,6 @@ def response_handle(data):
     return ret
 
 @require_http_methods(["POST"])
-@csrf_exempt
 def post_data(request):
     body = request.body.decode('utf-8')
     sha512 = hashlib.sha512((body + SALT).encode('utf-8'))
