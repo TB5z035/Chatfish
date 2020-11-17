@@ -82,8 +82,12 @@ const messages = (state = initialState, action) => {
             content: action.message,
             time: new Date().getTime(),
             mtype: action.mtype,
-            userInfo: action.userInfo
+            userInfo: action.userInfo,
+            id: action.id
           })
+          if (!action.isFocus) {
+            temp.offline_ids.push(action.id)
+          }
           newList.unshift(temp)
         }
       }
