@@ -12,6 +12,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFocusUser } from '../../actions'
 import md5 from 'crypto-js/md5'
+import Badge from '@material-ui/core/Badge'
+import { postEnterChat } from '../../fetch/message/enterChat'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,17 +65,34 @@ export default function FriendList() {
             key={user.user}
             alignItems="flex-start"
             onClick={() => {
+              if (user.offline_ids.length > 0) {
+                postEnterChat(user.user,
+                  user.isGroup, user.offline_ids[user.offline_ids.length - 1]).then()
+              }
               dispatch(setFocusUser({ user: user.user, isGroup: user.isGroup }))
             }}
           >
             <ListItemAvatar>
-              <Avatar src={user.isGroup === 1
-                ? null
-                : 'https://www.gravatar.com/avatar/' +
+              {user.offline_ids.length === 0
+                ? <Avatar src={user.isGroup === 1
+                  ? null
+                  : 'https://www.gravatar.com/avatar/' +
+                      md5(user.userInfo.email).toString() +
+                      '?d=robohash'}>{user.isGroup === 1
+                    ? user.user[0]
+                    : null}</Avatar>
+                : <Badge
+                  badgeContent={user.offline_ids.length.toString()}
+                  color="secondary"
+                >
+                  <Avatar src={user.isGroup === 1
+                    ? null
+                    : 'https://www.gravatar.com/avatar/' +
                   md5(user.userInfo.email).toString() +
                   '?d=robohash'}>{user.isGroup === 1
-                  ? user.user[0]
-                  : null}</Avatar>
+                      ? user.user[0]
+                      : null}</Avatar>
+                </Badge>}
             </ListItemAvatar>
             <ListItemText
               primary={user.userInfo.nickname}

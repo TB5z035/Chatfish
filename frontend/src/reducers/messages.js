@@ -88,6 +88,14 @@ const messages = (state = initialState, action) => {
         }
       }
       return newList
+    case 'SET_FOCUS_USER':
+      for (; j < len; j++) {
+        if (newList[j].isGroup === action.username.isGroup &&
+            newList[j].user === action.username.user) {
+          newList[j].offline_ids = []
+        }
+      }
+      return newList
     default:
       return state
   }
@@ -96,12 +104,14 @@ const messages = (state = initialState, action) => {
 const initialState = [
   // { user: 'asg',
   //   isGroup: 0,
-  //   userInfo: { nickname: 'a', email: 'g12sagsad@qq.com' },
+  //   userInfo: { nickname: 'a', email: '6dsa@qq.com' },
+  //   offline_ids: [131],
   //   message_list: [{ from: 'a',
   //     type: 'abnormal',
   //     content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
   //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
   //     time: 46546516,
+  //     id: 131,
   //     userInfo: { nickname: 'a', email: '6dsa@qq.com' } }] }
 ]
 

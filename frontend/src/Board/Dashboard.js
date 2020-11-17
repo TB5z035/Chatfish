@@ -197,7 +197,7 @@ export default function Dashboard() {
   const open = useSelector((state) => state.drawerOpen)
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
-
+  const webSocket = useSelector((state) => state.socket)
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
@@ -350,6 +350,7 @@ export default function Dashboard() {
     dispatch(setFocusUser(null))
     dispatch(setSocket(null))
     dispatch(setMyName(null))
+    webSocket.close()
     setInitWebSocket(false)
     history.push('/sign')
   }
@@ -445,7 +446,8 @@ export default function Dashboard() {
                       receivedData['username'],
                       1,
                       receivedData['mtype'],
-                      receivedData['userInfo']
+                      receivedData['userInfo'],
+                      receivedData['id']
                     )
                   )
                 } else {
@@ -456,7 +458,8 @@ export default function Dashboard() {
                       null,
                       0,
                       receivedData['mtype'],
-                      receivedData['userInfo']
+                      receivedData['userInfo'],
+                      receivedData['id']
                     )
                   )
                 }
