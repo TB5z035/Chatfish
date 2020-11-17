@@ -22,12 +22,20 @@ const messages = (state = initialState, action) => {
     case 'ADD_FRIEND':
       return [
         ...state,
-        { user: action.friendName, message_list: [], isGroup: 0, userInfo: action.userInfo }
+        { user: action.friendName,
+          message_list: [],
+          isGroup: 0,
+          userInfo: action.userInfo,
+          offline_ids: [] }
       ]
     case 'ADD_GROUP':
       return [
         ...state,
-        { user: action.groupName, message_list: [], isGroup: 1, userInfo: action.userInfo }
+        { user: action.groupName,
+          message_list: [],
+          isGroup: 1,
+          userInfo: action.userInfo,
+          offline_ids: [] }
       ]
     case 'SET_MESSAGE_LIST':
       newList = action.messageList

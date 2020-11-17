@@ -54,7 +54,7 @@ import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
 import md5 from 'crypto-js/md5'
-import {postEnterChat} from "../fetch/message/enterChat";
+import { postEnterChat } from '../fetch/message/enterChat'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -371,7 +371,8 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = (receivedData) => {
+  const handleReceiveMessage = useCallback((receivedData) => {
+    console.log(receivedData)
     let isFocus = false
     if (focusUser.isGroup === 1 &&
         receivedData['is_group'].isGroup === 1 &&
@@ -412,7 +413,7 @@ export default function Dashboard() {
         )
       )
     }
-  }
+  }, [dispatch, focusUser])
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
