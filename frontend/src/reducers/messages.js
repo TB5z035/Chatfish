@@ -121,6 +121,19 @@ const messages = (state = initialState, action) => {
         }
       }
       return { messageList: newList, focusUser: state.focusUser }
+    case 'SET_ALREADY_READ':
+      for (; j < len; j++) {
+        if (
+          newList[j].isGroup === action.username.isGroup &&
+            newList[j].user === action.username.user
+        ) {
+          newList[j].friend_offline_ids = []
+          newList[j].message_list.forEach((item) => {
+            item['isRead'] = true
+          })
+        }
+      }
+      return { messageList: newList, focusUser: action.username }
     case 'SET_FOCUS_USER':
       for (; j < len; j++) {
         if (
