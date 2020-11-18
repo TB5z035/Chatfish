@@ -358,10 +358,10 @@ export default function Dashboard() {
   )
 
   const handleNicknameChange = () => {
-    
     // Wait until succeed
     dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
     setInfoNewNickname(infoNewNickname)
+    setInfoCurrentPassword()
     setInfoDialogOpen(false)
   }
 
@@ -444,36 +444,39 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = useCallback(async (receivedData) => {
-    console.log(receivedData)
-    if (receivedData['is_group'] === 1) {
-      console.log('group')
-      dispatch(
-        messageReceived(
-          receivedData['content'],
-          receivedData['friend_name'],
-          receivedData['username'],
-          1,
-          receivedData['mtype'],
-          receivedData['userInfo'],
-          receivedData['id']
+  const handleReceiveMessage = useCallback(
+    async (receivedData) => {
+      console.log(receivedData)
+      if (receivedData['is_group'] === 1) {
+        console.log('group')
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            receivedData['username'],
+            1,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id']
+          )
         )
-      )
-    } else {
-      console.log('private')
-      dispatch(
-        messageReceived(
-          receivedData['content'],
-          receivedData['friend_name'],
-          null,
-          0,
-          receivedData['mtype'],
-          receivedData['userInfo'],
-          receivedData['id']
+      } else {
+        console.log('private')
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            null,
+            0,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id']
+          )
         )
-      )
-    }
-  }, [dispatch])
+      }
+    },
+    [dispatch]
+  )
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
@@ -719,6 +722,7 @@ export default function Dashboard() {
               onClick={() => {
                 handleMenuClose()
                 setInfoNewNickname(myName.nickname)
+                setInfoCurrentPassword()
                 setInfoDialogOpen(true)
               }}
             >
@@ -813,6 +817,17 @@ export default function Dashboard() {
                 ></TextField>
               </Grid>
             </Grid>
+            <Box marginTop={1}>
+              <TextField
+                fullWidth
+                label="Current Password"
+                value={infoCurrentPassword}
+                onChange={(e) => {
+                  setInfoCurrentPassword(e.target.value)
+                }}
+                type="password"
+              ></TextField>
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleNicknameChange}>Submit</Button>
