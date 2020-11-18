@@ -15,7 +15,8 @@ import {
   addRequest,
   deleteRequest,
   setRequestList,
-  deleteFriend
+  deleteFriend,
+  setAlreadyRead
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Box from '@material-ui/core/Box'
@@ -252,7 +253,9 @@ export default function Dashboard() {
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
   const [initWebSocket, setInitWebSocket] = useState(false)
-  const [infoNewNickname, setInfoNewNickname] = useState(myName.nickname)
+  const [infoNewNickname, setInfoNewNickname] = useState(
+    myName ? myName.nickname : null
+  )
   const [infoCurrentPassword, setInfoCurrentPassword] = useState()
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
@@ -417,12 +420,9 @@ export default function Dashboard() {
             ) {
               if (data['state'] === 200) {
                 dispatch(setMyName({ ...myName, email: infoNewEmail }))
-                enqueueSnackbar(
-                  'Successfully changed user info.',
-                  {
-                    variant: 'success'
-                  }
-                )
+                enqueueSnackbar('Successfully changed user info.', {
+                  variant: 'success'
+                })
               } else if (data['state'] === 405) {
                 enqueueSnackbar('Wrong password!', {
                   variant: 'error'
@@ -506,38 +506,35 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = useCallback(
-    async (receivedData) => {
-      console.log(receivedData)
-      if (receivedData['is_group'] === 1) {
-        console.log('group')
-        dispatch(
-          messageReceived(
-            receivedData['content'],
-            receivedData['friend_name'],
-            receivedData['username'],
-            1,
-            receivedData['mtype'],
-            receivedData['userInfo'],
-            receivedData['id']
-          )
+
+  const handleReceiveMessage = useCallback(async (receivedData) => {
+    if (receivedData['is_group'] === 1) {
+      dispatch(
+        messageReceived(
+          receivedData['content'],
+          receivedData['friend_name'],
+          receivedData['username'],
+          1,
+          receivedData['mtype'],
+          receivedData['userInfo'],
+          receivedData['id']
         )
-      } else {
-        console.log('private')
-        dispatch(
-          messageReceived(
-            receivedData['content'],
-            receivedData['friend_name'],
-            null,
-            0,
-            receivedData['mtype'],
-            receivedData['userInfo'],
-            receivedData['id']
-          )
+      )
+    } else {
+      dispatch(
+        messageReceived(
+          receivedData['content'],
+          receivedData['friend_name'],
+          null,
+          0,
+          receivedData['mtype'],
+          receivedData['userInfo'],
+          receivedData['id']
         )
-      }
-    },
-    [dispatch]
+      )
+    }
+  },
+  [dispatch]
   )
 
   const handleAvatarClick = (event) => {
@@ -604,8 +601,13 @@ export default function Dashboard() {
             Object.prototype.hasOwnProperty.call(receivedData, 'state') &&
             receivedData['state'] === 200
           ) {
-            console.log(receivedData)
             switch (receivedData['type']) {
+              case 'READSTATE_NOTIFY':
+                dispatch(setAlreadyRead(
+                  { user: receivedData['is_group'] === 0
+                    ? receivedData['friend_name'] : receivedData['group_name'],
+                  isGroup: receivedData['is_group'] }))
+                break
               case 'MESSAGE_NOTIFY':
                 handleReply('NOTIFY_MESSAGE_NOTIFY').then()
                 handleReceiveMessage(receivedData)
@@ -803,10 +805,10 @@ export default function Dashboard() {
                 </Box>
                 <Box className={classes.menuItemInfoNames}>
                   <Box className={classes.menuItemInfoNickname}>
-                    {myName.nickname}
+                    {myName ? myName.nickname : null}
                   </Box>
                   <Box className={classes.menuItemInfoUsername}>
-                    {'@' + myName.username}
+                    {'@' + (myName ? myName.username : null)}
                   </Box>
                 </Box>
               </Box>

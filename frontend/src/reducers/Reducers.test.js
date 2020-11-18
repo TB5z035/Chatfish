@@ -332,7 +332,8 @@ describe('chat reducer', () => {
         {
           type: types.NEW_MESSAGE_RECEIVE,
           message: 'hello',
-          author: 'bob'
+          author: 'bob',
+          isGroup: 1
         }
       )
     ).not.toBeNull()
