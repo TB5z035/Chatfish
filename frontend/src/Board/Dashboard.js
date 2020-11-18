@@ -805,7 +805,7 @@ export default function Dashboard() {
                     {myName ? myName.nickname : null}
                   </Box>
                   <Box className={classes.menuItemInfoUsername}>
-                    {'@' + myName ? myName.username : null}
+                    {'@' + (myName ? myName.username : null)}
                   </Box>
                 </Box>
               </Box>
