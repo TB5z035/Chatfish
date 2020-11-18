@@ -56,7 +56,10 @@ import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
+import { postModifyInfo } from '../fetch/info/modifyInfo'
 import md5 from 'crypto-js/md5'
+import sha1 from 'crypto-js/sha1'
+
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -254,6 +257,7 @@ export default function Dashboard() {
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
   const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
+  const [passwordSame, setPasswordSame] = useState(true)
   // const [online, setOnline] = useState(false)
 
   useEffect(() => {
@@ -358,18 +362,76 @@ export default function Dashboard() {
   )
 
   const handleNicknameChange = () => {
-    // Wait until succeed
-    dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
-    setInfoNewNickname(infoNewNickname)
+    const passwordSHA = sha1(infoCurrentPassword + 'iwantaplus').toString()
+    postModifyInfo(myName.username, passwordSHA, {
+      nickname: infoNewNickname
+    }).then((res) =>
+      res
+        .json()
+        .catch((error) => console.error('Error:', error))
+        .then((data) => {
+          if (
+            data != null &&
+            Object.prototype.hasOwnProperty.call(data, 'state')
+          ) {
+            if (data['state'] === 200) {
+              dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
+              setInfoNewNickname(infoNewNickname)
+              enqueueSnackbar(
+                'Successfully changed nickname: ' + infoNewNickname,
+                {
+                  variant: 'success'
+                }
+              )
+            } else if (data['state'] == 405) {
+              setInfoNewNickname(myName.nickname)
+              enqueueSnackbar('Wrong password!', {
+                variant: 'error'
+              })
+            }
+          }
+        })
+    )
     setInfoCurrentPassword()
     setInfoDialogOpen(false)
   }
 
   const handleInfoChange = () => {
+    const passwordSHA = sha1(infoCurrentPassword + 'iwantaplus').toString()
+    var params = {}
     if (infoNewEmail != null) {
-      dispatch(setMyName({ ...myName, email: infoNewEmail }))
+      params.email = infoNewEmail
     }
-    // Wait for verification
+    if (infoNewPassword != null) {
+      params.password = infoNewPassword
+    }
+    if (params != {}) {
+      postModifyInfo(myName.username, passwordSHA, params).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
+              Object.prototype.hasOwnProperty.call(data, 'state')
+            ) {
+              if (data['state'] === 200) {
+                dispatch(setMyName({ ...myName, email: infoNewEmail }))
+                enqueueSnackbar(
+                  'Successfully changed user info.',
+                  {
+                    variant: 'success'
+                  }
+                )
+              } else if (data['state'] == 405) {
+                enqueueSnackbar('Wrong password!', {
+                  variant: 'error'
+                })
+              }
+            }
+          })
+      )
+    }
     setAccountDialogOpen(false)
     setInfoCurrentPassword()
     setInfoNewEmail()
