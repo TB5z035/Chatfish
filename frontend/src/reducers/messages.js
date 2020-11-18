@@ -113,7 +113,7 @@ const messages = (state = initialState, action) => {
         if (
           (newList[j].isGroup === 1 &&
             action.isGroup === 1 &&
-            newList[j].user === action.group) ||
+            newList[j].user.toString() === action.group.toString()) ||
           (newList[j].isGroup === 0 &&
             action.isGroup === 0 &&
             newList[j].user === action.author)
