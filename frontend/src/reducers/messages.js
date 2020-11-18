@@ -122,8 +122,10 @@ const messages = (state = initialState, action) => {
       return { messageList: newList, focusUser: state.focusUser }
     case 'SET_FOCUS_USER':
       for (; j < len; j++) {
-        if (newList[j].isGroup === action.username.isGroup &&
-            newList[j].user === action.username.user) {
+        if (
+          newList[j].isGroup === action.username.isGroup &&
+          newList[j].user === action.username.user
+        ) {
           newList[j].offline_ids = []
         }
       }
