@@ -13,7 +13,7 @@ const messages = (state = initialState, action) => {
           break
         }
       }
-      return { messageList: newList, focusUser: state.focusUser }
+      return { messageList: newList, focusUser: null }
     case 'DELETE_GROUP':
       for (; j < len; j++) {
         if (newList[j].isGroup === 1 && newList[j].user === action.groupName) {
@@ -21,7 +21,7 @@ const messages = (state = initialState, action) => {
           break
         }
       }
-      return { messageList: newList, focusUser: state.focusUser }
+      return { messageList: newList, focusUser: null }
     case 'ADD_FRIEND':
       return {
         messageList: [
@@ -81,7 +81,8 @@ const messages = (state = initialState, action) => {
             content: action.message,
             time: new Date().getTime(),
             mtype: action.mtype,
-            userInfo: action.userInfo
+            userInfo: action.userInfo,
+            isRead: false
           })
           newList.unshift(temp)
         }
