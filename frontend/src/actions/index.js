@@ -26,6 +26,11 @@ export const setFocusUser = (username) => ({
   username
 })
 
+export const setAlreadyRead = (username) => ({
+  type: types.SET_ALREADY_READ,
+  username
+})
+
 export const setMessageList = (messageList) => ({
   type: types.SET_MESSAGE_LIST,
   messageList

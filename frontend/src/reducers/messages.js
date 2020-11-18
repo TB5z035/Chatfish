@@ -31,7 +31,8 @@ const messages = (state = initialState, action) => {
             message_list: [],
             isGroup: 0,
             userInfo: action.userInfo,
-            offline_ids: []
+            offline_ids: [],
+            friend_offline_ids: []
           }
         ],
         focusUser: state.focusUser
@@ -45,7 +46,8 @@ const messages = (state = initialState, action) => {
             message_list: [],
             isGroup: 1,
             userInfo: action.userInfo,
-            offline_ids: []
+            offline_ids: [],
+            friend_offline_ids: []
           }
         ],
         focusUser: state.focusUser
@@ -111,7 +113,7 @@ const messages = (state = initialState, action) => {
         if (
           (newList[j].isGroup === 1 &&
             action.isGroup === 1 &&
-            newList[j].user === action.group) ||
+            newList[j].user.toString() === action.group.toString()) ||
           (newList[j].isGroup === 0 &&
             action.isGroup === 0 &&
             newList[j].user === action.author)
@@ -133,6 +135,19 @@ const messages = (state = initialState, action) => {
         }
       }
       return { messageList: newList, focusUser: state.focusUser }
+    case 'SET_ALREADY_READ':
+      for (; j < len; j++) {
+        if (
+          newList[j].isGroup === action.username.isGroup &&
+            newList[j].user === action.username.user
+        ) {
+          newList[j].friend_offline_ids = []
+          newList[j].message_list.forEach((item) => {
+            item['isRead'] = true
+          })
+        }
+      }
+      return { messageList: newList, focusUser: action.username }
     case 'SET_FOCUS_USER':
       for (; j < len; j++) {
         if (
