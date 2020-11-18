@@ -260,7 +260,10 @@ export default function Dashboard() {
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
   const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
-  // const [passwordSame, setPasswordSame] = useState(true)
+  const [nicknameValid, setNicknameValid] = useState(true)
+  const [emailValid, setEmailValid] = useState(true)
+  const [newPasswordValid, setNewPasswordValid] = useState(true)
+  const [passwordSame, setPasswordSame] = useState(true)
   // const [online, setOnline] = useState(false)
 
   useEffect(() => {
@@ -402,11 +405,15 @@ export default function Dashboard() {
   const handleInfoChange = () => {
     const passwordSHA = sha1(infoCurrentPassword + 'iwantaplus').toString()
     var params = {}
+    console.log('new email:' + infoNewEmail)
     if (infoNewEmail != null) {
+      console.log('yes')
       params.email = infoNewEmail
     }
+    console.log('new email:' + infoNewPassword)
     if (infoNewPassword != null) {
-      params.password = infoNewPassword
+      console.log('yes2')
+      params.new_password = sha1(infoNewPassword + 'iwantaplus').toString()
     }
     if (params !== {}) {
       postModifyInfo(myName.username, passwordSHA, params).then((res) =>
@@ -788,6 +795,7 @@ export default function Dashboard() {
                 setInfoNewNickname(myName.nickname)
                 setInfoCurrentPassword()
                 setInfoDialogOpen(true)
+                setNicknameValid(true)
               }}
             >
               <Box className={classes.menuItemInfo}>
@@ -821,6 +829,9 @@ export default function Dashboard() {
                 setInfoNewEmail()
                 setInfoNewPassword()
                 setInfoNewPasswordComfirm()
+                setEmailValid(true)
+                setNewPasswordValid(true)
+                setPasswordSame(true)
               }}
             >
               Account Settings
@@ -873,10 +884,21 @@ export default function Dashboard() {
               <Grid item>
                 <TextField
                   fullWidth
+                  error={!nicknameValid}
                   label="New Nickname"
                   value={infoNewNickname}
+                  helperText={
+                    !nicknameValid ? 'Invalid nickname' : '1-10 characters'
+                  }
                   onChange={(e) => {
                     setInfoNewNickname(e.target.value)
+                    if (
+                      /^[\u4e00-\u9fa5_a-zA-Z0-9]{1,10}$/.test(e.target.value)
+                    ) {
+                      setNicknameValid(true)
+                    } else {
+                      setNicknameValid(false)
+                    }
                   }}
                 ></TextField>
               </Grid>
@@ -894,7 +916,9 @@ export default function Dashboard() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleNicknameChange}>Submit</Button>
+            <Button disabled={!nicknameValid} onClick={handleNicknameChange}>
+              Submit
+            </Button>
           </DialogActions>
         </Box>
       </Dialog>
@@ -921,33 +945,79 @@ export default function Dashboard() {
             ></TextField>
             <TextField
               fullWidth
+              error={!emailValid}
               label="New Email Address"
               value={infoNewEmail}
+              helperText={
+                emailValid ? 'new email address' : 'Invalid email address'
+              }
               onChange={(e) => {
                 setInfoNewEmail(e.target.value)
+                if (
+                  /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+/.test(
+                    e.target.value
+                  )
+                ) {
+                  setEmailValid(true)
+                } else if (e.target.value === '' || !e.target.value) {
+                  setEmailValid(true)
+                } else {
+                  setEmailValid(false)
+                }
               }}
             ></TextField>
             <TextField
               fullWidth
+              error={!newPasswordValid}
+              helperText={
+                newPasswordValid
+                  ? '8-16 characters including numbers and letters'
+                  : 'Invalid password'
+              }
               label="New Password"
               value={infoNewPassword}
               onChange={(e) => {
                 setInfoNewPassword(e.target.value)
+                if (/^[A-Za-z0-9]{8,16}$/.test(e.target.value)) {
+                  setNewPasswordValid(true)
+                } else if (e.target.value === '' || !e.target.value) {
+                  setNewPasswordValid(true)
+                } else {
+                  setNewPasswordValid(false)
+                }
+                setPasswordSame(
+                  e.target.value === infoNewPasswordComfirm ||
+                    ((infoNewPasswordComfirm === '' ||
+                      !infoNewPasswordComfirm) &&
+                      (e.target.value === '' || !e.target.value))
+                )
               }}
               type="password"
             ></TextField>
             <TextField
               fullWidth
+              error={!passwordSame}
+              helperText="repeat the new password"
               label="New Password Comfirm"
               value={infoNewPasswordComfirm}
               onChange={(e) => {
                 setInfoNewPasswordComfirm(e.target.value)
+                setPasswordSame(
+                  e.target.value === infoNewPassword ||
+                    ((infoNewPassword === '' || !infoNewPassword) &&
+                      (e.target.value === '' || !e.target.value))
+                )
               }}
               type="password"
             ></TextField>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleInfoChange}>Submit</Button>
+            <Button
+              disabled={!(emailValid && newPasswordValid && passwordSame)}
+              onClick={handleInfoChange}
+            >
+              Submit
+            </Button>
           </DialogActions>
         </Box>
       </Dialog>
