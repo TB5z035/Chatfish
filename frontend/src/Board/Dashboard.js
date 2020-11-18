@@ -16,7 +16,6 @@ import {
   deleteRequest,
   setRequestList, deleteFriend
 } from '../actions'
-import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
@@ -44,7 +43,6 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
-import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
@@ -211,7 +209,7 @@ export default function Dashboard() {
   const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
 
-  const [online, setOnline] = useState(false)
+  // const [online, setOnline] = useState(false)
 
   useEffect(() => {
     const friends = []
@@ -435,7 +433,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          setOnline(true)
+          // setOnline(true)
           setInitWebSocket(true)
 
           requireFriendList(nameCookie).then((res) =>
@@ -511,10 +509,10 @@ export default function Dashboard() {
           if (!initWebSocket) {
             history.push('/sign')
           }
-          setOnline(false)
+          // setOnline(false)
         }
         socket.onclose = (event) => {
-          setOnline(false)
+          // setOnline(false)
         }
       } else {
         history.push('/sign')
@@ -565,17 +563,6 @@ export default function Dashboard() {
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
-          </div>
-          <div
-            className={classes.appBarIcon}
-            // onClick={handleOnlineIconClick}
-          >
-            <IconButton
-            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
-            >
-              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
-            </IconButton>
-            {/* <CircularProgress></CircularProgress> */}
           </div>
           <div
             className={classes.appBarIcon}
@@ -657,7 +644,8 @@ export default function Dashboard() {
           display="flex"
           flexDirection="row"
           justifyContent="center"
-          margin={2}
+          marginTop={1}
+          height="80%"
         >
           {/* <Chatroom />
           <Chatroom />
