@@ -802,10 +802,10 @@ export default function Dashboard() {
                 </Box>
                 <Box className={classes.menuItemInfoNames}>
                   <Box className={classes.menuItemInfoNickname}>
-                    {myName.nickname}
+                    {myName ? myName.nickname : null}
                   </Box>
                   <Box className={classes.menuItemInfoUsername}>
-                    {'@' + myName.username}
+                    {'@' + myName ? myName.username : null}
                   </Box>
                 </Box>
               </Box>
