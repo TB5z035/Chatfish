@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from 'react'
-import SettingsIcon from '@material-ui/icons/Settings'
 import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import GroupAddIcon from '@material-ui/icons/GroupAdd'
 import ForumIcon from '@material-ui/icons/Forum'
 import {
-  Box,
   List,
   Avatar,
   ListItem,
@@ -60,7 +58,7 @@ export default function SecondaryList() {
   const webSocket = useSelector((state) => state.socket)
   const dispatch = useDispatch()
   const myName = useSelector((state) => state.myName)
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
 
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')
@@ -277,7 +275,9 @@ export default function SecondaryList() {
           <DialogTitle> Creat New Group</DialogTitle>
           <DialogContent>
             <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Invite your friends into group:</FormLabel>
+              <FormLabel component="legend">
+                Invite your friends into group:
+              </FormLabel>
               <FormGroup>
                 {friendList.map((user) =>
                   user.isGroup === 0 ? (

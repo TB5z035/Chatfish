@@ -19,13 +19,14 @@ it('Renders the connected app with initialState', () => {
   </div>, { initialState: {
     socket: null,
     focusUser: { user: 'name', isGroup: 0 },
-    messages: [{ user: 'name',
+    messages: { messageList: [{ user: 'name',
       message_list: [{ type: 'normal',
         time: '2019-10-21T06:38:03.063Z',
         from: 'alice',
         content: 'hello' }] },
     { user: 'era',
       message_list: [] }],
+    focusUser: null },
     myName: 'alice',
     theme: null
   } })
