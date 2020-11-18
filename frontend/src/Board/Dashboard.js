@@ -249,10 +249,15 @@ export default function Dashboard() {
   )
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [infoDialogOpen, setInfoDialogOpen] = useState(false)
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
   const [initWebSocket, setInitWebSocket] = useState(false)
   const [infoNewNickname, setInfoNewNickname] = useState(myName.nickname)
+  const [infoCurrentPassword, setInfoCurrentPassword] = useState()
+  const [infoNewEmail, setInfoNewEmail] = useState()
+  const [infoNewPassword, setInfoNewPassword] = useState()
+  const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
   const [online, setOnline] = useState(false)
 
   useEffect(() => {
@@ -356,9 +361,23 @@ export default function Dashboard() {
     [myName, dispatch, enqueueSnackbar, friendList]
   )
 
-  const handleChangeInfo = () => {
+  const handleNicknameChange = () => {
+    // Wait until succeed
     dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
+    setInfoNewNickname(infoNewNickname)
     setInfoDialogOpen(false)
+  }
+
+  const handleInfoChange = () => {
+    if (infoNewEmail != null) {
+      dispatch(setMyName({ ...myName, email: infoNewEmail }))
+    }
+    // Wait for verification
+    setAccountDialogOpen(false)
+    setInfoCurrentPassword()
+    setInfoNewEmail()
+    setInfoNewPassword()
+    setInfoNewPasswordComfirm()
   }
 
   const refuseAddFriendRequest = useCallback(
@@ -760,7 +779,18 @@ export default function Dashboard() {
                 </Box>
               </Box>
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>Account Setting</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose()
+                setAccountDialogOpen(true)
+                setInfoCurrentPassword()
+                setInfoNewEmail()
+                setInfoNewPassword()
+                setInfoNewPasswordComfirm()
+              }}
+            >
+              Account Settings
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
@@ -818,7 +848,60 @@ export default function Dashboard() {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleChangeInfo}>Submit</Button>
+            <Button onClick={handleNicknameChange}>Submit</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+      <Dialog
+        open={accountDialogOpen}
+        onClose={() => {
+          setAccountDialogOpen(false)
+        }}
+      >
+        <Box className={classes.infoBox}>
+          <DialogTitle>Account Settings</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You can modify your email address and password here.
+            </DialogContentText>
+            <TextField
+              fullWidth
+              label="Current Password"
+              value={infoCurrentPassword}
+              onChange={(e) => {
+                setInfoCurrentPassword(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Email Address"
+              value={infoNewEmail}
+              onChange={(e) => {
+                setInfoNewEmail(e.target.value)
+              }}
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Password"
+              value={infoNewPassword}
+              onChange={(e) => {
+                setInfoNewPassword(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Password Comfirm"
+              value={infoNewPasswordComfirm}
+              onChange={(e) => {
+                setInfoNewPasswordComfirm(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleInfoChange}>Submit</Button>
           </DialogActions>
         </Box>
       </Dialog>
