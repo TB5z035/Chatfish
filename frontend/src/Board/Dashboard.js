@@ -252,7 +252,9 @@ export default function Dashboard() {
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
   const [initWebSocket, setInitWebSocket] = useState(false)
-  const [infoNewNickname, setInfoNewNickname] = useState(myName.nickname)
+  const [infoNewNickname, setInfoNewNickname] = useState(
+    myName ? myName.nickname : null
+  )
   const [infoCurrentPassword, setInfoCurrentPassword] = useState()
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
@@ -417,12 +419,9 @@ export default function Dashboard() {
             ) {
               if (data['state'] === 200) {
                 dispatch(setMyName({ ...myName, email: infoNewEmail }))
-                enqueueSnackbar(
-                  'Successfully changed user info.',
-                  {
-                    variant: 'success'
-                  }
-                )
+                enqueueSnackbar('Successfully changed user info.', {
+                  variant: 'success'
+                })
               } else if (data['state'] === 405) {
                 enqueueSnackbar('Wrong password!', {
                   variant: 'error'
