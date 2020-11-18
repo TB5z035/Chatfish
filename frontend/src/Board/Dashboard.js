@@ -583,17 +583,6 @@ export default function Dashboard() {
           </div>
           <div
             className={classes.appBarIcon}
-            // onClick={handleOnlineIconClick}
-          >
-            <IconButton
-            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
-            >
-              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
-            </IconButton>
-            {/* <CircularProgress></CircularProgress> */}
-          </div>
-          <div
-            className={classes.appBarIcon}
             onClick={() => {
               setNotificationDialogOpen(true)
             }}
@@ -672,7 +661,8 @@ export default function Dashboard() {
           display="flex"
           flexDirection="row"
           justifyContent="center"
-          margin={2}
+          marginTop={1}
+          height="80%"
         >
           {/* <Chatroom />
           <Chatroom />

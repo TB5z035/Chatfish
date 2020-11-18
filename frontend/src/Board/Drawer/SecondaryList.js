@@ -4,6 +4,7 @@ import PersonAddIcon from '@material-ui/icons/PersonAdd'
 import GroupAddIcon from '@material-ui/icons/GroupAdd'
 import ForumIcon from '@material-ui/icons/Forum'
 import {
+  Box,
   List,
   Avatar,
   ListItem,
@@ -12,7 +13,7 @@ import {
   Divider
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { green, pink } from '@material-ui/core/colors'
+import { green, pink, yellow } from '@material-ui/core/colors'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
@@ -31,7 +32,6 @@ import { addGroup, addMessage } from '../../actions'
 import { useSnackbar } from 'notistack'
 import { postAddFriend } from '../../fetch/friend/addFriend'
 import { postAddGroup } from '../../fetch/friend/addGroup'
-import yellow from '@material-ui/core/colors/yellow'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,15 +42,15 @@ const useStyles = makeStyles((theme) => ({
   },
   pink: {
     color: '#fff',
-    backgroundColor: pink[500]
+    backgroundColor: pink[600]
   },
   yellow: {
     color: '#fff',
-    backgroundColor: yellow[500]
+    backgroundColor: yellow[800]
   },
   green: {
     color: '#fff',
-    backgroundColor: green[500]
+    backgroundColor: green[600]
   }
 }))
 
@@ -214,42 +214,46 @@ export default function SecondaryList() {
           }}
         >
           <ListItemAvatar>
-            <Avatar className={classes.green}>
+            <Avatar className={classes.pink}>
               <GroupAddIcon />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary="Add Groups" />
+          <ListItemText primary="Create Groups" />
         </ListItem>
-        <ListItem button
+        <ListItem
+          button
           onClick={() => {
             setMassSendDialogOpen(true)
-          }}>
+          }}
+        >
           <ListItemAvatar>
             <Avatar className={classes.yellow}>
               <ForumIcon />
             </Avatar>
           </ListItemAvatar>
-          <ListItemText primary="MassSend" />
+          <ListItemText primary="Mass Send" />
         </ListItem>
-        <ListItem button>
+        {/* <ListItem button>
           <ListItemAvatar>
             <Avatar className={classes.pink}>
               <SettingsIcon />
             </Avatar>
           </ListItemAvatar>
           <ListItemText primary="Settings" />
-        </ListItem>
+        </ListItem> */}
         <Dialog
           open={addFriendDialogOpen}
           onClose={() => {
             setAddFriendDialogOpen(false)
           }}
         >
-          <DialogTitle> Add new friend</DialogTitle>
+          <DialogTitle> Send Friend Request</DialogTitle>
           <DialogContent>
-            <DialogContentText>Enter username of new friend</DialogContentText>
+            <DialogContentText>
+              Please enter the username of a user.
+            </DialogContentText>
             <TextField
-              label="username"
+              label="Username"
               autoFocus
               fullWidth
               onKeyPress={onKeyPressAddFriend}
@@ -260,7 +264,7 @@ export default function SecondaryList() {
           </DialogContent>
           <DialogActions>
             <Button color="primary" onClick={handleAddFriend}>
-              Add
+              Send
             </Button>
           </DialogActions>
         </Dialog>
@@ -270,18 +274,10 @@ export default function SecondaryList() {
             setCreateGroupDialogOpen(false)
           }}
         >
-          <DialogTitle> Creat new group</DialogTitle>
+          <DialogTitle> Creat New Group</DialogTitle>
           <DialogContent>
-            <TextField
-              label="Group Name"
-              autoFocus
-              fullWidth
-              onChange={(e) => {
-                setGroupName(e.target.value)
-              }}
-            />
             <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Select friends</FormLabel>
+              <FormLabel component="legend">Invite your friends into group:</FormLabel>
               <FormGroup>
                 {friendList.map((user) =>
                   user.isGroup === 0 ? (
@@ -296,10 +292,18 @@ export default function SecondaryList() {
                 )}
               </FormGroup>
             </FormControl>
+            <TextField
+              label="Group Name"
+              autoFocus
+              fullWidth
+              onChange={(e) => {
+                setGroupName(e.target.value)
+              }}
+            />
           </DialogContent>
           <DialogActions>
             <Button color="primary" onClick={handleCreateGroup}>
-              Creat
+              Create
             </Button>
           </DialogActions>
         </Dialog>
@@ -309,18 +313,10 @@ export default function SecondaryList() {
             setMassSendDialogOpen(false)
           }}
         >
-          <DialogTitle> Mass sending</DialogTitle>
+          <DialogTitle> Mass Sending</DialogTitle>
           <DialogContent>
-            <TextField
-              label="Message"
-              autoFocus
-              fullWidth
-              onChange={(e) => {
-                setMessage(e.target.value)
-              }}
-            />
             <FormControl component="fieldset" className={classes.formControl}>
-              <FormLabel component="legend">Select friends</FormLabel>
+              <FormLabel component="legend">Select friends:</FormLabel>
               <FormGroup>
                 {friendList.map((user) =>
                   user.isGroup === 0 ? (
@@ -335,6 +331,14 @@ export default function SecondaryList() {
                 )}
               </FormGroup>
             </FormControl>
+            <TextField
+              label="Message"
+              autoFocus
+              fullWidth
+              onChange={(e) => {
+                setMessage(e.target.value)
+              }}
+            />
           </DialogContent>
           <DialogActions>
             <Button color="primary" onClick={handleMassSend}>
