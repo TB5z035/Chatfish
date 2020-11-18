@@ -110,43 +110,33 @@ export default function SecondaryList() {
       }
     })
     setSelectState({})
-    if (
-      friendList
-        .map((user) => {
-          return user.isGroup === 1 ? user.user : null
+    const trueName = groupName === '' ? myName.username + '创建的群聊' : groupName
+    setGroupName('')
+    postAddGroup(0, myName.username, friends, trueName).then((res) =>
+      res
+        .json()
+        .catch((error) => console.error('Error:', error))
+        .then((data) => {
+          if (
+            data != null &&
+                  Object.prototype.hasOwnProperty.call(data, 'state') &&
+                  data['state'] === 200
+          ) {
+            dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
+            enqueueSnackbar('Successful create group: ' + trueName, {
+              variant: 'success'
+            })
+          } else {
+            enqueueSnackbar(
+              'Fail to create group: ' + trueName,
+              {
+                variant: 'error'
+              }
+            )
+          }
         })
-        .includes(groupName)
-    ) {
-      enqueueSnackbar('You are already in group :' + groupName, {
-        variant: 'warning'
-      })
-    } else {
-      postAddGroup(0, myName.username, friends, groupName).then((res) =>
-        res
-          .json()
-          .catch((error) => console.error('Error:', error))
-          .then((data) => {
-            if (
-              data != null &&
-              Object.prototype.hasOwnProperty.call(data, 'state') &&
-              data['state'] === 200
-            ) {
-              dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
-              enqueueSnackbar('Successful create group: ' + groupName, {
-                variant: 'success'
-              })
-            } else {
-              enqueueSnackbar(
-                'The name of group already exists: ' + groupName,
-                {
-                  variant: 'error'
-                }
-              )
-            }
-          })
-      )
-    }
-  }, [selectState, groupName, myName, friendList, dispatch, enqueueSnackbar])
+    )
+  }, [selectState, groupName, myName, dispatch, enqueueSnackbar])
 
   const handleMassSend = useCallback(async () => {
     setMassSendDialogOpen(false)
@@ -296,6 +286,7 @@ export default function SecondaryList() {
               label="Group Name"
               autoFocus
               fullWidth
+              value={groupName}
               onChange={(e) => {
                 setGroupName(e.target.value)
               }}
