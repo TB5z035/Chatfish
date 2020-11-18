@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
 export default function FriendList() {
   const dispatch = useDispatch()
   const classes = useStyles()
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
 
   return friendList.length === 0 ? null : (
     <>

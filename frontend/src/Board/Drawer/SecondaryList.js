@@ -60,7 +60,7 @@ export default function SecondaryList() {
   const webSocket = useSelector((state) => state.socket)
   const dispatch = useDispatch()
   const myName = useSelector((state) => state.myName)
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
 
   const [addFriendDialogOpen, setAddFriendDialogOpen] = useState(false)
   const [friendToAdd, setFriendToAdd] = useState('')

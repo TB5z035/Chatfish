@@ -195,7 +195,7 @@ export default function Dashboard() {
   const { enqueueSnackbar } = useSnackbar()
 
   const open = useSelector((state) => state.drawerOpen)
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
   const myName = useSelector((state) => state.myName)
   const webSocket = useSelector((state) => state.socket)
   const [darkState, setDarkState] = useState(false)
@@ -205,7 +205,6 @@ export default function Dashboard() {
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
   )
-  const user = useSelector((state) => state.focusUser)
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
@@ -372,7 +371,6 @@ export default function Dashboard() {
   // }
   const handleReceiveMessage = useCallback(async (receivedData) => {
     console.log(receivedData)
-    console.log(user)
     if (receivedData['is_group'] === 1) {
       console.log('group')
       dispatch(
@@ -400,7 +398,7 @@ export default function Dashboard() {
         )
       )
     }
-  }, [dispatch, user])
+  }, [dispatch])
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)

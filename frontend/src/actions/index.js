@@ -26,11 +26,6 @@ export const setFocusUser = (username) => ({
   username
 })
 
-export const clearUnread = (username) => ({
-  type: types.CLEAR_UNREAD,
-  username
-})
-
 export const setMessageList = (messageList) => ({
   type: types.SET_MESSAGE_LIST,
   messageList
