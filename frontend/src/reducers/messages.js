@@ -13,7 +13,7 @@ const messages = (state = initialState, action) => {
           break
         }
       }
-      return { messageList: newList, focusUser: state.focusUser }
+      return { messageList: newList, focusUser: null }
     case 'DELETE_GROUP':
       for (; j < len; j++) {
         if (newList[j].isGroup === 1 && newList[j].user === action.groupName) {
@@ -21,7 +21,7 @@ const messages = (state = initialState, action) => {
           break
         }
       }
-      return { messageList: newList, focusUser: state.focusUser }
+      return { messageList: newList, focusUser: null }
     case 'ADD_FRIEND':
       return { messageList: [
         ...state.messageList,
@@ -73,7 +73,8 @@ const messages = (state = initialState, action) => {
             content: action.message,
             time: new Date().getTime(),
             mtype: action.mtype,
-            userInfo: action.userInfo
+            userInfo: action.userInfo,
+            isRead: false
           })
           newList.unshift(temp)
         }
@@ -140,13 +141,26 @@ const initialState = {
         //   isGroup: 0,
         //   userInfo: { nickname: 'a', email: '6dsa@qq.com' },
         //   offline_ids: [131],
+        //   friend_offline_ids: [120],
         //   message_list: [{ from: 'a',
-        //     type: 'abnormal',
+        //     mtype: 'abnormal',
         //     content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
         //   'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
         //     time: 46546516,
         //     id: 131,
-        //     userInfo: { nickname: 'a', email: '6dsa@qq.com' } }] }
+        //     userInfo: { nickname: 'a', email: '6dsa@qq.com' } },
+        //   { from: 'b',
+        //     mtype: 'normal',
+        //     content: 'abs',
+        //     time: 465465178,
+        //     id: 120,
+        //     userInfo: { nickname: 'b', email: '6dsadsag@qq.com' } },
+        //   { from: 'c',
+        //     mtype: 'normal',
+        //     content: 'abs',
+        //     time: 4654651444,
+        //     isRead: false,
+        //     userInfo: { nickname: 'c', email: '6dsadsagdsag@qq.com' } }] }
       ],
   focusUser: null
 }
