@@ -14,7 +14,8 @@ import {
   setDrawerOpen,
   addRequest,
   deleteRequest,
-  setRequestList, deleteFriend
+  setRequestList,
+  deleteFriend
 } from '../actions'
 import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -30,9 +31,13 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
 import {
+  DialogActions,
+  Button,
+  Grid,
   // CircularProgress,
   Menu,
-  MenuItem
+  MenuItem,
+  TextField
 } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
@@ -164,6 +169,39 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240
   },
+  infoBox: {
+    // minHeight: '30vh',
+    minWidth: '20vw'
+  },
+  menuItemInfo: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'strech',
+    minHeight: '5vh',
+    minWidth: '10vw',
+    maxWidth: '20vw'
+  },
+  menuItemInfoAvatar: {},
+  menuItemInfoNames: {
+    maxWidth: '85%',
+    marginLeft: '1vw',
+    marginRight: '1vw',
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  menuItemInfoNickname: {
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  menuItemInfoUsername: {
+    color: theme.palette.text.secondary,
+    fontSize: 'small',
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
   listStyles: {
     width: '100%',
     maxWidth: '36ch',
@@ -200,6 +238,8 @@ export default function Dashboard() {
   const myName = useSelector((state) => state.myName)
   const webSocket = useSelector((state) => state.socket)
   const focusUser = useSelector((state) => state.focusUser)
+  const requestList = useSelector((state) => state.requests)
+
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
@@ -208,11 +248,11 @@ export default function Dashboard() {
     themeLightDefault
   )
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
-  const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
-
+  const [infoNewNickname, setInfoNewNickname] = useState(myName.nickname)
   const [online, setOnline] = useState(false)
 
   useEffect(() => {
@@ -260,8 +300,8 @@ export default function Dashboard() {
             .then((data) => {
               if (
                 data != null &&
-                      Object.prototype.hasOwnProperty.call(data, 'state') &&
-                      data['state'] === 200
+                Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200
               ) {
                 dispatch(addFriend(friendName, data['userInfo']))
                 dispatch(deleteRequest(0, fName))
@@ -298,10 +338,12 @@ export default function Dashboard() {
             .then((data) => {
               if (
                 data != null &&
-                      Object.prototype.hasOwnProperty.call(data, 'state') &&
-                      data['state'] === 200
+                Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200
               ) {
-                dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
+                dispatch(
+                  addGroup(data['userInfo']['username'], data['userInfo'])
+                )
                 dispatch(deleteRequest(1, gName))
                 enqueueSnackbar('Successful add group: ' + groupName, {
                   variant: 'success'
@@ -314,9 +356,19 @@ export default function Dashboard() {
     [myName, dispatch, enqueueSnackbar, friendList]
   )
 
+  const handleChangeInfo = () => {
+    dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
+    setInfoDialogOpen(false)
+  }
+
   const refuseAddFriendRequest = useCallback(
     async (refusedUsername, friendName) => {
-      if (await postDisagreeAddFriend(myName.username, refusedUsername.split('@')[1])) {
+      if (
+        await postDisagreeAddFriend(
+          myName.username,
+          refusedUsername.split('@')[1]
+        )
+      ) {
         dispatch(deleteRequest(0, refusedUsername))
       }
     },
@@ -325,8 +377,13 @@ export default function Dashboard() {
 
   const refuseAddGroupRequest = useCallback(
     async (refusedGroupName, friendName) => {
-      if (await postDisagreeAddGroup(myName.username,
-        refusedGroupName.split('@')[1], friendName.split('@')[1])) {
+      if (
+        await postDisagreeAddGroup(
+          myName.username,
+          refusedGroupName.split('@')[1],
+          friendName.split('@')[1]
+        )
+      ) {
         dispatch(deleteRequest(1, refusedGroupName))
       }
     },
@@ -371,49 +428,56 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = useCallback((receivedData) => {
-    console.log(receivedData)
-    let isFocus = false
-    if (focusUser.isGroup === 1 &&
+  const handleReceiveMessage = useCallback(
+    (receivedData) => {
+      console.log(receivedData)
+      let isFocus = false
+      if (
+        focusUser.isGroup === 1 &&
         receivedData['is_group'].isGroup === 1 &&
-        focusUser.user === receivedData['username']) {
-      isFocus = true
-      postEnterChat(receivedData['username'], 1, receivedData['id']).then()
-    }
-    if (focusUser.isGroup === 0 &&
+        focusUser.user === receivedData['username']
+      ) {
+        isFocus = true
+        postEnterChat(receivedData['username'], 1, receivedData['id']).then()
+      }
+      if (
+        focusUser.isGroup === 0 &&
         receivedData['is_group'].isGroup === 0 &&
-        focusUser.user === receivedData['friend_name']) {
-      isFocus = true
-      postEnterChat(receivedData['friend_name'], 0, receivedData['id']).then()
-    }
-    if (receivedData['is_group'] === 1) {
-      dispatch(
-        messageReceived(
-          receivedData['content'],
-          receivedData['friend_name'],
-          receivedData['username'],
-          1,
-          receivedData['mtype'],
-          receivedData['userInfo'],
-          receivedData['id'],
-          isFocus
+        focusUser.user === receivedData['friend_name']
+      ) {
+        isFocus = true
+        postEnterChat(receivedData['friend_name'], 0, receivedData['id']).then()
+      }
+      if (receivedData['is_group'] === 1) {
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            receivedData['username'],
+            1,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id'],
+            isFocus
+          )
         )
-      )
-    } else {
-      dispatch(
-        messageReceived(
-          receivedData['content'],
-          receivedData['friend_name'],
-          null,
-          0,
-          receivedData['mtype'],
-          receivedData['userInfo'],
-          receivedData['id'],
-          isFocus
+      } else {
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            null,
+            0,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id'],
+            isFocus
+          )
         )
-      )
-    }
-  }, [dispatch, focusUser])
+      }
+    },
+    [dispatch, focusUser]
+  )
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
@@ -510,7 +574,12 @@ export default function Dashboard() {
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-                dispatch(addFriend(receivedData['friend_name'], receivedData['userInfo']))
+                dispatch(
+                  addFriend(
+                    receivedData['friend_name'],
+                    receivedData['userInfo']
+                  )
+                )
                 enqueueSnackbar(
                   'Successful add friend: ' + receivedData['friend_name'],
                   { variant: 'success' }
@@ -532,7 +601,7 @@ export default function Dashboard() {
           setOnline(false)
         }
       } else {
-        history.push('/sign')
+        // history.push('/sign')
       }
     }
     setWebSocket().then()
@@ -643,12 +712,16 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar src=
-              {myName === null ? 'https://www.gravatar.com/avatar/' +
-                  'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
-                : 'https://www.gravatar.com/avatar/' +
-                        md5(myName.email).toString() +
-                        '?d=robohash'}/>
+            <Avatar
+              src={
+                myName === null
+                  ? 'https://www.gravatar.com/avatar/' +
+                    'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                  : 'https://www.gravatar.com/avatar/' +
+                    md5(myName.email).toString() +
+                    '?d=robohash'
+              }
+            />
           </IconButton>
           <Menu
             id="simple-menu"
@@ -657,8 +730,37 @@ export default function Dashboard() {
             open={Boolean(anchorMenu)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose()
+                setInfoNewNickname(myName.nickname)
+                setInfoDialogOpen(true)
+              }}
+            >
+              <Box className={classes.menuItemInfo}>
+                <Box className={classes.menuItemInfoAvatar}>
+                  <Avatar
+                    src={
+                      myName === null
+                        ? 'https://www.gravatar.com/avatar/' +
+                          'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                        : 'https://www.gravatar.com/avatar/' +
+                          md5(myName.email).toString() +
+                          '?d=robohash'
+                    }
+                  />
+                </Box>
+                <Box className={classes.menuItemInfoNames}>
+                  <Box className={classes.menuItemInfoNickname}>
+                    {myName.nickname}
+                  </Box>
+                  <Box className={classes.menuItemInfoUsername}>
+                    {'@' + myName.username}
+                  </Box>
+                </Box>
+              </Box>
+            </MenuItem>
+            <MenuItem onClick={handleMenuClose}>Account Setting</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
@@ -681,7 +783,45 @@ export default function Dashboard() {
           <Chatroom />
         </Box>
       </main>
-
+      <Dialog
+        open={infoDialogOpen}
+        onClose={() => {
+          setInfoDialogOpen(false)
+        }}
+      >
+        <Box className={classes.infoBox}>
+          <DialogTitle>Choose a nickname</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={1} alignItems="flex-end">
+              <Grid item>
+                <Avatar
+                  src={
+                    myName === null
+                      ? 'https://www.gravatar.com/avatar/' +
+                        'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                      : 'https://www.gravatar.com/avatar/' +
+                        md5(myName.email).toString() +
+                        '?d=robohash'
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  fullWidth
+                  label="New Nickname"
+                  value={infoNewNickname}
+                  onChange={(e) => {
+                    setInfoNewNickname(e.target.value)
+                  }}
+                ></TextField>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleChangeInfo}>Submit</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
       <Dialog
         open={notificationDialogOpen}
         onClose={() => {
