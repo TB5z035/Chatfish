@@ -31,7 +31,8 @@ const messages = (state = initialState, action) => {
             message_list: [],
             isGroup: 0,
             userInfo: action.userInfo,
-            offline_ids: []
+            offline_ids: [],
+            friend_offline_ids: []
           }
         ],
         focusUser: state.focusUser
@@ -45,7 +46,8 @@ const messages = (state = initialState, action) => {
             message_list: [],
             isGroup: 1,
             userInfo: action.userInfo,
-            offline_ids: []
+            offline_ids: [],
+            friend_offline_ids: []
           }
         ],
         focusUser: state.focusUser
