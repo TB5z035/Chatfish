@@ -235,7 +235,7 @@ export default function Dashboard() {
   const myName = useSelector((state) => state.myName)
   const webSocket = useSelector((state) => state.socket)
   const requestList = useSelector((state) => state.requests)
-  
+
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
@@ -358,6 +358,7 @@ export default function Dashboard() {
   )
 
   const handleNicknameChange = () => {
+    
     // Wait until succeed
     dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
     setInfoNewNickname(infoNewNickname)
