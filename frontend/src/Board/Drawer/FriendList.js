@@ -6,12 +6,15 @@ import {
   ListItemAvatar,
   Typography,
   Avatar,
-  Divider
+  Divider,
+  Box
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFocusUser } from '../../actions'
 import md5 from 'crypto-js/md5'
+import Badge from '@material-ui/core/Badge'
+import { postEnterChat } from '../../fetch/message/enterChat'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
 export default function FriendList() {
   const dispatch = useDispatch()
   const classes = useStyles()
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
 
   return friendList.length === 0 ? null : (
     <>
@@ -63,17 +66,47 @@ export default function FriendList() {
             key={user.user}
             alignItems="flex-start"
             onClick={() => {
+              if (user.offline_ids.length > 0) {
+                postEnterChat(
+                  user.user,
+                  user.isGroup,
+                  user.offline_ids[user.offline_ids.length - 1]
+                ).then()
+              }
               dispatch(setFocusUser({ user: user.user, isGroup: user.isGroup }))
             }}
           >
             <ListItemAvatar>
-              <Avatar src={user.isGroup === 1
-                ? null
-                : 'https://www.gravatar.com/avatar/' +
-                  md5(user.userInfo.email).toString() +
-                  '?d=robohash'}>{user.isGroup === 1
-                  ? user.user[0]
-                  : null}</Avatar>
+              {user.offline_ids.length === 0 ? (
+                <Avatar
+                  src={
+                    user.isGroup === 1
+                      ? null
+                      : 'https://www.gravatar.com/avatar/' +
+                        md5(user.userInfo.email).toString() +
+                        '?d=robohash'
+                  }
+                >
+                  {user.isGroup === 1 ? user.user[0] : null}
+                </Avatar>
+              ) : (
+                <Badge
+                  badgeContent={user.offline_ids.length.toString()}
+                  color="secondary"
+                >
+                  <Avatar
+                    src={
+                      user.isGroup === 1
+                        ? null
+                        : 'https://www.gravatar.com/avatar/' +
+                          md5(user.userInfo.email).toString() +
+                          '?d=robohash'
+                    }
+                  >
+                    {user.isGroup === 1 ? user.user[0] : null}
+                  </Avatar>
+                </Badge>
+              )}
             </ListItemAvatar>
             <ListItemText
               primary={user.userInfo.nickname}
@@ -103,11 +136,32 @@ export default function FriendList() {
                       color="textSecondary"
                       noWrap
                     >
-                      {user.message_list.length > 0 &&
-                      user.message_list.slice(-1)[0].content
-                        ? user.message_list.slice(-1)[0].content
-                        : undefined}
-                      {/* {user.recent ? user.recent : 'recent messages blah blah blah'} */}
+                      {(() => {
+                        if (
+                          user.message_list.length > 0 &&
+                          user.message_list.slice(-1)[0].content
+                        ) {
+                          if (
+                            user.message_list.slice(-1)[0].mtype === 'normal'
+                          ) {
+                            return (
+                              <Box>
+                                {user.message_list.slice(-1)[0].content}
+                              </Box>
+                            )
+                          } else {
+                            return (
+                              <Box fontStyle="italic">
+                                {decodeURI(
+                                  user.message_list
+                                    .slice(-1)[0]
+                                    .content.slice(76)
+                                )}
+                              </Box>
+                            )
+                          }
+                        }
+                      })()}
                     </Typography>
                   </Typography>
                 </React.Fragment>

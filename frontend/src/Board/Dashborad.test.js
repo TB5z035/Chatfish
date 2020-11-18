@@ -10,23 +10,42 @@ import { render } from '../testUtils'
 it('Renders the connected app with initialState', () => {
   const div = document.createElement('div')
   const store = createStore(reducer)
-  render(<div>
-    <Provider store={store}>
-      <SnackbarProvider>
-        <Dashboard/>
-      </SnackbarProvider>
-    </Provider>
-  </div>, { initialState: {
-    socket: null,
-    focusUser: { user: 'name', isGroup: 0 },
-    messages: [{ user: 'name',
-      message_list: [{ type: 'normal',
-        time: '2019-10-21T06:38:03.063Z',
-        from: 'alice',
-        content: 'hello' }] },
-    { user: 'era',
-      message_list: [] }],
-    myName: 'alice',
-    theme: null
-  } })
+  render(
+    <div>
+      <Provider store={store}>
+        <SnackbarProvider>
+          <Dashboard />
+        </SnackbarProvider>
+      </Provider>
+    </div>,
+    {
+      initialState: {
+        socket: null,
+        focusUser: { user: 'name', isGroup: 0 },
+        messages: {
+          messageList: [
+            {
+              user: 'name',
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2019-10-21T06:38:03.063Z',
+                  from: 'alice',
+                  content: 'hello'
+                }
+              ]
+            },
+            { user: 'era', message_list: [] }
+          ],
+          focusUser: null
+        },
+        myName: {
+          username: 'alice',
+          nickname: 'Sasha',
+          email: '654154090@qq.com'
+        },
+        theme: null
+      }
+    }
+  )
 })

@@ -10,14 +10,15 @@ export const addMessage = (message, author, receiver, isGroup, mtype, userInfo) 
   userInfo
 })
 
-export const messageReceived = (message, author, group, isGroup, mtype, userInfo) => ({
+export const messageReceived = (message, author, group, isGroup, mtype, userInfo, id) => ({
   type: types.NEW_MESSAGE_RECEIVE,
   message,
   author,
   group,
   isGroup,
   mtype,
-  userInfo
+  userInfo,
+  id
 })
 
 export const setFocusUser = (username) => ({

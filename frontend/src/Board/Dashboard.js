@@ -14,9 +14,9 @@ import {
   setDrawerOpen,
   addRequest,
   deleteRequest,
-  setRequestList, deleteFriend
+  setRequestList,
+  deleteFriend
 } from '../actions'
-import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
@@ -30,9 +30,13 @@ import NotificationsIcon from '@material-ui/icons/Notifications'
 import Switch from '@material-ui/core/Switch'
 import Avatar from '@material-ui/core/Avatar'
 import {
+  DialogActions,
+  Button,
+  Grid,
   // CircularProgress,
   Menu,
-  MenuItem
+  MenuItem,
+  TextField
 } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import Chatroom from './Chatroom/Chatroom'
@@ -44,7 +48,6 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
-import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
@@ -53,7 +56,10 @@ import { postAgreeAddGroup } from '../fetch/friend/agreeAddGroup'
 import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
+import { postModifyInfo } from '../fetch/info/modifyInfo'
 import md5 from 'crypto-js/md5'
+import sha1 from 'crypto-js/sha1'
+
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -163,6 +169,39 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240
   },
+  infoBox: {
+    // minHeight: '30vh',
+    minWidth: '20vw'
+  },
+  menuItemInfo: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'strech',
+    minHeight: '5vh',
+    minWidth: '10vw',
+    maxWidth: '20vw'
+  },
+  menuItemInfoAvatar: {},
+  menuItemInfoNames: {
+    maxWidth: '85%',
+    marginLeft: '1vw',
+    marginRight: '1vw',
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  menuItemInfoNickname: {
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  menuItemInfoUsername: {
+    color: theme.palette.text.secondary,
+    fontSize: 'small',
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
   listStyles: {
     width: '100%',
     maxWidth: '36ch',
@@ -195,8 +234,10 @@ export default function Dashboard() {
   const { enqueueSnackbar } = useSnackbar()
 
   const open = useSelector((state) => state.drawerOpen)
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
   const myName = useSelector((state) => state.myName)
+  const webSocket = useSelector((state) => state.socket)
+  const requestList = useSelector((state) => state.requests)
 
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
@@ -206,12 +247,20 @@ export default function Dashboard() {
     themeLightDefault
   )
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false)
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
-  const requestList = useSelector((state) => state.requests)
   const [initWebSocket, setInitWebSocket] = useState(false)
-
-  const [online, setOnline] = useState(false)
+  const [infoNewNickname, setInfoNewNickname] = useState(
+    myName ? myName.nickname : null
+  )
+  const [infoCurrentPassword, setInfoCurrentPassword] = useState()
+  const [infoNewEmail, setInfoNewEmail] = useState()
+  const [infoNewPassword, setInfoNewPassword] = useState()
+  const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
+  // const [passwordSame, setPasswordSame] = useState(true)
+  // const [online, setOnline] = useState(false)
 
   useEffect(() => {
     const friends = []
@@ -258,8 +307,8 @@ export default function Dashboard() {
             .then((data) => {
               if (
                 data != null &&
-                      Object.prototype.hasOwnProperty.call(data, 'state') &&
-                      data['state'] === 200
+                Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200
               ) {
                 dispatch(addFriend(friendName, data['userInfo']))
                 dispatch(deleteRequest(0, fName))
@@ -296,10 +345,12 @@ export default function Dashboard() {
             .then((data) => {
               if (
                 data != null &&
-                      Object.prototype.hasOwnProperty.call(data, 'state') &&
-                      data['state'] === 200
+                Object.prototype.hasOwnProperty.call(data, 'state') &&
+                data['state'] === 200
               ) {
-                dispatch(addGroup(data['userInfo']['username'], data['userInfo']))
+                dispatch(
+                  addGroup(data['userInfo']['username'], data['userInfo'])
+                )
                 dispatch(deleteRequest(1, gName))
                 enqueueSnackbar('Successful add group: ' + groupName, {
                   variant: 'success'
@@ -312,9 +363,89 @@ export default function Dashboard() {
     [myName, dispatch, enqueueSnackbar, friendList]
   )
 
+  const handleNicknameChange = () => {
+    const passwordSHA = sha1(infoCurrentPassword + 'iwantaplus').toString()
+    postModifyInfo(myName.username, passwordSHA, {
+      nickname: infoNewNickname
+    }).then((res) =>
+      res
+        .json()
+        .catch((error) => console.error('Error:', error))
+        .then((data) => {
+          if (
+            data != null &&
+            Object.prototype.hasOwnProperty.call(data, 'state')
+          ) {
+            if (data['state'] === 200) {
+              dispatch(setMyName({ ...myName, nickname: infoNewNickname }))
+              setInfoNewNickname(infoNewNickname)
+              enqueueSnackbar(
+                'Successfully changed nickname: ' + infoNewNickname,
+                {
+                  variant: 'success'
+                }
+              )
+            } else if (data['state'] === 405) {
+              setInfoNewNickname(myName.nickname)
+              enqueueSnackbar('Wrong password!', {
+                variant: 'error'
+              })
+            }
+          }
+        })
+    )
+    setInfoCurrentPassword()
+    setInfoDialogOpen(false)
+  }
+
+  const handleInfoChange = () => {
+    const passwordSHA = sha1(infoCurrentPassword + 'iwantaplus').toString()
+    var params = {}
+    if (infoNewEmail != null) {
+      params.email = infoNewEmail
+    }
+    if (infoNewPassword != null) {
+      params.password = infoNewPassword
+    }
+    if (params !== {}) {
+      postModifyInfo(myName.username, passwordSHA, params).then((res) =>
+        res
+          .json()
+          .catch((error) => console.error('Error:', error))
+          .then((data) => {
+            if (
+              data != null &&
+              Object.prototype.hasOwnProperty.call(data, 'state')
+            ) {
+              if (data['state'] === 200) {
+                dispatch(setMyName({ ...myName, email: infoNewEmail }))
+                enqueueSnackbar('Successfully changed user info.', {
+                  variant: 'success'
+                })
+              } else if (data['state'] === 405) {
+                enqueueSnackbar('Wrong password!', {
+                  variant: 'error'
+                })
+              }
+            }
+          })
+      )
+    }
+    setAccountDialogOpen(false)
+    setInfoCurrentPassword()
+    setInfoNewEmail()
+    setInfoNewPassword()
+    setInfoNewPasswordComfirm()
+  }
+
   const refuseAddFriendRequest = useCallback(
     async (refusedUsername, friendName) => {
-      if (await postDisagreeAddFriend(myName.username, refusedUsername.split('@')[1])) {
+      if (
+        await postDisagreeAddFriend(
+          myName.username,
+          refusedUsername.split('@')[1]
+        )
+      ) {
         dispatch(deleteRequest(0, refusedUsername))
       }
     },
@@ -323,8 +454,13 @@ export default function Dashboard() {
 
   const refuseAddGroupRequest = useCallback(
     async (refusedGroupName, friendName) => {
-      if (await postDisagreeAddGroup(myName.username,
-        refusedGroupName.split('@')[1], friendName.split('@')[1])) {
+      if (
+        await postDisagreeAddGroup(
+          myName.username,
+          refusedGroupName.split('@')[1],
+          friendName.split('@')[1]
+        )
+      ) {
         dispatch(deleteRequest(1, refusedGroupName))
       }
     },
@@ -350,6 +486,7 @@ export default function Dashboard() {
     dispatch(setFocusUser(null))
     dispatch(setSocket(null))
     dispatch(setMyName(null))
+    webSocket.close()
     setInitWebSocket(false)
     history.push('/sign')
   }
@@ -368,6 +505,39 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
+  const handleReceiveMessage = useCallback(
+    async (receivedData) => {
+      console.log(receivedData)
+      if (receivedData['is_group'] === 1) {
+        console.log('group')
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            receivedData['username'],
+            1,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id']
+          )
+        )
+      } else {
+        console.log('private')
+        dispatch(
+          messageReceived(
+            receivedData['content'],
+            receivedData['friend_name'],
+            null,
+            0,
+            receivedData['mtype'],
+            receivedData['userInfo'],
+            receivedData['id']
+          )
+        )
+      }
+    },
+    [dispatch]
+  )
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
@@ -404,7 +574,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          setOnline(true)
+          // setOnline(true)
           setInitWebSocket(true)
 
           requireFriendList(nameCookie).then((res) =>
@@ -437,29 +607,7 @@ export default function Dashboard() {
             switch (receivedData['type']) {
               case 'MESSAGE_NOTIFY':
                 handleReply('NOTIFY_MESSAGE_NOTIFY').then()
-                if (receivedData['is_group'] === 1) {
-                  dispatch(
-                    messageReceived(
-                      receivedData['content'],
-                      receivedData['friend_name'],
-                      receivedData['username'],
-                      1,
-                      receivedData['mtype'],
-                      receivedData['userInfo']
-                    )
-                  )
-                } else {
-                  dispatch(
-                    messageReceived(
-                      receivedData['content'],
-                      receivedData['friend_name'],
-                      null,
-                      0,
-                      receivedData['mtype'],
-                      receivedData['userInfo']
-                    )
-                  )
-                }
+                handleReceiveMessage(receivedData)
                 break
               case 'NEW_ADD_FRIEND':
                 handleReply('NOTIFY_NEW_ADD_FRIEND').then()
@@ -486,7 +634,12 @@ export default function Dashboard() {
                 break
               case 'AGREE_ADD_FRIEND':
                 handleReply('NOTIFY_AGREE_ADD_FRIEND').then()
-                dispatch(addFriend(receivedData['friend_name'], receivedData['userInfo']))
+                dispatch(
+                  addFriend(
+                    receivedData['friend_name'],
+                    receivedData['userInfo']
+                  )
+                )
                 enqueueSnackbar(
                   'Successful add friend: ' + receivedData['friend_name'],
                   { variant: 'success' }
@@ -502,10 +655,10 @@ export default function Dashboard() {
           if (!initWebSocket) {
             history.push('/sign')
           }
-          setOnline(false)
+          // setOnline(false)
         }
         socket.onclose = (event) => {
-          setOnline(false)
+          // setOnline(false)
         }
       } else {
         history.push('/sign')
@@ -559,17 +712,6 @@ export default function Dashboard() {
           </div>
           <div
             className={classes.appBarIcon}
-            // onClick={handleOnlineIconClick}
-          >
-            <IconButton
-            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
-            >
-              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
-            </IconButton>
-            {/* <CircularProgress></CircularProgress> */}
-          </div>
-          <div
-            className={classes.appBarIcon}
             onClick={() => {
               setNotificationDialogOpen(true)
             }}
@@ -619,12 +761,16 @@ export default function Dashboard() {
             className={classes.appBarIcon}
             onClick={handleAvatarClick}
           >
-            <Avatar src=
-              {myName === null ? 'https://www.gravatar.com/avatar/' +
-                  'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
-                : 'https://www.gravatar.com/avatar/' +
-                        md5(myName.email).toString() +
-                        '?d=robohash'}/>
+            <Avatar
+              src={
+                myName === null
+                  ? 'https://www.gravatar.com/avatar/' +
+                    'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                  : 'https://www.gravatar.com/avatar/' +
+                    md5(myName.email).toString() +
+                    '?d=robohash'
+              }
+            />
           </IconButton>
           <Menu
             id="simple-menu"
@@ -633,8 +779,49 @@ export default function Dashboard() {
             open={Boolean(anchorMenu)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose()
+                setInfoNewNickname(myName.nickname)
+                setInfoCurrentPassword()
+                setInfoDialogOpen(true)
+              }}
+            >
+              <Box className={classes.menuItemInfo}>
+                <Box className={classes.menuItemInfoAvatar}>
+                  <Avatar
+                    src={
+                      myName === null
+                        ? 'https://www.gravatar.com/avatar/' +
+                          'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                        : 'https://www.gravatar.com/avatar/' +
+                          md5(myName.email).toString() +
+                          '?d=robohash'
+                    }
+                  />
+                </Box>
+                <Box className={classes.menuItemInfoNames}>
+                  <Box className={classes.menuItemInfoNickname}>
+                    {myName ? myName.nickname : null}
+                  </Box>
+                  <Box className={classes.menuItemInfoUsername}>
+                    {'@' + (myName ? myName.username : null)}
+                  </Box>
+                </Box>
+              </Box>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose()
+                setAccountDialogOpen(true)
+                setInfoCurrentPassword()
+                setInfoNewEmail()
+                setInfoNewPassword()
+                setInfoNewPasswordComfirm()
+              }}
+            >
+              Account Settings
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
@@ -648,7 +835,8 @@ export default function Dashboard() {
           display="flex"
           flexDirection="row"
           justifyContent="center"
-          margin={2}
+          marginTop={1}
+          height="80%"
         >
           {/* <Chatroom />
           <Chatroom />
@@ -657,7 +845,109 @@ export default function Dashboard() {
           <Chatroom />
         </Box>
       </main>
-
+      <Dialog
+        open={infoDialogOpen}
+        onClose={() => {
+          setInfoDialogOpen(false)
+        }}
+      >
+        <Box className={classes.infoBox}>
+          <DialogTitle>Choose a nickname</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={1} alignItems="flex-end">
+              <Grid item>
+                <Avatar
+                  src={
+                    myName === null
+                      ? 'https://www.gravatar.com/avatar/' +
+                        'dce3adc8812d921a8af8963d3cc413b7?d=robohash'
+                      : 'https://www.gravatar.com/avatar/' +
+                        md5(myName.email).toString() +
+                        '?d=robohash'
+                  }
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  fullWidth
+                  label="New Nickname"
+                  value={infoNewNickname}
+                  onChange={(e) => {
+                    setInfoNewNickname(e.target.value)
+                  }}
+                ></TextField>
+              </Grid>
+            </Grid>
+            <Box marginTop={1}>
+              <TextField
+                fullWidth
+                label="Current Password"
+                value={infoCurrentPassword}
+                onChange={(e) => {
+                  setInfoCurrentPassword(e.target.value)
+                }}
+                type="password"
+              ></TextField>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleNicknameChange}>Submit</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+      <Dialog
+        open={accountDialogOpen}
+        onClose={() => {
+          setAccountDialogOpen(false)
+        }}
+      >
+        <Box className={classes.infoBox}>
+          <DialogTitle>Account Settings</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              You can modify your email address and password here.
+            </DialogContentText>
+            <TextField
+              fullWidth
+              label="Current Password"
+              value={infoCurrentPassword}
+              onChange={(e) => {
+                setInfoCurrentPassword(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Email Address"
+              value={infoNewEmail}
+              onChange={(e) => {
+                setInfoNewEmail(e.target.value)
+              }}
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Password"
+              value={infoNewPassword}
+              onChange={(e) => {
+                setInfoNewPassword(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+            <TextField
+              fullWidth
+              label="New Password Comfirm"
+              value={infoNewPasswordComfirm}
+              onChange={(e) => {
+                setInfoNewPasswordComfirm(e.target.value)
+              }}
+              type="password"
+            ></TextField>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleInfoChange}>Submit</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
       <Dialog
         open={notificationDialogOpen}
         onClose={() => {

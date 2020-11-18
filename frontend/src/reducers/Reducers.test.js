@@ -13,7 +13,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: { user: 'name', isGroup: 0 },
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -28,7 +28,7 @@ describe('chat reducer', () => {
       {
         socket: 'socket',
         focusUser: 'focusUser',
-        messages: [],
+        messages: { messageList: [], focusUser: null },
         myName: 'name',
         theme: null,
         drawerOpen: false
@@ -42,7 +42,7 @@ describe('chat reducer', () => {
       {
         socket: 'socket',
         focusUser: 'focusUser',
-        messages: [],
+        messages: { messageList: [], focusUser: null },
         myName: 'name',
         theme: null,
         drawerOpen: false
@@ -56,7 +56,7 @@ describe('chat reducer', () => {
       {
         socket: 'socket',
         focusUser: 'focusUser',
-        messages: [],
+        messages: { messageList: [], focusUser: null },
         myName: 'name',
         theme: null,
         drawerOpen: false
@@ -74,7 +74,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -93,7 +93,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -112,7 +112,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -131,7 +131,7 @@ describe('chat reducer', () => {
         {
           socket: null,
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -147,7 +147,7 @@ describe('chat reducer', () => {
         {
           socket: null,
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -163,7 +163,7 @@ describe('chat reducer', () => {
         {
           socket: null,
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -182,7 +182,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -223,7 +223,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -242,7 +242,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -272,7 +272,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -305,7 +305,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -324,20 +324,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [
-            {
-              user: 'name',
-              message_list: [
-                {
-                  type: 'normal',
-                  time: '2019-10-21T06:38:03.063Z',
-                  from: 'alice',
-                  content: 'hello'
-                }
-              ]
-            },
-            { user: 'bob', message_list: [] }
-          ],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
@@ -357,20 +344,7 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
-          messages: [
-            {
-              user: 'name',
-              message_list: [
-                {
-                  type: 'normal',
-                  time: '2019-10-21T06:38:03.063Z',
-                  from: 'alice',
-                  content: 'hello'
-                }
-              ]
-            },
-            { user: 'era', message_list: [] }
-          ],
+          messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
           drawerOpen: false
