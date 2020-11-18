@@ -93,13 +93,12 @@ const messages = (state = initialState, action) => {
             userInfo: action.userInfo,
             id: action.id
           })
-          if (!action.isFocus) {
-            temp.offline_ids.push(action.id)
-          }
+          temp.offline_ids.push(action.id)
           newList.unshift(temp)
         }
       }
       return newList
+    case 'CLEAR_UNREAD':
     case 'SET_FOCUS_USER':
       for (; j < len; j++) {
         if (newList[j].isGroup === action.username.isGroup &&

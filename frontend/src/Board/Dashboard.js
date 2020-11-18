@@ -54,7 +54,6 @@ import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
 import md5 from 'crypto-js/md5'
-import { postEnterChat } from '../fetch/message/enterChat'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -199,7 +198,6 @@ export default function Dashboard() {
   const friendList = useSelector((state) => state.messages)
   const myName = useSelector((state) => state.myName)
   const webSocket = useSelector((state) => state.socket)
-  const focusUser = useSelector((state) => state.focusUser)
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
@@ -207,6 +205,7 @@ export default function Dashboard() {
   const [previousLightTheme, setPreviousLightTheme] = useState(
     themeLightDefault
   )
+  const user = useSelector((state) => state.focusUser)
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false)
   const [friendToAddList, setFriendToAddList] = useState([])
   const [groupToAddList, setGroupToAddList] = useState([])
@@ -371,22 +370,11 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = useCallback((receivedData) => {
+  const handleReceiveMessage = useCallback(async (receivedData) => {
     console.log(receivedData)
-    let isFocus = false
-    if (focusUser.isGroup === 1 &&
-        receivedData['is_group'].isGroup === 1 &&
-        focusUser.user === receivedData['username']) {
-      isFocus = true
-      postEnterChat(receivedData['username'], 1, receivedData['id']).then()
-    }
-    if (focusUser.isGroup === 0 &&
-        receivedData['is_group'].isGroup === 0 &&
-        focusUser.user === receivedData['friend_name']) {
-      isFocus = true
-      postEnterChat(receivedData['friend_name'], 0, receivedData['id']).then()
-    }
+    console.log(user)
     if (receivedData['is_group'] === 1) {
+      console.log('group')
       dispatch(
         messageReceived(
           receivedData['content'],
@@ -395,11 +383,11 @@ export default function Dashboard() {
           1,
           receivedData['mtype'],
           receivedData['userInfo'],
-          receivedData['id'],
-          isFocus
+          receivedData['id']
         )
       )
     } else {
+      console.log('private')
       dispatch(
         messageReceived(
           receivedData['content'],
@@ -408,12 +396,11 @@ export default function Dashboard() {
           0,
           receivedData['mtype'],
           receivedData['userInfo'],
-          receivedData['id'],
-          isFocus
+          receivedData['id']
         )
       )
     }
-  }, [dispatch, focusUser])
+  }, [dispatch, user])
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
