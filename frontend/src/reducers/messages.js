@@ -23,25 +23,33 @@ const messages = (state = initialState, action) => {
       }
       return { messageList: newList, focusUser: null }
     case 'ADD_FRIEND':
-      return { messageList: [
-        ...state.messageList,
-        { user: action.friendName,
-          message_list: [],
-          isGroup: 0,
-          userInfo: action.userInfo,
-          offline_ids: [] }
-      ],
-      focusUser: state.focusUser }
+      return {
+        messageList: [
+          ...state.messageList,
+          {
+            user: action.friendName,
+            message_list: [],
+            isGroup: 0,
+            userInfo: action.userInfo,
+            offline_ids: []
+          }
+        ],
+        focusUser: state.focusUser
+      }
     case 'ADD_GROUP':
-      return { messageList: [
-        ...state.messageList,
-        { user: action.groupName,
-          message_list: [],
-          isGroup: 1,
-          userInfo: action.userInfo,
-          offline_ids: [] }
-      ],
-      focusUser: state.focusUser }
+      return {
+        messageList: [
+          ...state.messageList,
+          {
+            user: action.groupName,
+            message_list: [],
+            isGroup: 1,
+            userInfo: action.userInfo,
+            offline_ids: []
+          }
+        ],
+        focusUser: state.focusUser
+      }
 
     case 'SET_MESSAGE_LIST':
       newList = action.messageList
@@ -82,15 +90,19 @@ const messages = (state = initialState, action) => {
       return { messageList: newList, focusUser: state.focusUser }
     case 'NEW_MESSAGE_RECEIVE':
       if (state.focusUser !== null) {
-        if (state.focusUser.isGroup === 1 &&
-            action.isGroup === 1 &&
-            state.focusUser.user === action.group) {
+        if (
+          state.focusUser.isGroup === 1 &&
+          action.isGroup === 1 &&
+          state.focusUser.user === action.group
+        ) {
           isFocus = true
           postEnterChat(action.group, 1, action.id).then()
         }
-        if (state.focusUser.isGroup === 0 &&
-            action.isGroup === 0 &&
-            state.focusUser.user === action.author) {
+        if (
+          state.focusUser.isGroup === 0 &&
+          action.isGroup === 0 &&
+          state.focusUser.user === action.author
+        ) {
           isFocus = true
           postEnterChat(action.author, 0, action.id).then()
         }
@@ -150,33 +162,62 @@ const messages = (state = initialState, action) => {
 }
 
 const initialState = {
-  messageList:
-      [
-        // { user: 'asg',
-        //   isGroup: 0,
-        //   userInfo: { nickname: 'a', email: '6dsa@qq.com' },
-        //   offline_ids: [131],
-        //   friend_offline_ids: [120],
-        //   message_list: [{ from: 'a',
-        //     mtype: 'abnormal',
-        //     content: 'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-        //   'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-        //     time: 46546516,
-        //     id: 131,
-        //     userInfo: { nickname: 'a', email: '6dsa@qq.com' } },
-        //   { from: 'b',
-        //     mtype: 'normal',
-        //     content: 'abs',
-        //     time: 465465178,
-        //     id: 120,
-        //     userInfo: { nickname: 'b', email: '6dsadsag@qq.com' } },
-        //   { from: 'c',
-        //     mtype: 'normal',
-        //     content: 'abs',
-        //     time: 4654651444,
-        //     isRead: false,
-        //     userInfo: { nickname: 'c', email: '6dsadsagdsag@qq.com' } }] }
-      ],
+  messageList: [
+    // {
+    //   user: 'asg',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'aa',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546515,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // },
+    // {
+    //   user: 'asg1',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6dswa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'ae',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546526,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // },
+    // {
+    //   user: 'asg2',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6d2sa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'a3',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546316,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // }
+  ],
   focusUser: null
 }
 
