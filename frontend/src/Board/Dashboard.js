@@ -17,7 +17,6 @@ import {
   setRequestList,
   deleteFriend
 } from '../actions'
-import RefreshIcon from '@material-ui/icons/Refresh'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
@@ -49,7 +48,6 @@ import Dialog from '@material-ui/core/Dialog'
 import { useSnackbar } from 'notistack'
 import NotificationListItem from './NotificationListItem'
 import PaletteIcon from '@material-ui/icons/Palette'
-import CheckIcon from '@material-ui/icons/Check'
 import { themesAvailable, themeLightDefault, themeDarkDefault } from '../themes'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import { postAgreeAddFriend } from '../fetch/friend/agreeAddFriend'
@@ -59,7 +57,6 @@ import { requireFriendList } from '../fetch/message/requireFriendList'
 import { postDisagreeAddFriend } from '../fetch/friend/refuseFriend'
 import { postDisagreeAddGroup } from '../fetch/friend/refuseGroup'
 import md5 from 'crypto-js/md5'
-import { postEnterChat } from '../fetch/message/enterChat'
 // import socket from '../reducers/socket'
 
 // function Copyright() {
@@ -234,12 +231,11 @@ export default function Dashboard() {
   const { enqueueSnackbar } = useSnackbar()
 
   const open = useSelector((state) => state.drawerOpen)
-  const friendList = useSelector((state) => state.messages)
+  const friendList = useSelector((state) => state.messages.messageList)
   const myName = useSelector((state) => state.myName)
   const webSocket = useSelector((state) => state.socket)
-  const focusUser = useSelector((state) => state.focusUser)
   const requestList = useSelector((state) => state.requests)
-
+  
   const [darkState, setDarkState] = useState(false)
   const [anchorMenu, setAnchorMenu] = useState(null)
   const [anchorThemeMenu, setAnchorThemeMenu] = useState(null)
@@ -258,7 +254,7 @@ export default function Dashboard() {
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
   const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
-  const [online, setOnline] = useState(false)
+  // const [online, setOnline] = useState(false)
 
   useEffect(() => {
     const friends = []
@@ -447,56 +443,36 @@ export default function Dashboard() {
   // const handleOnlineIconClick = () => {
   //   setOnline(!online)
   // }
-  const handleReceiveMessage = useCallback(
-    (receivedData) => {
-      console.log(receivedData)
-      let isFocus = false
-      if (
-        focusUser.isGroup === 1 &&
-        receivedData['is_group'].isGroup === 1 &&
-        focusUser.user === receivedData['username']
-      ) {
-        isFocus = true
-        postEnterChat(receivedData['username'], 1, receivedData['id']).then()
-      }
-      if (
-        focusUser.isGroup === 0 &&
-        receivedData['is_group'].isGroup === 0 &&
-        focusUser.user === receivedData['friend_name']
-      ) {
-        isFocus = true
-        postEnterChat(receivedData['friend_name'], 0, receivedData['id']).then()
-      }
-      if (receivedData['is_group'] === 1) {
-        dispatch(
-          messageReceived(
-            receivedData['content'],
-            receivedData['friend_name'],
-            receivedData['username'],
-            1,
-            receivedData['mtype'],
-            receivedData['userInfo'],
-            receivedData['id'],
-            isFocus
-          )
+  const handleReceiveMessage = useCallback(async (receivedData) => {
+    console.log(receivedData)
+    if (receivedData['is_group'] === 1) {
+      console.log('group')
+      dispatch(
+        messageReceived(
+          receivedData['content'],
+          receivedData['friend_name'],
+          receivedData['username'],
+          1,
+          receivedData['mtype'],
+          receivedData['userInfo'],
+          receivedData['id']
         )
-      } else {
-        dispatch(
-          messageReceived(
-            receivedData['content'],
-            receivedData['friend_name'],
-            null,
-            0,
-            receivedData['mtype'],
-            receivedData['userInfo'],
-            receivedData['id'],
-            isFocus
-          )
+      )
+    } else {
+      console.log('private')
+      dispatch(
+        messageReceived(
+          receivedData['content'],
+          receivedData['friend_name'],
+          null,
+          0,
+          receivedData['mtype'],
+          receivedData['userInfo'],
+          receivedData['id']
         )
-      }
-    },
-    [dispatch, focusUser]
-  )
+      )
+    }
+  }, [dispatch])
 
   const handleAvatarClick = (event) => {
     setAnchorMenu(event.currentTarget)
@@ -533,7 +509,7 @@ export default function Dashboard() {
         // Connection opened
         socket.addEventListener('open', function (event) {
           dispatch(setSocket(socket))
-          setOnline(true)
+          // setOnline(true)
           setInitWebSocket(true)
 
           requireFriendList(nameCookie).then((res) =>
@@ -614,10 +590,10 @@ export default function Dashboard() {
           if (!initWebSocket) {
             history.push('/sign')
           }
-          setOnline(false)
+          // setOnline(false)
         }
         socket.onclose = (event) => {
-          setOnline(false)
+          // setOnline(false)
         }
       } else {
         // history.push('/sign')
@@ -668,17 +644,6 @@ export default function Dashboard() {
               }}
               inputProps={{ 'aria-label': 'secondary checkbox' }}
             />
-          </div>
-          <div
-            className={classes.appBarIcon}
-            // onClick={handleOnlineIconClick}
-          >
-            <IconButton
-            // style={{ transform: 'rotate(' + 45 + 'deg)' }}
-            >
-              {online ? <CheckIcon></CheckIcon> : <RefreshIcon></RefreshIcon>}
-            </IconButton>
-            {/* <CircularProgress></CircularProgress> */}
           </div>
           <div
             className={classes.appBarIcon}
@@ -804,7 +769,8 @@ export default function Dashboard() {
           display="flex"
           flexDirection="row"
           justifyContent="center"
-          margin={2}
+          marginTop={1}
+          height="80%"
         >
           {/* <Chatroom />
           <Chatroom />

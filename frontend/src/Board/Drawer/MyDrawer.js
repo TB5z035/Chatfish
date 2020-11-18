@@ -56,7 +56,7 @@ export default function MyDrawer() {
     >
       {/* Drawer Title */}
       <div className={classes.toolbarIcon}>
-        <Typography>Friends</Typography>
+        <Typography>Chats</Typography>
         <IconButton
           onClick={() => {
             dispatch(setDrawerOpen(false))
