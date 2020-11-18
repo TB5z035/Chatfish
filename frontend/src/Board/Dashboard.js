@@ -257,7 +257,7 @@ export default function Dashboard() {
   const [infoNewEmail, setInfoNewEmail] = useState()
   const [infoNewPassword, setInfoNewPassword] = useState()
   const [infoNewPasswordComfirm, setInfoNewPasswordComfirm] = useState()
-  const [passwordSame, setPasswordSame] = useState(true)
+  // const [passwordSame, setPasswordSame] = useState(true)
   // const [online, setOnline] = useState(false)
 
   useEffect(() => {
@@ -383,7 +383,7 @@ export default function Dashboard() {
                   variant: 'success'
                 }
               )
-            } else if (data['state'] == 405) {
+            } else if (data['state'] === 405) {
               setInfoNewNickname(myName.nickname)
               enqueueSnackbar('Wrong password!', {
                 variant: 'error'
@@ -405,7 +405,7 @@ export default function Dashboard() {
     if (infoNewPassword != null) {
       params.password = infoNewPassword
     }
-    if (params != {}) {
+    if (params !== {}) {
       postModifyInfo(myName.username, passwordSHA, params).then((res) =>
         res
           .json()
@@ -423,7 +423,7 @@ export default function Dashboard() {
                     variant: 'success'
                   }
                 )
-              } else if (data['state'] == 405) {
+              } else if (data['state'] === 405) {
                 enqueueSnackbar('Wrong password!', {
                   variant: 'error'
                 })
@@ -662,7 +662,7 @@ export default function Dashboard() {
           // setOnline(false)
         }
       } else {
-        // history.push('/sign')
+        history.push('/sign')
       }
     }
     setWebSocket().then()

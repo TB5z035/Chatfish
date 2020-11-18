@@ -149,60 +149,60 @@ const messages = (state = initialState, action) => {
 
 const initialState = {
   messageList: [
-    {
-      user: 'asg',
-      isGroup: 0,
-      userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
-      offline_ids: [131],
-      message_list: [
-        {
-          from: 'aa',
-          type: 'abnormal',
-          content:
-            'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-            'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-          time: 46546515,
-          id: 131,
-          userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-        }
-      ]
-    },
-    {
-      user: 'asg1',
-      isGroup: 0,
-      userInfo: { nickname: 'a', email: '6dswa@qq.com' },
-      offline_ids: [131],
-      message_list: [
-        {
-          from: 'ae',
-          type: 'abnormal',
-          content:
-            'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-            'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-          time: 46546526,
-          id: 131,
-          userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-        }
-      ]
-    },
-    {
-      user: 'asg2',
-      isGroup: 0,
-      userInfo: { nickname: 'a', email: '6d2sa@qq.com' },
-      offline_ids: [131],
-      message_list: [
-        {
-          from: 'a3',
-          type: 'abnormal',
-          content:
-            'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-            'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-          time: 46546316,
-          id: 131,
-          userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-        }
-      ]
-    }
+    // {
+    //   user: 'asg',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'aa',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546515,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // },
+    // {
+    //   user: 'asg1',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6dswa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'ae',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546526,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // },
+    // {
+    //   user: 'asg2',
+    //   isGroup: 0,
+    //   userInfo: { nickname: 'a', email: '6d2sa@qq.com' },
+    //   offline_ids: [131],
+    //   message_list: [
+    //     {
+    //       from: 'a3',
+    //       type: 'abnormal',
+    //       content:
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //       time: 46546316,
+    //       id: 131,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     }
+    //   ]
+    // }
   ],
   focusUser: null
 }
