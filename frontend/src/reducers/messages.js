@@ -84,7 +84,8 @@ const messages = (state = initialState, action) => {
             time: new Date().getTime(),
             mtype: action.mtype,
             userInfo: action.userInfo,
-            isRead: false
+            isRead: false,
+            id: action.id
           })
           newList.unshift(temp)
         }
