@@ -75,6 +75,32 @@ def register_in(data):
         }
     return ret
 
+def modify_user_info(uid, data):
+    try:
+        user = User.objects.get(uid = uid)
+        if data.get('password') != user.pwd:
+            return {
+                'state': 405,
+                'message': 'Wrong password!'
+            }
+        if 'nickname' in data:
+            user.nickname = data.get('nickname')
+        if 'email' in data:
+            user.email = data.get('email')
+        if 'new_password' in data:
+            user.pwd = data.get('new_password')
+        user.save()
+        ret = {
+            'state': 200,
+            'message': 'Successfully modified.'
+        }
+    except Exception:
+        ret = {
+            'state': 405,
+            'message': 'Unknown user!'
+        }
+    return ret
+
 def insert_user_to_chat(uid, cid):
     insert_chat_meta(cid = cid, meta_name = 'member', meta_val = uid)
 
@@ -767,6 +793,8 @@ def post_data(request):
                 ret = login_verify(data.get('user_info'))
             elif data['type'] == 'REGISTER_IN':
                 ret = register_in(data.get('user_info'))
+            elif data['type'] == 'MODIFY_USER_INFO':
+                ret = modify_user_info(uid = data.get('uid'), data = data)
             elif data['type'] == 'ALL_MESSAGE':
                 ret = fetch_all_message(data.get('uid'))
             elif data['type'] == 'MESSAGE_UPLOAD':
