@@ -572,8 +572,8 @@ export default function Dashboard() {
       if (localCookie != null && nameCookie != null) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         const socket = new ReconnectingWebSocket(
-          'wss://' + window.location.host + '/ws'
-          // 'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
+          // 'wss://' + window.location.host + '/ws'
+          'ws://' + window.location.host + '/ws' // fixme: for local debug only!!
         )
 
         // Connection opened
