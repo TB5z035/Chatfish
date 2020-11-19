@@ -495,7 +495,7 @@ var disagree_add_group_request = function(request, response, body) {
 var message_upload_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user === null || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.userName) {
         response.writeHead(403)
         response.end()
         return
@@ -528,10 +528,10 @@ var recall_request = function(request, response, body) {
         response.end()
         return
     }
-    if ( json_data.hasOwnProperty('is_group') && json_data.is_group == 1 ) {
+    if ( json_data.hasOwnProperty('is_group') && json_data.is_group === 1 ) {
         var data = {
             type: 'RECALL',
-            response_type: json_data.type,
+            is_group: 1,
             uid: user.id,
             mid: json_data.id,
             group_name: json_data.group_name,
@@ -541,7 +541,7 @@ var recall_request = function(request, response, body) {
     else {
         var data = {
             type: 'RECALL',
-            response_type: json_data.type,
+            is_group: 0,
             uid: user.id,
             mid: json_data.id,
             friend_name: json_data.friend_name,
