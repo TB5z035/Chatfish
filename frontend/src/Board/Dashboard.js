@@ -16,7 +16,7 @@ import {
   deleteRequest,
   setRequestList,
   deleteFriend,
-  setAlreadyRead
+  setAlreadyRead, recallMessage
 } from '../actions'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Box from '@material-ui/core/Box'
@@ -602,6 +602,11 @@ export default function Dashboard() {
             receivedData['state'] === 200
           ) {
             switch (receivedData['type']) {
+              case 'RECALL_NOTIFY':
+                dispatch(recallMessage(receivedData['is_group'] === 0
+                  ? receivedData['friend_name'] : receivedData['group_name'],
+                receivedData['is_group'], receivedData['id']))
+                break
               case 'READSTATE_NOTIFY':
                 dispatch(setAlreadyRead(
                   { user: receivedData['is_group'] === 0
