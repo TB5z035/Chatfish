@@ -887,6 +887,11 @@ def recall_message(data):
             cid = data.get('group_name')
         else :
             cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')
+
+        message = Message.objects.get(mid = mid)
+        message.content = ''
+        message.save()
+
         new_hidden_msg = HiddenMessage(mid = data.get('id'), cid = cid)
         new_hidden_msg.full_clean()
         new_hidden_msg.save()
@@ -922,10 +927,10 @@ def recall_message(data):
             'state': 200,
             'message': 'Successfully recalled.'
         }
-    except:
+    except Exception as e:
         ret = {
             'state': 405,
-            'message': 'Something wrong during recalling.'
+            'message': 'Something wrong during recalling: ' + str(e)
         }
     return ret
 
