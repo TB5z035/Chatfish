@@ -226,23 +226,6 @@ def del_offline_request(data):
         }
     return ret
 
-def insert_offline_message(data):
-    try:
-        new_offl_msg = OfflineMessage(ruid = data.get('ruid'), mid = data.get('mid'), cid = data.get('cid'))
-        new_offl_msg.full_clean()
-        new_offl_msg.save()
-        ret = {
-            'state': 200,
-            'uid': data.get('ruid'),
-            'id': new_offl_msg.id
-        }
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in offline message insertion.'
-        }
-    return ret
-
 def del_offline_message(data, by = 'cid'):
     try:
         print(data)
