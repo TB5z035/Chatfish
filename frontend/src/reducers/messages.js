@@ -140,7 +140,7 @@ const messages = (state = initialState, action) => {
       for (; j < len; j++) {
         if (
           newList[j].isGroup === action.username.isGroup &&
-            newList[j].user === action.username.user
+          newList[j].user === action.username.user
         ) {
           newList[j].friend_offline_ids = []
           newList[j].message_list.forEach((item) => {
@@ -163,7 +163,7 @@ const messages = (state = initialState, action) => {
       for (; j < len; j++) {
         if (
           newList[j].isGroup === action.isGroup &&
-            newList[j].user === action.friendName
+          newList[j].user === action.friendName
         ) {
           newList[j].hidden_ids.push(action.id)
         }
@@ -176,34 +176,13 @@ const messages = (state = initialState, action) => {
 
 const initialState = {
   messageList: [
-<<<<<<< HEAD
-    // {
-    //   user: 'asg',
-    //   isGroup: 0,
-    //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
-    //   offline_ids: [129],
-    //   friend_offline_ids: [],
-    //   hidden_ids: [],
-    //   message_list: [
-    //     {
-    //       from: 'aa',
-    //       mtype: 'abnormal',
-    //       content:
-    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-    //       time: 46546515,
-    //       id: 129,
-    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-    //     }
-    //   ]
-    // },
-=======
     {
       user: 'asg',
       isGroup: 0,
       userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
       offline_ids: [131],
       friend_offline_ids: [],
+      hidden_ids: [],
       message_list: [
         {
           from: 'aa',
@@ -218,15 +197,13 @@ const initialState = {
         {
           from: 'ada',
           mtype: 'normal',
-          content:
-            'https%91%E7%9A%84uart_io.v',
+          content: 'https%91%E7%9A%84uart_io.v',
           time: 46546599,
           id: 132,
           userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-        },
+        }
       ]
-    },
->>>>>>> 8cf517e343b09544130ac6ab3f6d13657b3405af
+    }
     // {
     //   user: 'asg1',
     //   isGroup: 1,
