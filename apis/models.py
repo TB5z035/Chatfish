@@ -94,7 +94,7 @@ def judge_member(uid, cid):
         return False
 
 def fetch_recall_msg_id(cid):
-    recalled_msgs = HiddenMessage.objects.filter(cid = cid)
+    recalled_msgs = HiddenMessage.objects.filter(cid = cid).values('mid')
     mids = [ msg['mid'] for msg in recalled_msgs ]
     return mids
 
