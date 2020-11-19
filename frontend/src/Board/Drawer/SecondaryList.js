@@ -273,7 +273,7 @@ export default function SecondaryList() {
             setCreateGroupDialogOpen(false)
           }}
         >
-          <DialogTitle> Creat New Group</DialogTitle>
+          <DialogTitle> Create New Group</DialogTitle>
           <DialogContent>
             <FormControl component="fieldset" className={classes.formControl}>
               <FormLabel component="legend">
