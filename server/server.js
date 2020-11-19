@@ -492,6 +492,34 @@ var disagree_add_group_request = function(request, response, body) {
     })
 }
 
+var message_upload_request = function(request, response, body) {
+    var json_data = try_json(body)
+    var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
+    if (user === undefined || user === null || user.username !== json_data.username) {
+        response.writeHead(403)
+        response.end()
+        return
+    }
+    var data = {
+        type: 'MESSAGE_UPLOAD',
+        mtype: json_data.mtype,
+        is_group: json_data.is_group,
+        userName: json_data.userName,
+        friend_name: json_data.friend_name,
+        content: json_data.content
+    }
+
+    request_to_django.post('/api/post_data/', data, function(res) {
+        response.writeHead(200, {
+            'Content-Type': 'application/json;charset=utf8',
+            'Access-Control-Allow-Origin': '*'
+        })
+        response.end(JSON.stringify(res))
+    }, function(e) {
+        console.log('error post_data: ' + e)
+    })
+}
+
 var recall_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
@@ -636,6 +664,8 @@ var handle_post_request = function(request, response) {
                 agree_add_group_request(request, response, body)
             else if (params.action === 'disagree_add_group')
                 disagree_add_group_request(request, response, body)
+            else if (params.action === 'message_upload')
+                message_upload_request(request, response, body)
             else if (params.action === 'recall')
                 recall_request(request, response, body)
             else if (params.action === 'response')
