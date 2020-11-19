@@ -886,8 +886,8 @@ def recall_message(data):
         if 'is_group' in data and data.get('is_group') == 1:
             cid = data.get('group_name')
         else :
-            cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')     
-        new_hidden_msg = HiddenMessage(mid = data.get('id'), cid = cid)   
+            cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')
+        new_hidden_msg = HiddenMessage(mid = data.get('id'), cid = cid)
         new_hidden_msg.full_clean()
         new_hidden_msg.save()
 
@@ -926,6 +926,7 @@ def recall_message(data):
             'state': 405,
             'message': 'Something wrong during recalling.'
         }
+    return ret
 
 def response_handle(data):
     '''
