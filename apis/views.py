@@ -902,6 +902,7 @@ def recall_message(data):
                     'id': data.get('id'),
                     'username': find_name_by_uid(member).get('name'),
                     'friend_name': data.get('username'),
+                    'group_name': cid,
                     'userInfo': fetch_user_info_by_uid(data.get('uid')).get('userInfo'),
                     'uid': member
                 })
