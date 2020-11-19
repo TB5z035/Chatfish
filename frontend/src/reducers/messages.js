@@ -165,24 +165,34 @@ const messages = (state = initialState, action) => {
 
 const initialState = {
   messageList: [
-    // {
-    //   user: 'asg',
-    //   isGroup: 0,
-    //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
-    //   offline_ids: [131],
-    //   message_list: [
-    //     {
-    //       from: 'aa',
-    //       type: 'abnormal',
-    //       content:
-    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
-    //       time: 46546515,
-    //       id: 131,
-    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
-    //     }
-    //   ]
-    // },
+    {
+      user: 'asg',
+      isGroup: 0,
+      userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
+      offline_ids: [131],
+      friend_offline_ids: [],
+      message_list: [
+        {
+          from: 'aa',
+          mtype: 'gInit',
+          content:
+            'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
+            'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+          time: 46546515,
+          id: 131,
+          userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+        },
+        {
+          from: 'ada',
+          mtype: 'normal',
+          content:
+            'https%91%E7%9A%84uart_io.v',
+          time: 46546599,
+          id: 132,
+          userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+        },
+      ]
+    },
     // {
     //   user: 'asg1',
     //   isGroup: 0,

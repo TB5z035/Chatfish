@@ -671,7 +671,7 @@ export default function Dashboard() {
           // setOnline(false)
         }
       } else {
-        history.push('/sign')
+        // history.push('/sign')
       }
     }
     setWebSocket().then()
