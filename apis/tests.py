@@ -304,7 +304,6 @@ class MessageUploadTest(PostTest):
         data = {
             'type': 'MESSAGE_UPLOAD',
             'is_group': 0,
-            'uid': self.uid1,
             'content': TEST_UPLOAD,
             'userName': TEST_USER,
             'friend_name': TEST_FRIEND_USER
@@ -319,7 +318,6 @@ class MessageUploadTest(PostTest):
         data = {
             'type': 'MESSAGE_UPLOAD',
             'is_group': 0,
-            'uid': self.uid1,
             'content': TEST_UPLOAD,
             'userName': TEST_USER,
             'friend_name': 'NotFriend'
@@ -335,7 +333,6 @@ class MessageUploadTest(PostTest):
             'type': 'MESSAGE_UPLOAD',
             'is_group': 0,
             'mtype': 'this is too long...',
-            'uid': self.uid1,
             'content': TEST_UPLOAD,
             'userName': TEST_USER,
             'friend_name': TEST_FRIEND_USER
@@ -350,7 +347,6 @@ class MessageUploadTest(PostTest):
         data = {
             'type': 'MESSAGE_UPLOAD',
             'is_group': 1,
-            'uid': self.uid1,
             'content': TEST_UPLOAD,
             'userName': TEST_USER,
             'friend_name': self.cid2
@@ -366,7 +362,6 @@ class MessageUploadTest(PostTest):
             'type': 'MESSAGE_UPLOAD',
             'is_group': 1,
             'mtype': 'this is too long...',
-            'uid': self.uid1,
             'content': TEST_UPLOAD,
             'userName': TEST_USER,
             'friend_name': self.cid2
