@@ -967,6 +967,8 @@ def post_data(request):
             elif data['type'] == 'ALL_MESSAGE':
                 ret = fetch_all_message(data.get('uid'))
             elif data['type'] == 'MESSAGE_UPLOAD':
+                if 'uid' not in data:
+                    data['uid'] = find_uid_by_name(data.get('userName')).get('uid')
                 ret = message_upload(data)
             elif data['type'] == 'REQUIRE_FRIEND_LIST':
                 message_list_ret = fetch_all_message(data.get('uid'))
