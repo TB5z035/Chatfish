@@ -158,6 +158,16 @@ const messages = (state = initialState, action) => {
         }
       }
       return { messageList: newList, focusUser: action.username }
+    case 'RECALL_MESSAGE':
+      for (; j < len; j++) {
+        if (
+          newList[j].isGroup === action.isGroup &&
+            newList[j].user === action.friendName
+        ) {
+          newList[j].hidden_ids.push(action.id)
+        }
+      }
+      return { messageList: newList, focusUser: state.focusUser }
     default:
       return state
   }
@@ -171,6 +181,7 @@ const initialState = {
     //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
     //   offline_ids: [129],
     //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'aa',
@@ -190,6 +201,7 @@ const initialState = {
     //   userInfo: { nickname: 'abacd', email: '6dswa@qq.com' },
     //   offline_ids: [],
     //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'ae',
@@ -203,11 +215,12 @@ const initialState = {
     //   ]
     // },
     // {
-    //   user: 'asg2',
+    //   user: 'a3',
     //   isGroup: 0,
     //   userInfo: { nickname: 'a', email: '6d2sa@qq.com' },
-    //   offline_ids: [131],
+    //   offline_ids: [],
     //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'a3',

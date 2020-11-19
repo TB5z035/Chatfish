@@ -31,6 +31,13 @@ export const setAlreadyRead = (username) => ({
   username
 })
 
+export const recallMessage = (friendName, isGroup, id) => ({
+  type: types.RECALL_MESSAGE,
+  friendName,
+  isGroup,
+  id
+})
+
 export const setMessageList = (messageList) => ({
   type: types.SET_MESSAGE_LIST,
   messageList
