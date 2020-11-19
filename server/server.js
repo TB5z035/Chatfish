@@ -533,7 +533,7 @@ var recall_request = function(request, response, body) {
             type: 'RECALL',
             is_group: 1,
             uid: user.id,
-            mid: json_data.id,
+            id: json_data.id,
             group_name: json_data.group_name,
             username: json_data.username
         }
@@ -543,7 +543,7 @@ var recall_request = function(request, response, body) {
             type: 'RECALL',
             is_group: 0,
             uid: user.id,
-            mid: json_data.id,
+            id: json_data.id,
             friend_name: json_data.friend_name,
             username: json_data.username
         }
