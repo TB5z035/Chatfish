@@ -32,7 +32,8 @@ const messages = (state = initialState, action) => {
             isGroup: 0,
             userInfo: action.userInfo,
             offline_ids: [],
-            friend_offline_ids: []
+            friend_offline_ids: [],
+            hidden_ids: []
           }
         ],
         focusUser: state.focusUser
@@ -47,7 +48,8 @@ const messages = (state = initialState, action) => {
             isGroup: 1,
             userInfo: action.userInfo,
             offline_ids: [],
-            friend_offline_ids: []
+            friend_offline_ids: [],
+            hidden_ids: []
           }
         ],
         focusUser: state.focusUser
@@ -84,7 +86,8 @@ const messages = (state = initialState, action) => {
             time: new Date().getTime(),
             mtype: action.mtype,
             userInfo: action.userInfo,
-            isRead: false
+            isRead: false,
+            id: action.id
           })
           newList.unshift(temp)
         }
@@ -139,7 +142,7 @@ const messages = (state = initialState, action) => {
       for (; j < len; j++) {
         if (
           newList[j].isGroup === action.username.isGroup &&
-            newList[j].user === action.username.user
+          newList[j].user === action.username.user
         ) {
           newList[j].friend_offline_ids = []
           newList[j].message_list.forEach((item) => {
@@ -158,6 +161,16 @@ const messages = (state = initialState, action) => {
         }
       }
       return { messageList: newList, focusUser: action.username }
+    case 'RECALL_MESSAGE':
+      for (; j < len; j++) {
+        if (
+          newList[j].isGroup === action.isGroup &&
+          newList[j].user === action.friendName
+        ) {
+          newList[j].hidden_ids.push(action.id)
+        }
+      }
+      return { messageList: newList, focusUser: state.focusUser }
     default:
       return state
   }
@@ -170,46 +183,59 @@ const initialState = {
     //   isGroup: 0,
     //   userInfo: { nickname: 'a', email: '6dsaa@qq.com' },
     //   offline_ids: [131],
+    //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'aa',
-    //       type: 'abnormal',
+    //       mtype: 'gInit',
     //       content:
     //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
     //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
     //       time: 46546515,
     //       id: 131,
     //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
+    //     },
+    //     {
+    //       from: 'ada',
+    //       mtype: 'normal',
+    //       content: 'https%91%E7%9A%84uart_io.v',
+    //       time: 46546599,
+    //       id: 132,
+    //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
     //     }
     //   ]
-    // },
+    // }
     // {
     //   user: 'asg1',
-    //   isGroup: 0,
-    //   userInfo: { nickname: 'a', email: '6dswa@qq.com' },
-    //   offline_ids: [131],
+    //   isGroup: 1,
+    //   userInfo: { nickname: 'abacd', email: '6dswa@qq.com' },
+    //   offline_ids: [],
+    //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'ae',
-    //       type: 'abnormal',
+    //       mtype: 'normal',
     //       content:
-    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
-    //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',
+    //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs',
     //       time: 46546526,
-    //       id: 131,
+    //       id: 130,
     //       userInfo: { nickname: 'a', email: '6dsa@qq.com' }
     //     }
     //   ]
     // },
     // {
-    //   user: 'asg2',
+    //   user: 'a3',
     //   isGroup: 0,
     //   userInfo: { nickname: 'a', email: '6d2sa@qq.com' },
-    //   offline_ids: [131],
+    //   offline_ids: [],
+    //   friend_offline_ids: [],
+    //   hidden_ids: [],
     //   message_list: [
     //     {
     //       from: 'a3',
-    //       type: 'abnormal',
+    //       mtype: 'normal',
     //       content:
     //         'https://wzf2000-1.oss-cn-hangzhou.aliyuncs.com/' +
     //         'ChatFish/image/1605171666244/%E6%88%91%E7%9A%84uart_io.v',

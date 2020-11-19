@@ -142,23 +142,31 @@ export default function FriendList() {
                           user.message_list.slice(-1)[0].content
                         ) {
                           if (
-                            user.message_list.slice(-1)[0].mtype === 'normal'
+                            !user.hidden_ids.includes(
+                              user.message_list.slice(-1)[0].id
+                            )
                           ) {
-                            return (
-                              <Box>
-                                {user.message_list.slice(-1)[0].content}
-                              </Box>
-                            )
+                            if (
+                              user.message_list.slice(-1)[0].mtype === 'normal'
+                            ) {
+                              return (
+                                <Box>
+                                  {user.message_list.slice(-1)[0].content}
+                                </Box>
+                              )
+                            } else {
+                              return (
+                                <Box fontStyle="italic">
+                                  {decodeURI(
+                                    user.message_list
+                                      .slice(-1)[0]
+                                      .content.slice(76)
+                                  )}
+                                </Box>
+                              )
+                            }
                           } else {
-                            return (
-                              <Box fontStyle="italic">
-                                {decodeURI(
-                                  user.message_list
-                                    .slice(-1)[0]
-                                    .content.slice(76)
-                                )}
-                              </Box>
-                            )
+                            return <Box>{'已撤回的消息'}</Box>
                           }
                         }
                       })()}
