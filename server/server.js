@@ -531,6 +531,7 @@ var recall_request = function(request, response, body) {
     if ( json_data.hasOwnProperty('is_group') && json_data.is_group == 1 ) {
         var data = {
             type: 'RECALL',
+            is_group: 1,
             response_type: json_data.type,
             uid: user.id,
             mid: json_data.id,
@@ -541,6 +542,7 @@ var recall_request = function(request, response, body) {
     else {
         var data = {
             type: 'RECALL',
+            is_group: 0,
             response_type: json_data.type,
             uid: user.id,
             mid: json_data.id,
