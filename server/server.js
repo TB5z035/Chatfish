@@ -495,7 +495,7 @@ var disagree_add_group_request = function(request, response, body) {
 var message_upload_request = function(request, response, body) {
     var json_data = try_json(body)
     var user = manager.find_by_token(ws_server.get_token(request.headers.cookie, request.url))
-    if (user === undefined || user === null || user.username !== json_data.username) {
+    if (user === undefined || user === null || user.username !== json_data.userName) {
         response.writeHead(403)
         response.end()
         return
