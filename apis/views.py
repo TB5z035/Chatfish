@@ -289,8 +289,6 @@ def del_offline_message(data, by = 'cid'):
             cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
             cid = [ cid.get('cid') for cid in cid_list1 if cid in cid_list2 and Chat.objects.get(cid = cid.get('cid')).ctype == 0 ][0]
             OfflineMessage.objects.filter(ruid = data.get('uid'), cid = cid).delete()
-        else:
-            pass
         ret = {
             'state': 200,
             'message': 'Successfully delete offline messages.'
@@ -453,7 +451,7 @@ def delete_friend(data):
     try:
         fuid = find_uid_by_name(data.get('friend_name')).get('uid')
         cid = find_cid_by_user(ruid = fuid, uid = data.get('uid')).get('cid')
-        chat = Chat.objects.get(cid = cid)
+        Chat.objects.get(cid = cid)
         UserMeta.objects.filter(uid = data.get('uid'), meta_name = 'friend', meta_value = str(fuid)).delete()
         UserMeta.objects.filter(uid = fuid, meta_name = 'friend', meta_value = str(data.get('uid'))).delete()
         ChatMeta.objects.filter(cid = cid).delete()
@@ -652,7 +650,7 @@ def leave_group(data):
             'state': 200,
             'message': 'Successful requested'
         }
-    except:
+    except Exception:
         ret = {
             'state': 405,
             'message': 'Failed'
@@ -887,6 +885,11 @@ def recall_message(data):
             cid = data.get('group_name')
         else :
             cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')
+
+        message = Message.objects.get(mid = data.get('id'))
+        message.content = ''
+        message.save()
+
         new_hidden_msg = HiddenMessage(mid = data.get('id'), cid = cid)
         new_hidden_msg.full_clean()
         new_hidden_msg.save()
@@ -922,10 +925,10 @@ def recall_message(data):
             'state': 200,
             'message': 'Successfully recalled.'
         }
-    except:
+    except Exception as e:
         ret = {
             'state': 405,
-            'message': 'Something wrong during recalling.'
+            'message': 'Something wrong during recalling: ' + str(e)
         }
     return ret
 

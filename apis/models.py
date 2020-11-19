@@ -142,7 +142,7 @@ def fetch_chat_type(cid):
 def fetch_group_member_info(data):
     try:
         cid = data.get('group_name')
-        chat = Chat.objects.get(cid = cid)
+        Chat.objects.get(cid = cid)
         uid_list = fetch_chat_member(cid)
         group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
@@ -152,7 +152,7 @@ def fetch_group_member_info(data):
             'group_name': cid,
             'group_member': group_member
         }
-    except:
+    except Exception:
         ret = {
             'state': 400,
             'message': 'Fetch failed.'
@@ -195,7 +195,7 @@ def fetch_chat_message(cid, number = 20, page = -1):
 
 def fetch_all_message(uid, number = -1):
     try:
-        user = User.objects.get(uid = uid)
+        User.objects.get(uid = uid)
         chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat_info['cid'] for chat_info in chats_info ]
         chats = [ Chat.objects.get(cid = cid) for cid in cid_list ]
@@ -236,7 +236,7 @@ def fetch_all_message(uid, number = -1):
 
 def fetch_all_offline_request(uid):
     try:
-        user = User.objects.get(uid = uid)
+        User.objects.get(uid = uid)
         requests = OfflineRequest.objects.filter(ruid = uid)
         request_list = [{
             'isGroup': request.req_type,
@@ -319,9 +319,7 @@ def find_cid_by_user(ruid, username = None, uid = None):
                 'find': 0
             }
             return ret
-        elif not uid is None:
-            pass
-        else :
+        elif uid is None :
             uid = find_uid_by_name(username).get('uid')
         cid_list1 = [ chatmeta.cid for chatmeta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid)) \
                         if Chat.objects.get(cid = chatmeta.cid).ctype == 0 ]
