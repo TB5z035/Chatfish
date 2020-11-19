@@ -2,10 +2,12 @@ from django.http import HttpResponse, JsonResponse
 from .models import *
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token as csrf_get_token
 import requests
 import hashlib
 import json
 from config.local_settings import SALT
+from .sha import get_key
 # Create your views here.
 
 @require_http_methods(["GET"])
@@ -15,6 +17,14 @@ def get_data(request):
         'data': 'This is a test from django.'
     }
     print('Receive get request from nodejs.')
+    return JsonResponse(data, safe = False)
+
+@require_http_methods(["GET"])
+def get_token(request):
+    data = {
+        'token': csrf_get_token(request)
+    }
+    print('Receive get token request from nodejs.')
     return JsonResponse(data, safe = False)
 
 def login_verify(data):
@@ -735,14 +745,12 @@ def response_handle(data):
     return ret
 
 @require_http_methods(["POST"])
-@csrf_exempt
 def post_data(request):
     body = request.body.decode('utf-8')
-    sha256 = hashlib.sha256((body + SALT).encode('utf-8'))
     ret = {}
     print('Receive post request from nodejs: ')
     print(body)
-    if (sha256.hexdigest() == request.META.get('HTTP_DATA_KEY')):
+    if (get_key(body) == request.META.get('HTTP_DATA_KEY')):
         ret = {
             'state': 200,
             'message': 'Successfuly post!'
@@ -863,9 +871,7 @@ def post_data(request):
     return JsonResponse(ret, safe = False)
 
 def post_to_nodejs(data):
-    text_bytes = (json.dumps(data) + SALT).encode('utf-8')
-    sha256 = hashlib.sha256(text_bytes)
-    key = sha256.hexdigest()
+    key = get_key(json.dumps(data))
     headers = {
         'Content-Type': 'application/json;charset=utf8',
         'Data-Key': key
