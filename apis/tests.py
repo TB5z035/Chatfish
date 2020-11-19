@@ -40,6 +40,10 @@ class GetTest(TestCase):
     def test_get(self):
         response = self.client.get('/api/get_data/')
         self.assertEqual(response.status_code, 200)
+    
+    def test_get_token(self):
+        response = self.client.get('/api/get_token/')
+        self.assertEqual(response.status_code, 200)
 
 class PostTest(TestCase):
     '''
@@ -943,3 +947,56 @@ class ChatFetchTest(PostTest):
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
+
+class ModifyUserInfoTest(PostTest):
+    '''
+    TestCase for Modify User Info post request
+    '''
+
+    def setUp(self):
+        super().setUp()
+
+    def test_modify_user_info_success(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': self.uid1,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': TEST_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully modified.')
+
+    def test_modify_user_info_fail_wrong(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': self.uid1,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': WRONG_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Wrong password!')
+
+    def test_modify_user_info_fail_none(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': 0,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': WRONG_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Unknown user!')
