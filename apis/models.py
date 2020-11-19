@@ -64,7 +64,13 @@ class OfflineRequest(models.Model):
 
 class OfflineMessage(models.Model):
     id = models.BigAutoField(primary_key = True)
+    fuid = models.IntegerField(blank = False, default = 0)
     ruid = models.IntegerField(blank = False, default = 0)
+    mid = models.IntegerField(blank = False, default = 0)
+    cid = models.IntegerField(blank = False, default = 0)
+
+class HiddenMessage(models.Model):
+    id = models.BigAutoField(primary_key = True)
     mid = models.IntegerField(blank = False, default = 0)
     cid = models.IntegerField(blank = False, default = 0)
 
@@ -86,6 +92,31 @@ def judge_member(uid, cid):
         return True
     except Exception:
         return False
+
+def fetch_recall_msg_id(cid):
+    recalled_msgs = HiddenMessage.objects.filter(cid = cid)
+    mids = [ msg['mid'] for msg in recalled_msgs ]
+    return mids
+
+def fetch_offline_msg_id(data):
+    offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
+    mids = [ msg['mid'] for msg in offline_messages ]
+    return mids
+
+def fetch_friend_offline_msg_id(data):
+    member_num = len(fetch_chat_member(data.get('cid')))
+    friend_offline_messages = OfflineMessage.objects.filter(fuid = data.get('uid'), cid = data.get('cid')).values('mid')
+    mids_dic = {}
+    mids = []
+    for msg in friend_offline_messages:
+        if msg['mid'] in mids_dic:
+            mids_dic[msg['mid']] += 1
+        else :
+            mids_dic[msg['mid']] = 1
+    for mid in mids_dic:
+        if mids_dic[mid] == member_num - 1:
+            mids.append(mid)
+    return mids
 
 def fetch_offline_message(data, by = 'cid'):
     if by == 'cid':
@@ -134,8 +165,9 @@ def fetch_chat_member(cid):
     return ret
 
 def fetch_chat_message(cid, number = 20, page = -1):
-    msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
+    msgs = Message.objects.filter(cid = cid).values('mid', 'mtype', 'uid', 'time', 'content')
     message_list = [ { 
+        'id': msg['mid'],
         'mtype': msg['mtype'],
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
@@ -151,13 +183,13 @@ def fetch_chat_message(cid, number = 20, page = -1):
     elif len(msgs) > number * page :
         return {
             'state': 200,
-            'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ],
+            'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ] if page > 1 else message_list[ -1 * number * page :],
             'bottom': 0
         }
     else :
         return {
             'state': 200,
-            'message_list': message_list[: -1 * number * (page - 1) ],
+            'message_list': message_list[: -1 * number * (page - 1) ] if page > 1 else message_list,
             'bottom': 1
         }
 
@@ -177,11 +209,16 @@ def fetch_all_message(uid, number = -1):
             } if chat.ctype else [ fetch_user_info_by_uid(member).get('userInfo') for member in fetch_chat_member(chat.cid) if member != uid ][0],
             'user': chat.cid if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
             'userMap': fetch_user_map_by_cid(chat.cid) if chat.ctype else None,
-            'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
-            'offline_message_list': fetch_offline_message({
+            'message_list': fetch_chat_message(cid = chat.cid, page = 1).get('message_list'),
+            'offline_ids': fetch_offline_msg_id({
                 'uid': uid,
                 'cid': chat.cid
-            })
+            }),
+            'friend_offline_ids': fetch_friend_offline_msg_id({
+                'uid': uid,
+                'cid': chat.cid
+            }),
+            'hidden_ids': fetch_recall_msg_id(cid = chat.cid)
         } for chat in chats ]
         ret = {
             'state': 200,
@@ -204,7 +241,7 @@ def fetch_all_offline_request(uid):
         request_list = [{
             'isGroup': request.req_type,
             'user': request.name,
-            'friend_name': User.objects.get(uid = request.suid).nickname 
+            'friend_name': User.objects.get(uid = request.suid).nickname + "@" + User.objects.get(uid = request.suid).name
         } for request in requests ]
         ret = {
             'state': 200,
