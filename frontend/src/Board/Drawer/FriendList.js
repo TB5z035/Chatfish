@@ -142,7 +142,7 @@ export default function FriendList() {
                           user.message_list.slice(-1)[0].content
                         ) {
                           if (
-                            !user.message_list.hidden_ids.includes(
+                            !user.hidden_ids.includes(
                               user.message_list.slice(-1)[0].id
                             )
                           ) {
