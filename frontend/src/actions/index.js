@@ -1,13 +1,14 @@
 import * as types from './ActionTypes'
 
-export const addMessage = (message, author, receiver, isGroup, mtype, userInfo) => ({
+export const addMessage = (message, author, receiver, isGroup, mtype, userInfo, id) => ({
   type: types.NEW_MESSAGE_SEND,
   message,
   author,
   receiver,
   isGroup,
   mtype,
-  userInfo
+  userInfo,
+  id
 })
 
 export const messageReceived = (message, author, group, isGroup, mtype, userInfo, id) => ({
@@ -29,6 +30,13 @@ export const setFocusUser = (username) => ({
 export const setAlreadyRead = (username) => ({
   type: types.SET_ALREADY_READ,
   username
+})
+
+export const recallMessage = (friendName, isGroup, id) => ({
+  type: types.RECALL_MESSAGE,
+  friendName,
+  isGroup,
+  id
 })
 
 export const setMessageList = (messageList) => ({

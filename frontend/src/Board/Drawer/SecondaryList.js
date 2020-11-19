@@ -30,6 +30,7 @@ import { addGroup, addMessage } from '../../actions'
 import { useSnackbar } from 'notistack'
 import { postAddFriend } from '../../fetch/friend/addFriend'
 import { postAddGroup } from '../../fetch/friend/addGroup'
+import { postUploadMessage } from '../../fetch/message/uploadMessage'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -147,11 +148,8 @@ export default function SecondaryList() {
     Object.getOwnPropertyNames(selectState).forEach(function (key) {
       if (selectState[key]) {
         if (message !== '') {
-          dispatch(addMessage(message, userName, key, 0, 'normal', myName))
-
           if (webSocket !== null) {
             const params = {
-              type: 'MESSAGE_UPLOAD',
               content: message,
               userName: userName,
               friend_name: key,
@@ -159,7 +157,20 @@ export default function SecondaryList() {
               mtype: 'normal',
               userInfo: myName
             }
-            webSocket.send(JSON.stringify(params))
+            postUploadMessage(params).then((res) =>
+              res
+                .json()
+                .catch((error) => console.error('Error:', error))
+                .then((data) => {
+                  if (
+                    data != null &&
+                          Object.prototype.hasOwnProperty.call(data, 'state') &&
+                          data['state'] === 200
+                  ) {
+                    dispatch(addMessage(message, userName, key, 0, 'normal', myName, data['id']))
+                  }
+                })
+            )
           }
         }
       }

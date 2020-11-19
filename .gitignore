@@ -28,3 +28,5 @@ frontend/.idea
 *.log
 
 config/mysql-config-local.json
+
+*.tar.gz
