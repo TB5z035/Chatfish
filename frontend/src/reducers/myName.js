@@ -9,11 +9,11 @@ const myName = (state = initialName, action) => {
   }
 }
 
-// const initialName = {
-//   username: 'tb5zhh',
-//   nickname: 'W',
-//   email: '654154090@qq.com'
-// }
-const initialName = null
+const initialName = {
+  username: 'tb5zhh',
+  nickname: 'W',
+  email: '654154090@qq.com'
+}
+// const initialName = null
 
 export default myName
