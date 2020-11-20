@@ -40,6 +40,10 @@ class GetTest(TestCase):
     def test_get(self):
         response = self.client.get('/api/get_data/')
         self.assertEqual(response.status_code, 200)
+    
+    def test_get_token(self):
+        response = self.client.get('/api/get_token/')
+        self.assertEqual(response.status_code, 200)
 
 class PostTest(TestCase):
     '''
@@ -232,18 +236,24 @@ class RequireFriendListTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
-        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        self.uid2 = User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL).uid
+        self.uid3 = User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = TEST_PWD, email = TEST_NEW_EMAIL).uid
         UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
         UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
         self.cid1 = Chat.objects.create(name = PRIVATE_CHAT, ctype = 0).cid
         ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
-        Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT)
+        self.mid1 = Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
         self.cid2 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
-        Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT)
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid3))
+        self.mid2 = Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+        self.mid3 = Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid3, cid = self.cid1, ruid = self.uid2, fuid = self.uid1)
+        self.mid4 = Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid4, cid = self.cid2, ruid = self.uid2, fuid = self.uid1)
+        OfflineMessage.objects.create(mid = self.mid4, cid = self.cid2, ruid = self.uid3, fuid = self.uid1)
 
     def test_require_friend_list(self):
         data = {
@@ -637,6 +647,20 @@ class AddGroupTest(PostTest):
         self.assertEqual(res_json.get('state'), 200)
         self.assertEqual(res_json.get('message'), 'Successfully init group chat.')
 
+    def test_add_group_none(self):
+        data = {
+            'type': 'ADD_GROUP',
+            'is_init': 0,
+            'group_name': GROUP_NEW_CHAT,
+            'uid': 0,
+            'friend_list': []
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 403)
+        self.assertEqual(res_json.get('message'), 'Something wrong in chat initialization.')
+
     def test_add_group_not_friend(self):
         data = {
             'type': 'ADD_GROUP',
@@ -691,7 +715,9 @@ class AddGroupTest(PostTest):
             'uid': self.uid1,
             'friend_list': [
                 TEST_FRIEND_USER,
-                TEST_NEW_FRIEND_USER
+                TEST_NEW_FRIEND_USER,
+                TEST_NEW_FRIEND_USER + '_a',
+                "NotExist"
             ]
         }
         response = self.post_test(self.client, data)
@@ -742,6 +768,20 @@ class AddGroupTest(PostTest):
         self.assertEqual(res_json.get('state'), 405)
         self.assertEqual(res_json.get('message'), 'No group with this name!')
 
+    def test_agree_add_group_again(self):
+        data = {
+            'type': 'AGREE_ADD_GROUP',
+            'group_name': self.cid3,
+            'uid': self.uid2,
+            'username': TEST_FRIEND_USER,
+            'friend_name': TEST_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Already in this group!')
+
     def test_disagree_add_group_success(self):
         data = {
             'type': 'DISAGREE_ADD_GROUP',
@@ -783,6 +823,20 @@ class AddGroupTest(PostTest):
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 405)
         self.assertEqual(res_json.get('message'), 'No such request!')
+
+    def test_disagree_add_group_again(self):
+        data = {
+            'type': 'DISAGREE_ADD_GROUP',
+            'group_name': self.cid3,
+            'uid': self.uid2,
+            'username': TEST_FRIEND_USER,
+            'friend_name': TEST_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Already in this group!')
 
     def test_leave_group_success(self):
         data = {
@@ -873,6 +927,12 @@ class ChatEnterTest(PostTest):
         self.cid2 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
+        self.mid1 = Message.objects.create(uid = self.uid2, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid1, cid = self.cid1, ruid = self.uid1, fuid = self.uid2)
+        self.mid2 = Message.objects.create(uid = self.uid2, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid2, cid = self.cid2, ruid = self.uid1, fuid = self.uid2)
+        self.mid3 = Message.objects.create(uid = self.uid2, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid3, cid = self.cid1, ruid = self.uid1, fuid = self.uid2)
 
     def test_chat_enter_private_success(self):
         data = {
@@ -880,6 +940,20 @@ class ChatEnterTest(PostTest):
             'is_group': 0,
             'uid': self.uid1,
             'friend_name': TEST_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully delete offline messages.')
+
+    def test_chat_enter_private_success_with_id(self):
+        data = {
+            'type': 'CHAT_ENTER',
+            'is_group': 0,
+            'uid': self.uid1,
+            'friend_name': TEST_FRIEND_USER,
+            'id': self.mid1
         }
         response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
@@ -943,3 +1017,128 @@ class ChatFetchTest(PostTest):
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertEqual(res_json.get('state'), 200)
+
+    def test_chat_fetch_private_success_without_page(self):
+        data = {
+            'type': 'CHAT_FETCH',
+            'is_group': 0,
+            'uid': self.uid1,
+            'friend_name': TEST_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+
+    def test_chat_fetch_group_success_without_page(self):
+        data = {
+            'type': 'CHAT_FETCH',
+            'is_group': 1,
+            'uid': self.uid1,
+            'friend_name': self.cid2
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+
+class ModifyUserInfoTest(PostTest):
+    '''
+    TestCase for Modify User Info post request
+    '''
+
+    def setUp(self):
+        super().setUp()
+
+    def test_modify_user_info_success(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': self.uid1,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': TEST_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully modified.')
+
+    def test_modify_user_info_fail_wrong(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': self.uid1,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': WRONG_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Wrong password!')
+
+    def test_modify_user_info_fail_none(self):
+        data = {
+            'type': 'MODIFY_USER_INFO',
+            'uid': 0,
+            'nickname': TEST_NICKNAME + 'new',
+            'email': TEST_EMAIL,
+            'password': WRONG_PWD,
+            'new_password': TEST_PWD
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 405)
+        self.assertEqual(res_json.get('message'), 'Unknown user!')
+
+class RecallTest(PostTest):
+    '''
+    TestCase for Recall post request
+    '''
+
+    def setUp(self):
+        super().setUp()
+        self.uid2 = User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL).uid
+        UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
+        UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
+        self.cid1 = Chat.objects.create(name = PRIVATE_CHAT, ctype = 0).cid
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid1, meta_name = MEMBER, meta_value = str(self.uid2))
+        self.uid3 = User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = TEST_PWD, email = TEST_NEW_EMAIL).uid
+        self.cid2 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
+        self.mid1 = Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        self.mid2 = Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+
+    def test_recall_private_success(self):
+        data = {
+            'type': 'RECALL',
+            'is_group': 0,
+            'uid': self.uid1,
+            'friend_name': TEST_FRIEND_USER,
+            'id': self.mid1
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully recalled.')
+
+    def test_recall_group_success(self):
+        data = {
+            'type': 'RECALL',
+            'is_group': 1,
+            'uid': self.uid1,
+            'group_name': self.cid2,
+            'id': self.mid2
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully recalled.')
