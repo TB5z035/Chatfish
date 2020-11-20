@@ -236,8 +236,8 @@ class RequireFriendListTest(PostTest):
     
     def setUp(self):
         super().setUp()
-        User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL)
-        self.uid2 = User.objects.get(name = TEST_FRIEND_USER).uid
+        self.uid2 = User.objects.create(name = TEST_FRIEND_USER, pwd = TEST_PWD, email = TEST_EMAIL).uid
+        self.uid3 = User.objects.create(name = TEST_NEW_FRIEND_USER, pwd = TEST_PWD, email = TEST_NEW_EMAIL).uid
         UserMeta.objects.create(uid = self.uid1, meta_name = FRIEND, meta_value = str(self.uid2))
         UserMeta.objects.create(uid = self.uid2, meta_name = FRIEND, meta_value = str(self.uid1))
         self.cid1 = Chat.objects.create(name = PRIVATE_CHAT, ctype = 0).cid
@@ -247,9 +247,13 @@ class RequireFriendListTest(PostTest):
         self.cid2 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
+        ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid3))
         self.mid2 = Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
         self.mid3 = Message.objects.create(uid = self.uid1, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
         OfflineMessage.objects.create(mid = self.mid3, cid = self.cid1, ruid = self.uid2, fuid = self.uid1)
+        self.mid4 = Message.objects.create(uid = self.uid1, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid4, cid = self.cid2, ruid = self.uid2, fuid = self.uid1)
+        OfflineMessage.objects.create(mid = self.mid4, cid = self.cid2, ruid = self.uid3, fuid = self.uid1)
 
     def test_require_friend_list(self):
         data = {
