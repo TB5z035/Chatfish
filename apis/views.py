@@ -226,23 +226,6 @@ def del_offline_request(data):
         }
     return ret
 
-def insert_offline_message(data):
-    try:
-        new_offl_msg = OfflineMessage(ruid = data.get('ruid'), mid = data.get('mid'), cid = data.get('cid'))
-        new_offl_msg.full_clean()
-        new_offl_msg.save()
-        ret = {
-            'state': 200,
-            'uid': data.get('ruid'),
-            'id': new_offl_msg.id
-        }
-    except Exception:
-        ret = {
-            'state': 403,
-            'message': 'Something wrong in offline message insertion.'
-        }
-    return ret
-
 def del_offline_message(data, by = 'cid'):
     try:
         print(data)
@@ -284,11 +267,11 @@ def del_offline_message(data, by = 'cid'):
                         })
                         off_msg.delete()
             
-        elif by == 'uid':
-            cid_list1 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')
-            cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
-            cid = [ cid.get('cid') for cid in cid_list1 if cid in cid_list2 and Chat.objects.get(cid = cid.get('cid')).ctype == 0 ][0]
-            OfflineMessage.objects.filter(ruid = data.get('uid'), cid = cid).delete()
+        # elif by == 'uid':
+        #     cid_list1 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('uid'))).values('cid')
+        #     cid_list2 = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(data.get('fuid'))).values('cid')
+        #     cid = [ cid.get('cid') for cid in cid_list1 if cid in cid_list2 and Chat.objects.get(cid = cid.get('cid')).ctype == 0 ][0]
+        #     OfflineMessage.objects.filter(ruid = data.get('uid'), cid = cid).delete()
         ret = {
             'state': 200,
             'message': 'Successfully delete offline messages.'
@@ -886,7 +869,7 @@ def recall_message(data):
         else :
             cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')
 
-        message = Message.objects.get(mid = data.get('id'))
+        message = Message.objects.get(mid = data.get('id'), cid = cid)
         message.content = ''
         message.save()
 
