@@ -118,20 +118,20 @@ def fetch_friend_offline_msg_id(data):
             mids.append(mid)
     return mids
 
-def fetch_offline_message(data, by = 'cid'):
-    if by == 'cid':
-        offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
-        mids = [ msg['mid'] for msg in offline_messages ]
-        msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
-        ret = [ {
-            'mtype': msg['mtype'],
-            'time': msg['content'],
-            'from' : find_name_by_uid(msg['uid']).get('name'),
-            'content': msg['content']
-        } for msg in msgs ]
-    else :
-        ret = []
-    return ret
+# def fetch_offline_message(data, by = 'cid'):
+#     if by == 'cid':
+#         offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
+#         mids = [ msg['mid'] for msg in offline_messages ]
+#         msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
+#         ret = [ {
+#             'mtype': msg['mtype'],
+#             'time': msg['content'],
+#             'from' : find_name_by_uid(msg['uid']).get('name'),
+#             'content': msg['content']
+#         } for msg in msgs ]
+#     else :
+#         ret = []
+#     return ret
 
 def fetch_chat_type(cid):
     '''
