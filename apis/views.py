@@ -869,7 +869,7 @@ def recall_message(data):
         else :
             cid = find_cid_by_user(ruid = data.get('uid'), username = data.get('friend_name')).get('cid')
 
-        message = Message.objects.get(mid = data.get('id'))
+        message = Message.objects.get(mid = data.get('id'), cid = cid)
         message.content = ''
         message.save()
 
