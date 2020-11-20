@@ -921,6 +921,12 @@ class ChatEnterTest(PostTest):
         self.cid2 = Chat.objects.create(name = GROUP_CHAT, ctype = 1).cid
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid1))
         ChatMeta.objects.create(cid = self.cid2, meta_name = MEMBER, meta_value = str(self.uid2))
+        self.mid1 = Message.objects.create(uid = self.uid2, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid1, cid = self.cid1, ruid = self.uid1, fuid = self.uid2)
+        self.mid2 = Message.objects.create(uid = self.uid2, cid = self.cid2, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid2, cid = self.cid2, ruid = self.uid1, fuid = self.uid2)
+        self.mid3 = Message.objects.create(uid = self.uid2, cid = self.cid1, mtype = 'normal', content = TEST_CONTENT).mid
+        OfflineMessage.objects.create(mid = self.mid3, cid = self.cid1, ruid = self.uid1, fuid = self.uid2)
 
     def test_chat_enter_private_success(self):
         data = {
@@ -928,6 +934,20 @@ class ChatEnterTest(PostTest):
             'is_group': 0,
             'uid': self.uid1,
             'friend_name': TEST_FRIEND_USER
+        }
+        response = self.post_test(self.client, data)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json.get('state'), 200)
+        self.assertEqual(res_json.get('message'), 'Successfully delete offline messages.')
+
+    def test_chat_enter_private_success_with_id(self):
+        data = {
+            'type': 'CHAT_ENTER',
+            'is_group': 0,
+            'uid': self.uid1,
+            'friend_name': TEST_FRIEND_USER,
+            'id': self.mid1
         }
         response = self.post_test(self.client, data)
         self.assertEqual(response.status_code, 200)
