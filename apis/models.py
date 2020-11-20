@@ -133,11 +133,11 @@ def fetch_friend_offline_msg_id(data):
 #         ret = []
 #     return ret
 
-def fetch_chat_type(cid):
-    '''
-    Wait to complete for fetching chat type
-    '''
-    pass
+# def fetch_chat_type(cid):
+#     '''
+#     Wait to complete for fetching chat type
+#     '''
+#     pass
 
 def fetch_group_member_info(data):
     try:
