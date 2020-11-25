@@ -7,6 +7,7 @@ class User(models.Model):
     name = models.CharField(max_length = 12, unique = True)
     pwd = models.CharField(max_length = 50)
     email = models.EmailField(blank = True)
+    nickname = models.CharField(max_length = 12, blank = True)
 
 class UserMeta(models.Model):
     '''
@@ -58,12 +59,18 @@ class OfflineRequest(models.Model):
     id = models.BigAutoField(primary_key = True)
     ruid = models.IntegerField(blank = False, default = 0)
     suid = models.IntegerField(blank = False, default = 0)
-    name = models.CharField(max_length = 20)
+    name = models.CharField(max_length = 25)
     req_type = models.IntegerField(blank = False, default = 0)
 
 class OfflineMessage(models.Model):
     id = models.BigAutoField(primary_key = True)
+    fuid = models.IntegerField(blank = False, default = 0)
     ruid = models.IntegerField(blank = False, default = 0)
+    mid = models.IntegerField(blank = False, default = 0)
+    cid = models.IntegerField(blank = False, default = 0)
+
+class HiddenMessage(models.Model):
+    id = models.BigAutoField(primary_key = True)
     mid = models.IntegerField(blank = False, default = 0)
     cid = models.IntegerField(blank = False, default = 0)
 
@@ -86,46 +93,66 @@ def judge_member(uid, cid):
     except Exception:
         return False
 
-def fetch_offline_message(data, by = 'cid'):
-    if by == 'cid':
-        offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
-        mids = [ msg['mid'] for msg in offline_messages ]
-        msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
-        ret = [ {
-            'mtype': msg['mtype'],
-            'time': msg['content'],
-            'from' : find_name_by_uid(msg['uid']).get('name'),
-            'content': msg['content']
-        } for msg in msgs ]
-    else :
-        ret = []
-    return ret
+def fetch_recall_msg_id(cid):
+    recalled_msgs = HiddenMessage.objects.filter(cid = cid).values('mid')
+    mids = [ msg['mid'] for msg in recalled_msgs ]
+    return mids
 
-def fetch_chat_type(cid):
-    '''
-    Wait to complete for fetching chat type
-    '''
-    pass
+def fetch_offline_msg_id(data):
+    offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
+    mids = [ msg['mid'] for msg in offline_messages ]
+    return mids
+
+def fetch_friend_offline_msg_id(data):
+    member_num = len(fetch_chat_member(data.get('cid')))
+    friend_offline_messages = OfflineMessage.objects.filter(fuid = data.get('uid'), cid = data.get('cid')).values('mid')
+    mids_dic = {}
+    mids = []
+    for msg in friend_offline_messages:
+        if msg['mid'] in mids_dic:
+            mids_dic[msg['mid']] += 1
+        else :
+            mids_dic[msg['mid']] = 1
+    for mid in mids_dic:
+        if mids_dic[mid] == member_num - 1:
+            mids.append(mid)
+    return mids
+
+# def fetch_offline_message(data, by = 'cid'):
+#     if by == 'cid':
+#         offline_messages = OfflineMessage.objects.filter(ruid = data.get('uid'), cid = data.get('cid')).values('mid')
+#         mids = [ msg['mid'] for msg in offline_messages ]
+#         msgs = [ Message.objects.filter(mid = mid).values('mtype', 'uid', 'time', 'content')[0] for mid in mids ]
+#         ret = [ {
+#             'mtype': msg['mtype'],
+#             'time': msg['content'],
+#             'from' : find_name_by_uid(msg['uid']).get('name'),
+#             'content': msg['content']
+#         } for msg in msgs ]
+#     else :
+#         ret = []
+#     return ret
+
+# def fetch_chat_type(cid):
+#     '''
+#     Wait to complete for fetching chat type
+#     '''
+#     pass
 
 def fetch_group_member_info(data):
     try:
-        cid = find_cid_by_name(data.get('group_name')).get('cid')
+        cid = data.get('group_name')
+        Chat.objects.get(cid = cid)
         uid_list = fetch_chat_member(cid)
-        users = [ User.objects.get(uid = uid) for uid in uid_list ]
-        group_member = [{
-            'user': user.name,
-            # 'email': user.email,
-            'email': 'default_email',
-            'nickname': 'default_nickname'
-        } for user in users ]
+        group_member = [ fetch_user_info_by_uid(uid).get('userInfo') for uid in uid_list ]
         print(group_member)
         ret = {
             'state': 200,
             'message': 'Successfully requested.',
-            'group_name': data.get('group_name'),
+            'group_name': cid,
             'group_member': group_member
         }
-    except:
+    except Exception:
         ret = {
             'state': 400,
             'message': 'Fetch failed.'
@@ -138,12 +165,14 @@ def fetch_chat_member(cid):
     return ret
 
 def fetch_chat_message(cid, number = 20, page = -1):
-    msgs = Message.objects.filter(cid = cid).values('mtype', 'uid', 'time', 'content')
+    msgs = Message.objects.filter(cid = cid).values('mid', 'mtype', 'uid', 'time', 'content')
     message_list = [ { 
+        'id': msg['mid'],
         'mtype': msg['mtype'],
         'time': msg['time'],
         'from': find_name_by_uid(msg['uid']).get('name'),
         'content': msg['content'],
+        'userInfo': fetch_user_info_by_uid(msg['uid']).get('userInfo')
     } for msg in msgs ]
     if number == -1 or page == -1 :
         return {
@@ -151,21 +180,22 @@ def fetch_chat_message(cid, number = 20, page = -1):
             'message_list': message_list,
             'bottom': 1
         }
-    elif len(ret) > number * page :
+    elif len(msgs) > number * page :
         return {
             'state': 200,
-            'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ],
+            'message_list': message_list[ -1 * number * page : -1 * number * (page - 1) ] if page > 1 else message_list[ -1 * number * page :],
             'bottom': 0
         }
     else :
         return {
             'state': 200,
-            'message_list': message_list[: -1 * number * (page - 1) ],
+            'message_list': message_list[: -1 * number * (page - 1) ] if page > 1 else message_list,
             'bottom': 1
         }
 
 def fetch_all_message(uid, number = -1):
     try:
+        User.objects.get(uid = uid)
         chats_info = ChatMeta.objects.filter(meta_name = 'member', meta_value = str(uid)).values('cid')
         cid_list = [ chat_info['cid'] for chat_info in chats_info ]
         chats = [ Chat.objects.get(cid = cid) for cid in cid_list ]
@@ -173,12 +203,22 @@ def fetch_all_message(uid, number = -1):
         # user can be multiple if delete [0]
         message_list = [{
             'isGroup': int(chat.ctype),
-            'user': chat.name if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
-            'message_list': fetch_chat_message(cid = chat.cid).get('message_list'),
-            'offline_message_list': fetch_offline_message({
+            'userInfo': {
+                'username': chat.cid,
+                'nickname': chat.name
+            } if chat.ctype else [ fetch_user_info_by_uid(member).get('userInfo') for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'user': chat.cid if chat.ctype else [ User.objects.get(uid = member).name for member in fetch_chat_member(chat.cid) if member != uid ][0],
+            'userMap': fetch_user_map_by_cid(chat.cid) if chat.ctype else None,
+            'message_list': fetch_chat_message(cid = chat.cid, page = 1).get('message_list'),
+            'offline_ids': fetch_offline_msg_id({
                 'uid': uid,
                 'cid': chat.cid
-            })
+            }),
+            'friend_offline_ids': fetch_friend_offline_msg_id({
+                'uid': uid,
+                'cid': chat.cid
+            }),
+            'hidden_ids': fetch_recall_msg_id(cid = chat.cid)
         } for chat in chats ]
         ret = {
             'state': 200,
@@ -196,11 +236,12 @@ def fetch_all_message(uid, number = -1):
 
 def fetch_all_offline_request(uid):
     try:
+        User.objects.get(uid = uid)
         requests = OfflineRequest.objects.filter(ruid = uid)
         request_list = [{
             'isGroup': request.req_type,
             'user': request.name,
-            'friend_name': find_name_by_uid(request.suid).get('name') 
+            'friend_name': User.objects.get(uid = request.suid).nickname + "@" + User.objects.get(uid = request.suid).name
         } for request in requests ]
         ret = {
             'state': 200,
@@ -214,6 +255,35 @@ def fetch_all_offline_request(uid):
         }
     print('fetch all requests.')
     print(ret)
+    return ret
+
+def fetch_user_info_by_uid(uid):
+    try:
+        user = User.objects.get(uid = uid)
+        ret = {
+            'find': 1,
+            'userInfo': {
+                'username': user.name,
+                'nickname': user.nickname if user.nickname != "" else user.name,
+                'email': user.email
+            }
+        }
+    except Exception:
+        ret = {
+            'find': 0
+        }
+    return ret
+
+def fetch_user_map_by_cid(cid):
+    users = ChatMeta.objects.filter(cid = cid, meta_name = 'member').values('meta_value')
+    ret = {}
+    for user in users:
+        uid = int(user['meta_value'])
+        user_info = fetch_user_info_by_uid(uid).get('userInfo')
+        ret[user_info.get('username')] = {
+            'nickname': user_info.get('nickname'),
+            'email': user_info.get('email')
+        }
     return ret
 
 def find_uid_by_name(name):
@@ -249,9 +319,7 @@ def find_cid_by_user(ruid, username = None, uid = None):
                 'find': 0
             }
             return ret
-        elif not uid is None:
-            pass
-        else :
+        elif uid is None :
             uid = find_uid_by_name(username).get('uid')
         cid_list1 = [ chatmeta.cid for chatmeta in ChatMeta.objects.filter(meta_name = 'member', meta_value = str(ruid)) \
                         if Chat.objects.get(cid = chatmeta.cid).ctype == 0 ]
@@ -261,32 +329,6 @@ def find_cid_by_user(ruid, username = None, uid = None):
         ret = {
             'find': 1,
             'cid': cid
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
-
-def find_cid_by_name(name):
-    try:
-        chat = Chat.objects.get(name = name)
-        ret = {
-            'find': 1,
-            'cid': chat.cid
-        }
-    except Exception:
-        ret = {
-            'find': 0
-        }
-    return ret
-
-def find_name_by_cid(cid):
-    try:
-        chat = Chat.objects.get(cid = cid)
-        ret = {
-            'find': 1,
-            'name': chat.name
         }
     except Exception:
         ret = {

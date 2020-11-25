@@ -1,40 +1,40 @@
 const http = require('http')
-const crypto = require('crypto')
-const encoder = new TextEncoder('utf8')
+const jsSHA = require('jssha')
 
 var default_protocol = "http://"
 var default_host = "localhost"
 var default_port = "8000"
 
-exports.get = function get(path, on_data_callback, on_err_callback) {
-    var url = default_protocol + default_host + ':' + default_port + path
-    http.get(url, function(res) {
-        res.setEncoding('utf-8')
-        var body = ""
-        res.on('data', function(data) {
-            body += data
-        })
-        res.on("end", function() {
-            try {
-                on_data_callback(JSON.parse(data))
-            }
-            catch (e) {
-                console.log('error message: ' + e)
-            }
-        })
-        res.resume()
-    }).on('error', function(e) {
-        if (on_err_callback)
-            on_err_callback(e)
-        else
-            throw "error get " + url + ", " + e
+exports.get = function get(path) {
+    return new Promise(function(resolve, reject) {
+        var url = default_protocol + default_host + ':' + default_port + path
+        http.get(url, function(res) {
+            res.setEncoding('utf-8')
+            var body = ""
+            res.on('data', function(data) {
+                body += data
+            })
+            res.on("end", function() {
+                try {
+                    data = JSON.parse(body)
+                    resolve(data)
+                }
+                catch (e) {
+                    console.log('error message: ' + e)
+                    reject(e)
+                }
+            })
+            res.resume()
+        }).on('error', function(e) {
+            reject(e)
+        }).end()
     })
 }
 
 exports.post = function post(path, data, on_data_callback, on_err_callback) {
-    var sha256 = crypto.createHash('sha256')
-    var text = encoder.encode(JSON.stringify(data) + ' post from ChatFish Server')
-    var key = sha256.update(text).digest('hex')
+    const shaObj = new jsSHA("SHA3-512", "TEXT", { encoding: "UTF8" })
+    shaObj.update(JSON.stringify(data) + ' post from ChatFish Server')
+    var key = shaObj.getHash("HEX")
 
     var content = JSON.stringify(data)
     var options = {
@@ -43,9 +43,11 @@ exports.post = function post(path, data, on_data_callback, on_err_callback) {
         path: path,
         method: 'POST',
         headers: {
+            'Cookie': 'csrftoken=' + global.csrf_token,
             'Content-Type': 'application/json;charset=utf8',
             'Content-Length': Buffer.byteLength(content),
-            'Data-Key': key
+            'Data-Key': key,
+            'X-CSRFToken': global.csrf_token
         }
     }
     var post_req = http.request(options, function(res) {
