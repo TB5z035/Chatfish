@@ -223,6 +223,171 @@ describe('chat reducer', () => {
         {
           socket: 'socket',
           focusUser: 'focusUser',
+          messages: { messageList: [
+            {
+              user: 'bob',
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2020-10-21T06:38:03.063Z',
+                  from: 'bob',
+                  content: 'hi'
+                }
+              ],
+              isGroup: 0
+            },
+            {
+              user: 'alice',
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2019-10-21T06:38:03.063Z',
+                  from: 'alice',
+                  content: 'hello'
+                }
+              ],
+              isGroup: 0
+            }
+          ],
+          focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false
+        },
+        {
+          type: types.DELETE_FRIEND,
+          isGroup: 0,
+          friendName: 'alice'
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [
+            {
+              user: 'bob',
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2020-10-21T06:38:03.063Z',
+                  from: 'bob',
+                  content: 'hi'
+                }
+              ],
+              isGroup: 0
+            },
+            {
+              user: 'alice',
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2019-10-21T06:38:03.063Z',
+                  from: 'alice',
+                  content: 'hello'
+                }
+              ],
+              isGroup: 1
+            }
+          ],
+          focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false
+        },
+        {
+          type: types.DELETE_GROUP,
+          isGroup: 1,
+          groupName: 'alice'
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          messages: { messageList: [
+            {
+              user: 'bob',
+              hidden_ids: [],
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2020-10-21T06:38:03.063Z',
+                  from: 'bob',
+                  content: 'hi'
+                }
+              ],
+              isGroup: 0
+            },
+            {
+              user: 'alice',
+              hidden_ids: [],
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2019-10-21T06:38:03.063Z',
+                  from: 'alice',
+                  content: 'hello'
+                }
+              ],
+              isGroup: 0
+            }
+          ],
+          focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false
+        },
+        {
+          type: types.RECALL_MESSAGE,
+          isGroup: 0,
+          friendName: 'alice',
+          id: 50
+        }
+      )
+    ).not.toBeNull()
+
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          messages: { messageList: [
+            {
+              user: 'bob',
+              hidden_ids: [],
+              friend_offline_ids: [],
+              message_list: [
+                {
+                  type: 'normal',
+                  time: '2020-10-21T06:38:03.063Z',
+                  from: 'bob',
+                  content: 'hi'
+                }
+              ],
+              isGroup: 0
+            }
+          ],
+          focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false
+        },
+        {
+          type: types.SET_ALREADY_READ,
+          username: { isGroup: 0,
+            friendName: 'bob' },
+          id: 50
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
           messages: { messageList: [], focusUser: null },
           myName: 'name',
           theme: null,
@@ -355,6 +520,96 @@ describe('chat reducer', () => {
           message: 'hello',
           author: 'bob',
           receiver: 'name'
+        }
+      )
+    ).not.toBeNull()
+  })
+
+  it('should handle addMessage', () => {
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [], focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false,
+          request: []
+        },
+        {
+          type: types.SET_REQUEST_LIST,
+          requests: []
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [], focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false,
+          request: []
+        },
+        {
+          type: types.ADD_REQUEST
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [], focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false,
+          request: [{ user: 'test', isGroup: 1, friend_name: 'super' },
+            { user: 'test2', isGroup: 1, friend_name: 'super2' }]
+        },
+        {
+          type: types.DELETE_REQUEST,
+          isGroup: 1,
+          user: 'test'
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [], focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false,
+          request: [],
+          ossClient: null
+        },
+        {
+          type: types.SET_OSS_CLIENT,
+          client: ''
+        }
+      )
+    ).not.toBeNull()
+    expect(
+      reducer(
+        {
+          socket: 'socket',
+          focusUser: 'focusUser',
+          messages: { messageList: [], focusUser: null },
+          myName: 'name',
+          theme: null,
+          drawerOpen: false,
+          request: [],
+          ossClient: null
+        },
+        {
+          type: types.SET_OSS_CLIENT
         }
       )
     ).not.toBeNull()
