@@ -27,7 +27,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test src --coverage --testResultsProcessor=jest-sonar-reporter --silent --watchAll=false",
     "lint": "eslint src/**/*.js src/**/**/*.js",
     "lint-fix": "eslint --fix src/**/*.js src/**/**/*.js",
