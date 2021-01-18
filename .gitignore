@@ -30,3 +30,4 @@ frontend/.idea
 config/mysql-config-local.json
 
 *.tar.gz
+doc/
